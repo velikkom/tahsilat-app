@@ -17,6 +17,8 @@ import java.security.Key;
 
 import java.util.Date;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -51,13 +53,29 @@ public class JwtService {
             UserDetails userDetails
     ) {
 
+        Map<String, Object> claims =
+                new HashMap<>();
+
+        claims.put(
+                "role",
+                userDetails
+                        .getAuthorities()
+                        .iterator()
+                        .next()
+                        .getAuthority()
+        );
+
         return Jwts.builder()
+
+                .setClaims(claims)
 
                 .setSubject(
                         userDetails.getUsername()
                 )
 
-                .setIssuedAt(new Date())
+                .setIssuedAt(
+                        new Date(System.currentTimeMillis())
+                )
 
                 .setExpiration(
                         new Date(
@@ -73,7 +91,6 @@ public class JwtService {
 
                 .compact();
     }
-
     public boolean isTokenValid(
             String token,
             UserDetails userDetails

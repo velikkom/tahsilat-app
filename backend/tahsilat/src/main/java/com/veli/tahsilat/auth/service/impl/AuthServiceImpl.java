@@ -53,7 +53,7 @@ public class AuthServiceImpl
                         )
                 )
 
-                .role(Role.ROLE_SALESMAN)
+                .role(Role.ROLE_ADMIN)
 
                 .active(true)
 
@@ -61,15 +61,20 @@ public class AuthServiceImpl
 
         userRepository.save(user);
 
-        String jwtToken=
+        String jwtToken =
                 jwtService.generateToken(
+
                         new org.springframework.security.core.userdetails.User(
 
                                 user.getEmail(),
 
                                 user.getPassword(),
 
-                                java.util.List.of()
+                                java.util.List.of(
+                                        new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                                user.getRole().name()
+                                        )
+                                )
                         )
                 );
 
@@ -105,7 +110,11 @@ public class AuthServiceImpl
 
                                 user.getPassword(),
 
-                                java.util.List.of()
+                                java.util.List.of(
+                                        new org.springframework.security.core.authority.SimpleGrantedAuthority(
+                                                user.getRole().name()
+                                        )
+                                )
                         )
                 );
 
