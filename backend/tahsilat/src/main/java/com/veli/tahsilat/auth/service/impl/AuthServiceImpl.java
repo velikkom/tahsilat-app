@@ -19,6 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
+import com.veli.tahsilat.security.jwt.JwtService;
+
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl
@@ -29,6 +33,8 @@ public class AuthServiceImpl
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
+
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -55,12 +61,21 @@ public class AuthServiceImpl
 
         userRepository.save(user);
 
+        String jwtToken=
+                jwtService.generateToken(
+                        new org.springframework.security.core.userdetails.User(
+
+                                user.getEmail(),
+
+                                user.getPassword(),
+
+                                java.util.List.of()
+                        )
+                );
+
         return AuthResponse.builder()
-
-                .accessToken("REGISTER_SUCCESS")
-
+                .accessToken(jwtToken)
                 .tokenType("Bearer")
-
                 .build();
     }
 
@@ -77,12 +92,26 @@ public class AuthServiceImpl
                 )
         );
 
+        User user = userRepository.findByEmail(
+                request.getEmail()
+        ).orElseThrow();
+
+        String jwtToken =
+                jwtService.generateToken(
+
+                        new org.springframework.security.core.userdetails.User(
+
+                                user.getEmail(),
+
+                                user.getPassword(),
+
+                                java.util.List.of()
+                        )
+                );
+
         return AuthResponse.builder()
-
-                .accessToken("LOGIN_SUCCESS")
-
+                .accessToken(jwtToken)
                 .tokenType("Bearer")
-
                 .build();
     }
 }
