@@ -4,27 +4,11 @@ import com.veli.tahsilat.customer.dto.request.CreateCustomerRequest;
 import com.veli.tahsilat.customer.dto.request.UpdateCustomerRequest;
 import com.veli.tahsilat.customer.dto.response.CustomerResponse;
 import com.veli.tahsilat.customer.entity.Customer;
-import org.mapstruct.MappingTarget;
-
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
-
-    @Mapping(target = "id", ignore = true)
-
-    @Mapping(target = "active", constant = "true")
-
-    @Mapping(
-            target = "createdAt",
-            expression = "java(java.time.LocalDateTime.now())"
-    )
-
-    @Mapping(
-            target = "updatedAt",
-            expression = "java(java.time.LocalDateTime.now())"
-    )
 
     Customer toEntity(
             CreateCustomerRequest request
@@ -35,8 +19,9 @@ public interface CustomerMapper {
     );
 
     void updateCustomerFromRequest(
-            UpdateCustomerRequest request,
-            @MappingTarget Customer customer
 
+            UpdateCustomerRequest request,
+
+            @MappingTarget Customer customer
     );
 }

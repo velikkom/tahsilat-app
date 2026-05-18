@@ -1,5 +1,6 @@
 package com.veli.tahsilat.customer.entity;
 
+import com.veli.tahsilat.common.entity.BaseEntity;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -15,11 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Customer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Customer extends BaseEntity {
 
     @Column(nullable = false)
     private String companyName;
@@ -33,9 +30,4 @@ public class Customer {
 
     private String address;
 
-    private Boolean active;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

@@ -112,17 +112,13 @@ public class CustomerServiceImpl
             Pageable pageable
     ) {
 
-        return customerRepository
-
-                .findByCompanyNameContainingIgnoreCaseOrAuthorizedPersonContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrTaxNumberContainingIgnoreCase(
-
-                        keyword,
-                        keyword,
-                        keyword,
-                        keyword,
-                        pageable
+        return customerRepository.findByActiveTrueAndCompanyNameContainingIgnoreCaseOrActiveTrueAndAuthorizedPersonContainingIgnoreCaseOrActiveTrueAndPhoneContainingIgnoreCaseOrActiveTrueAndTaxNumberContainingIgnoreCase(
+                keyword,
+                keyword,
+                keyword,
+                keyword,
+                pageable
                 )
-
                 .map(customerMapper::toResponse);
     }
 

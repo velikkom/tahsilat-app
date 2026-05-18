@@ -20,17 +20,13 @@ public interface CustomerRepository
     boolean existsByTaxNumber(String taxNumber);
 
     Page<Customer>
-
-    findByCompanyNameContainingIgnoreCaseOrAuthorizedPersonContainingIgnoreCaseOrPhoneContainingIgnoreCaseOrTaxNumberContainingIgnoreCase(
-
+    findByActiveTrueAndCompanyNameContainingIgnoreCaseOrActiveTrueAndAuthorizedPersonContainingIgnoreCaseOrActiveTrueAndPhoneContainingIgnoreCaseOrActiveTrueAndTaxNumberContainingIgnoreCase(
             String companyName,
-
             String authorizedPerson,
-
             String phone,
-
             String taxNumber,
-
             Pageable pageable
     );
+
+
 }

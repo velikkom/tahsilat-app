@@ -1,26 +1,18 @@
 package com.veli.tahsilat.customer.controller;
 
 import com.veli.tahsilat.customer.dto.request.CreateCustomerRequest;
-
 import com.veli.tahsilat.customer.dto.request.UpdateCustomerRequest;
 import com.veli.tahsilat.customer.dto.response.CustomerResponse;
-
 import com.veli.tahsilat.customer.service.CustomerService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.UUID;
 
 @RestController
@@ -147,13 +139,10 @@ public class CustomerController {
             summary = "Search customers",
             description = "Search customers by keyword"
     )
-
     @GetMapping("/search")
-
     @PreAuthorize(
             "hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')"
     )
-
     public ResponseEntity<Page<CustomerResponse>>
     searchCustomers(
 
