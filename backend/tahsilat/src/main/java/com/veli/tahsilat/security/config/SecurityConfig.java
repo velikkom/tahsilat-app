@@ -53,6 +53,7 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
+                .cors(cors -> {})
 
                 .csrf(AbstractHttpConfigurer::disable)
 
