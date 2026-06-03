@@ -15,6 +15,44 @@ const SUMMARY_FIELDS = [
   { key: "invalidRows", label: "Hatalı Satır" },
 ];
 
+function formatConflictDetails(issue) {
+  if (!issue.conflictCustomerId && !issue.conflictAmount) {
+    return "-";
+  }
+
+  const parts = [];
+
+  if (issue.conflictSource) {
+    parts.push(`Kaynak: ${issue.conflictSource}`);
+  }
+
+  if (issue.conflictRowNumber) {
+    parts.push(`Satır: ${issue.conflictRowNumber}`);
+  }
+
+  if (issue.conflictCustomerId) {
+    parts.push(`customerId=${issue.conflictCustomerId}`);
+  }
+
+  if (issue.conflictAmount != null) {
+    parts.push(`amount=${issue.conflictAmount}`);
+  }
+
+  if (issue.conflictCollectionDate) {
+    parts.push(`collectionDate=${issue.conflictCollectionDate}`);
+  }
+
+  if (issue.conflictPaymentType) {
+    parts.push(`paymentType=${issue.conflictPaymentType}`);
+  }
+
+  if (issue.conflictMaturityDate) {
+    parts.push(`maturityDate=${issue.conflictMaturityDate}`);
+  }
+
+  return parts.join(" | ");
+}
+
 export default function ImportCollectionsModal({
   show,
   onClose,
@@ -183,16 +221,30 @@ export default function ImportCollectionsModal({
                           <th>Satır</th>
                           <th>Müşteri</th>
                           <th>Tip</th>
+                          <th>Normalize Ad</th>
+                          <th>Eşleşen Müşteri</th>
                           <th>Mesaj</th>
+                          <th>Çakışma Detayı</th>
                         </tr>
                       </thead>
                       <tbody>
                         {activeResult.issues.map((issue) => (
-                          <tr key={`${issue.rowNumber}-${issue.issueType}-${issue.message}`}>
+                          <tr
+                            key={`${issue.rowNumber}-${issue.issueType}-${issue.message}-${issue.conflictRowNumber || ""}`}
+                          >
                             <td>{issue.rowNumber}</td>
                             <td>{issue.customerName || "-"}</td>
                             <td>{issue.issueType}</td>
+                            <td>{issue.normalizedCustomerName || "-"}</td>
+                            <td>
+                              {issue.matchedCustomerName
+                                ? `${issue.matchedCustomerName}${issue.matchedCustomerId ? ` (${issue.matchedCustomerId})` : ""}`
+                                : "-"}
+                            </td>
                             <td>{issue.message}</td>
+                            <td className="small">
+                              {formatConflictDetails(issue)}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

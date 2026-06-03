@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -20,24 +21,46 @@ public class CollectionDuplicateKey {
 
     private PaymentType paymentType;
 
+    private LocalDate maturityDate;
+
     public static CollectionDuplicateKey of(
             UUID customerId,
             BigDecimal amount,
             LocalDate collectionDate,
-            PaymentType paymentType
+            PaymentType paymentType,
+            LocalDate maturityDate
     ) {
         return CollectionDuplicateKey.builder()
                 .customerId(customerId)
                 .amount(normalizeAmount(amount))
                 .collectionDate(collectionDate)
                 .paymentType(paymentType)
+                .maturityDate(resolveMaturityDateForKey(paymentType, maturityDate))
                 .build();
+    }
+
+    public boolean requiresMaturityDateInKey() {
+        return paymentType == PaymentType.CHECK
+                || paymentType == PaymentType.PROMISSORY_NOTE;
+    }
+
+    private static LocalDate resolveMaturityDateForKey(
+            PaymentType paymentType,
+            LocalDate maturityDate
+    ) {
+        if (paymentType == PaymentType.CHECK
+                || paymentType == PaymentType.PROMISSORY_NOTE) {
+            return maturityDate;
+        }
+
+        return null;
     }
 
     private static BigDecimal normalizeAmount(BigDecimal amount) {
         return amount == null
                 ? BigDecimal.ZERO
-                : amount.stripTrailingZeros();
+                : amount.setScale(2, java.math.RoundingMode.HALF_UP)
+                        .stripTrailingZeros();
     }
 
     @Override
@@ -50,19 +73,21 @@ public class CollectionDuplicateKey {
             return false;
         }
 
-        return customerId.equals(that.customerId)
-                && amount.compareTo(that.amount) == 0
-                && collectionDate.equals(that.collectionDate)
-                && paymentType == that.paymentType;
+        return Objects.equals(customerId, that.customerId)
+                && normalizeAmount(amount).compareTo(normalizeAmount(that.amount)) == 0
+                && Objects.equals(collectionDate, that.collectionDate)
+                && paymentType == that.paymentType
+                && Objects.equals(maturityDate, that.maturityDate);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(
+        return Objects.hash(
                 customerId,
-                amount.stripTrailingZeros(),
+                normalizeAmount(amount),
                 collectionDate,
-                paymentType
+                paymentType,
+                maturityDate
         );
     }
 }

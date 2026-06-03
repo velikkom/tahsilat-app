@@ -110,26 +110,10 @@ public interface CollectionRepository
     List<Object[]> sumAmountGroupByMonthForYear(@Param("year") int year);
 
     @Query("""
-            SELECT c.customer.id, c.amount, c.collectionDate, c.paymentType
+            SELECT c.customer.id, c.amount, c.collectionDate, c.paymentType, c.maturityDate
             FROM Collection c
             WHERE c.active = true
             """)
     List<Object[]> findActiveCollectionDuplicateKeys();
-
-    @Query("""
-            SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END
-            FROM Collection c
-            WHERE c.active = true
-            AND c.customer.id = :customerId
-            AND c.amount = :amount
-            AND c.collectionDate = :collectionDate
-            AND c.paymentType = :paymentType
-            """)
-    boolean existsActiveDuplicate(
-            @Param("customerId") UUID customerId,
-            @Param("amount") BigDecimal amount,
-            @Param("collectionDate") LocalDate collectionDate,
-            @Param("paymentType") PaymentType paymentType
-    );
 
 }
