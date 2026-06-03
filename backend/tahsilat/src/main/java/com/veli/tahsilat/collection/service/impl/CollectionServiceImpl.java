@@ -102,6 +102,15 @@ public class CollectionServiceImpl
     }
 
     @Override
+    public void deleteCollection(UUID id) {
+        Collection collection = findActiveCollection(id);
+
+        collection.setActive(false);
+
+        collectionRepository.save(collection);
+    }
+
+    @Override
     public Page<CollectionResponse> getAllCollections(Pageable pageable) {
         return collectionRepository.findByActiveTrue(pageable)
                 .map(collectionMapper::toResponse);

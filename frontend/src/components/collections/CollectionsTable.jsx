@@ -23,7 +23,9 @@ export default function CollectionsTable({
   collections = [],
   loading = false,
   onEdit,
+  onDelete,
   actionsDisabled = false,
+  deletingId = null,
 }) {
   const {
     filters,
@@ -50,10 +52,12 @@ export default function CollectionsTable({
       <CollectionActions
         row={rowData}
         onEdit={onEdit}
+        onDelete={onDelete}
         disabled={actionsDisabled}
+        deletingId={deletingId}
       />
     ),
-    [onEdit, actionsDisabled]
+    [onEdit, onDelete, actionsDisabled, deletingId]
   );
 
   function paymentTypeFilterTemplate(options) {

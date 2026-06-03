@@ -87,4 +87,16 @@ public class CollectionController {
 
         return ResponseEntity.ok(collectionService.updateCollection(id, request));
     }
+
+    @Operation(
+            summary = "Delete collection by id"
+    )
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<Void> deleteCollection(@PathVariable UUID id) {
+
+        collectionService.deleteCollection(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

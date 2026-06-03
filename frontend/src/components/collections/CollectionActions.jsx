@@ -2,7 +2,15 @@
 
 import { Button } from "primereact/button";
 
-export default function CollectionActions({ row, onEdit, disabled = false }) {
+export default function CollectionActions({
+  row,
+  onEdit,
+  onDelete,
+  disabled = false,
+  deletingId = null,
+}) {
+  const isDeleting = deletingId === row?.id;
+
   return (
     <div className="d-flex gap-2">
       <Button
@@ -10,7 +18,7 @@ export default function CollectionActions({ row, onEdit, disabled = false }) {
         severity="info"
         rounded
         outlined
-        disabled={disabled}
+        disabled={disabled || isDeleting}
       />
 
       <Button
@@ -18,7 +26,7 @@ export default function CollectionActions({ row, onEdit, disabled = false }) {
         severity="warning"
         rounded
         outlined
-        disabled={disabled}
+        disabled={disabled || isDeleting}
         onClick={() => onEdit?.(row)}
         aria-label="Tahsilat düzenle"
       />
@@ -28,7 +36,10 @@ export default function CollectionActions({ row, onEdit, disabled = false }) {
         severity="danger"
         rounded
         outlined
-        disabled={disabled}
+        disabled={disabled || isDeleting}
+        loading={isDeleting}
+        onClick={() => onDelete?.(row)}
+        aria-label="Tahsilat sil"
       />
     </div>
   );

@@ -99,7 +99,9 @@ export async function deleteCollection(id) {
   });
 
   if (!response.ok) {
-    throw new Error("Collection delete failed");
+    throw new Error(
+      await parseErrorResponse(response, "Collection delete failed")
+    );
   }
 
   return true;

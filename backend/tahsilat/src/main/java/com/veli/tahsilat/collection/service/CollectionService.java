@@ -21,6 +21,8 @@ public interface CollectionService {
             UpdateCollectionRequest request
     );
 
+    void deleteCollection(UUID id);
+
     Page<CollectionResponse>getAllCollections(Pageable pageable);
 
     Page<CollectionResponse>getCollectionsByCustomerId(

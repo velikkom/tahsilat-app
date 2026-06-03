@@ -9,6 +9,7 @@ import NewCollectionModal from "@/components/collections/NewCollectionModal";
 import Swal from "sweetalert2";
 import {
   createCollection,
+  deleteCollection,
   updateCollection,
 } from "@/services/collectionService";
 import { getCustomers } from "@/services/customerService";
@@ -22,7 +23,12 @@ export default function CollectionsPage() {
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const submittingRef = useRef(false);
+  const deletingRef = useRef(false);
+
+  const isBusy = isSubmitting || isDeleting;
 
   useEffect(() => {
     loadCustomers();
@@ -50,7 +56,7 @@ export default function CollectionsPage() {
 
   const executeSubmission = useCallback(
     async (action, successText) => {
-      if (submittingRef.current) {
+      if (submittingRef.current || deletingRef.current) {
         return;
       }
 
@@ -108,6 +114,67 @@ export default function CollectionsPage() {
     [modalMode, editingCollection, executeSubmission]
   );
 
+  const handleDeleteCollection = useCallback(
+    async (collection) => {
+      if (!collection?.id || isBusy || deletingRef.current) {
+        return;
+      }
+
+      const confirmation = await Swal.fire({
+        title: "Emin misiniz?",
+        text: "Bu tahsilatı silmek istediğinize emin misiniz?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Evet, sil",
+        cancelButtonText: "İptal",
+        reverseButtons: true,
+        focusCancel: true,
+      });
+
+      if (!confirmation.isConfirmed) {
+        return;
+      }
+
+      if (deletingRef.current) {
+        return;
+      }
+
+      deletingRef.current = true;
+      setIsDeleting(true);
+      setDeletingId(collection.id);
+
+      try {
+        await deleteCollection(collection.id);
+
+        await Swal.fire({
+          icon: "success",
+          title: "Başarılı",
+          text: "Tahsilat başarıyla silindi.",
+          confirmButtonText: "Tamam",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+
+        await refresh();
+      } catch (error) {
+        console.error(error);
+
+        await Swal.fire({
+          icon: "error",
+          title: "Hata",
+          text:
+            error.message ||
+            "Tahsilat silinirken hata oluştu.",
+        });
+      } finally {
+        deletingRef.current = false;
+        setIsDeleting(false);
+        setDeletingId(null);
+      }
+    },
+    [isBusy, refresh]
+  );
+
   const handleCloseModal = () => {
     if (isSubmitting) {
       return;
@@ -117,7 +184,7 @@ export default function CollectionsPage() {
   };
 
   const handleOpenCreateModal = () => {
-    if (isSubmitting) {
+    if (isBusy) {
       return;
     }
 
@@ -128,7 +195,7 @@ export default function CollectionsPage() {
 
   const handleEditCollection = useCallback(
     (collection) => {
-      if (isSubmitting) {
+      if (isBusy) {
         return;
       }
 
@@ -136,13 +203,13 @@ export default function CollectionsPage() {
       setEditingCollection(collection);
       setShowModal(true);
     },
-    [isSubmitting]
+    [isBusy]
   );
 
   return (
     <>
       <div className="d-flex justify-content-end mb-3">
-        <Button onClick={handleOpenCreateModal} disabled={isSubmitting}>
+        <Button onClick={handleOpenCreateModal} disabled={isBusy}>
           Yeni Tahsilat
         </Button>
       </div>
@@ -153,7 +220,9 @@ export default function CollectionsPage() {
         collections={collections}
         loading={loading}
         onEdit={handleEditCollection}
-        actionsDisabled={isSubmitting}
+        onDelete={handleDeleteCollection}
+        actionsDisabled={isBusy}
+        deletingId={deletingId}
       />
 
       <NewCollectionModal
