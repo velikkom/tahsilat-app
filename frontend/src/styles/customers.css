@@ -1,0 +1,141 @@
+/* CUSTOMERS PAGE */
+
+.customers-page-title {
+
+    font-weight: 700;
+}
+
+.customers-search-input {
+
+    height: 72px !important;
+
+    font-size: 22px !important;
+
+    padding-left: 60px !important;
+
+    border-radius: 16px !important;
+}
+
+.customers-search-icon {
+
+    font-size: 22px !important;
+
+    margin-left: 18px;
+}
+
+/* CUSTOMER DETAIL TABS */
+
+.customer-tabs
+.p-tabview-nav {
+
+    border: none !important;
+
+    background: transparent !important;
+
+    gap: 0.75rem;
+
+    margin-bottom: 2rem;
+}
+
+.customer-tabs
+.p-tabview-nav li {
+
+    margin-right: 0 !important;
+}
+
+.customer-tabs
+.p-tabview-nav li .p-tabview-nav-link {
+
+    border: none !important;
+
+    background: #f3f4f6 !important;
+
+    border-radius: 14px !important;
+
+    padding:
+        0.9rem
+        1.4rem !important;
+
+    font-weight: 600;
+
+    color: #4b5563 !important;
+
+    transition: all 0.2s ease;
+
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.04);
+}
+
+/* HOVER */
+
+.customer-tabs
+.p-tabview-nav li .p-tabview-nav-link:hover {
+
+    background: #e5e7eb !important;
+
+    color: #111827 !important;
+}
+
+/* ACTIVE TAB */
+
+.customer-tabs
+.p-tabview-nav li.p-highlight .p-tabview-nav-link {
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        ) !important;
+
+    color: white !important;
+
+    box-shadow:
+        0 8px 24px rgba(37,99,235,0.25);
+}
+
+/* TAB CONTENT */
+
+.customer-tabs
+.p-tabview-panels {
+
+    padding: 0 !important;
+
+    background: transparent !important;
+
+    border: none !important;
+}
+
+/* DARK MODE */
+
+body.dark-mode
+.customer-tabs
+.p-tabview-nav li .p-tabview-nav-link {
+
+    background: #1f2937 !important;
+
+    color: #d1d5db !important;
+}
+
+body.dark-mode
+.customer-tabs
+.p-tabview-nav li .p-tabview-nav-link:hover {
+
+    background: #374151 !important;
+
+    color: white !important;
+}
+
+body.dark-mode
+.customer-tabs
+.p-tabview-nav li.p-highlight .p-tabview-nav-link {
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        ) !important;
+
+    color: white !important;
+}

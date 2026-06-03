@@ -1,0 +1,105 @@
+/* DATATABLE CELLS */
+
+.p-datatable .p-datatable-tbody > tr > td {
+
+    padding: 1rem 1rem !important;
+
+    font-size: 15px;
+
+    transition: all 0.2s ease;
+}
+
+/* DATATABLE HEADER */
+
+.p-datatable .p-datatable-thead > tr > th {
+
+    padding: 1rem 1rem !important;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+/* ROW HOVER */
+
+.p-datatable .p-datatable-tbody > tr:hover {
+
+    background-color: #f3f4f6 !important;
+
+    cursor: pointer;
+}
+
+/* FILTER INPUTS */
+
+.p-column-filter,
+.p-inputtext,
+.p-dropdown,
+.p-calendar,
+.p-inputnumber {
+
+    width: 100% !important;
+
+    min-height: 46px;
+
+    font-size: 15px !important;
+}
+
+/* FILTER POPUP */
+
+.p-column-filter-overlay {
+
+    min-width: 280px !important;
+
+    border-radius: 14px !important;
+}
+
+/* FILTER BUTTONS */
+
+.p-column-filter-buttonbar {
+
+    padding-top: 1rem;
+}
+
+/* FILTER LABELS */
+
+.p-column-filter-constraint,
+.p-dropdown-label,
+.p-inputtext {
+
+    font-size: 15px !important;
+}
+
+/* SEARCH BAR */
+
+.p-input-icon-left
+.p-inputtext {
+
+    padding-left: 3rem !important;
+}
+
+/* TAGS */
+
+.p-tag {
+
+    font-size: 13px !important;
+
+    padding:
+        0.45rem
+        0.7rem;
+}
+
+/* PAGINATOR */
+
+.p-paginator {
+
+    padding-top: 1rem;
+}
+
+/* TABLE HEADER */
+
+.p-datatable-header {
+
+    background: transparent !important;
+
+    border: none !important;
+}

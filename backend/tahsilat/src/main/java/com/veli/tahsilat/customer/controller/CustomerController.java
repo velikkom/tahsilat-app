@@ -53,9 +53,7 @@ public class CustomerController {
             description = "Get all customers"
     )
     @GetMapping
-    @PreAuthorize(
-            "hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')"
-    )
+   // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')" )
     public ResponseEntity<Page<CustomerResponse>> getAllCustomers(Pageable pageable)
     {
         return ResponseEntity.ok(
@@ -123,9 +121,7 @@ public class CustomerController {
             "hasAuthority('ROLE_ADMIN')"
     )
 
-    public ResponseEntity<Void>
-    deleteCustomer(
-
+    public ResponseEntity<Void> deleteCustomer(
             @PathVariable UUID id
     ) {
 
@@ -143,11 +139,8 @@ public class CustomerController {
     @PreAuthorize(
             "hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')"
     )
-    public ResponseEntity<Page<CustomerResponse>>
-    searchCustomers(
-
+    public ResponseEntity<Page<CustomerResponse>> searchCustomers(
             @RequestParam String keyword,
-
             Pageable pageable
     ) {
 

@@ -2,22 +2,15 @@ package com.veli.tahsilat.collection.controller;
 
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
-
 import com.veli.tahsilat.collection.service.CollectionService;
-
 import io.swagger.v3.oas.annotations.Operation;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -36,21 +29,10 @@ public class CollectionController {
     @PreAuthorize(
             "hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')"
     )
-    public ResponseEntity<CollectionResponse>
-    createCollection(
+    public ResponseEntity<CollectionResponse> createCollection(@Valid @RequestBody CreateCollectionRequest request) {
 
-            @Valid
-            @RequestBody
-            CreateCollectionRequest request
-    ) {
-
-        return ResponseEntity.status(
-                HttpStatus.CREATED
-        ).body(
-                collectionService.createCollection(
-                        request
-                )
-        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                collectionService.createCollection(request));
     }
 
     @Operation(
@@ -58,7 +40,7 @@ public class CollectionController {
     )
     @GetMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
-    public ResponseEntity<Page<CollectionResponse>> getAllCollections(Pageable pageable){
+    public ResponseEntity<Page<CollectionResponse>> getAllCollections(Pageable pageable) {
 
         return ResponseEntity.ok(collectionService.getAllCollections(pageable));
     }

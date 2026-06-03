@@ -2,26 +2,17 @@ package com.veli.tahsilat.collection.service.impl;
 
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
-
 import com.veli.tahsilat.collection.entity.Collection;
-
 import com.veli.tahsilat.collection.enums.CollectionStatus;
 import com.veli.tahsilat.collection.enums.PaymentType;
-
 import com.veli.tahsilat.collection.mapper.CollectionMapper;
-
 import com.veli.tahsilat.collection.repository.CollectionRepository;
-
 import com.veli.tahsilat.collection.service.CollectionService;
-
 import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
-
 import com.veli.tahsilat.customer.entity.Customer;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,11 +38,9 @@ public class CollectionServiceImpl
 
         Customer customer =
                 customerRepository
-
                         .findByIdAndActiveTrue(
                                 request.getCustomerId()
                         )
-
                         .orElseThrow(
                                 () ->
                                         new ResourceNotFoundException(
@@ -60,11 +49,8 @@ public class CollectionServiceImpl
                         );
 
         boolean requiresMaturityDate =
-
                 request.getPaymentType() == PaymentType.CHECK
-
                         ||
-
                         request.getPaymentType() == PaymentType.PROMISSORY_NOTE;
 
         if (
@@ -89,8 +75,7 @@ public class CollectionServiceImpl
             );
         }
 
-        Collection collection =
-                new Collection();
+        Collection collection = new Collection();
 
         collection.setCustomer(customer);
 
