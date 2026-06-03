@@ -6,6 +6,7 @@ import { Button } from "react-bootstrap";
 import CollectionHeader from "@/components/collections/CollectionHeader";
 import CollectionsTable from "@/components/collections/CollectionsTable";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
+import ImportCollectionsModal from "@/components/collections/ImportCollectionsModal";
 import Swal from "sweetalert2";
 import {
   createCollection,
@@ -18,6 +19,7 @@ import useCollections from "@/hooks/useCollections";
 export default function CollectionsPage() {
   const { collections, loading, refresh } = useCollections();
   const [showModal, setShowModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [editingCollection, setEditingCollection] = useState(null);
   const [customers, setCustomers] = useState([]);
@@ -206,9 +208,28 @@ export default function CollectionsPage() {
     [isBusy]
   );
 
+  const handleOpenImportModal = () => {
+    if (isBusy) {
+      return;
+    }
+
+    setShowImportModal(true);
+  };
+
+  const handleImportCompleted = useCallback(async () => {
+    await refresh();
+  }, [refresh]);
+
   return (
     <>
-      <div className="d-flex justify-content-end mb-3">
+      <div className="d-flex justify-content-end gap-2 mb-3">
+        <Button
+          variant="outline-secondary"
+          onClick={handleOpenImportModal}
+          disabled={isBusy}
+        >
+          Excel Import
+        </Button>
         <Button onClick={handleOpenCreateModal} disabled={isBusy}>
           Yeni Tahsilat
         </Button>
@@ -234,6 +255,12 @@ export default function CollectionsPage() {
         loadingCustomers={loadingCustomers}
         mode={modalMode}
         initialCollection={editingCollection}
+      />
+
+      <ImportCollectionsModal
+        show={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImported={handleImportCompleted}
       />
     </>
   );

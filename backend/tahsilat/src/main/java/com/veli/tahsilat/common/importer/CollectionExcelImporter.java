@@ -14,7 +14,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.springframework.boot.CommandLineRunner;
-
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
 
 import org.springframework.stereotype.Component;
@@ -32,6 +32,11 @@ import java.util.Optional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        prefix = "app.collection-import",
+        name = "startup-enabled",
+        havingValue = "true"
+)
 public class CollectionExcelImporter
         implements CommandLineRunner {
 
