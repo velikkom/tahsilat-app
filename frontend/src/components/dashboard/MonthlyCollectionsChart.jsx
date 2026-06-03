@@ -1,0 +1,77 @@
+"use client";
+
+import { useMemo } from "react";
+import { Chart } from "primereact/chart";
+import { useMonthlyCollections } from "@/hooks/useDashboardMetrics";
+import DashboardWidget from "./DashboardWidget";
+
+export default function MonthlyCollectionsChart() {
+  const currentYear = new Date().getFullYear();
+  const { data, loading, error, refresh } = useMonthlyCollections(currentYear);
+
+  const chartData = useMemo(() => {
+    const months = data?.months || [];
+
+    return {
+      labels: months.map((item) => item.monthName),
+      datasets: [
+        {
+          label: "Tahsilat",
+          data: months.map((item) => Number(item.totalAmount ?? 0)),
+          backgroundColor: "rgba(13, 110, 253, 0.7)",
+          borderColor: "rgb(13, 110, 253)",
+          borderWidth: 1,
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [data]);
+
+  const chartOptions = useMemo(
+    () => ({
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label(context) {
+              return new Intl.NumberFormat("tr-TR", {
+                style: "currency",
+                currency: "TRY",
+              }).format(context.raw ?? 0);
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback(value) {
+              return new Intl.NumberFormat("tr-TR", {
+                notation: "compact",
+                compactDisplay: "short",
+              }).format(value);
+            },
+          },
+        },
+      },
+    }),
+    []
+  );
+
+  return (
+    <DashboardWidget
+      title={`Aylık Tahsilat (${data?.year || currentYear})`}
+      loading={loading}
+      error={error}
+      onRetry={refresh}
+    >
+      <div className="dashboard-chart">
+        <Chart type="bar" data={chartData} options={chartOptions} />
+      </div>
+    </DashboardWidget>
+  );
+}

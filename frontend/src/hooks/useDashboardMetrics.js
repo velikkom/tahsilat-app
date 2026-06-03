@@ -1,0 +1,70 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  getDashboardMetrics,
+  getMonthlyCollections,
+  getPaymentTypeDistribution,
+  getRecentCollections,
+  getTopCustomers,
+} from "@/services/dashboardService";
+
+function useDashboardQuery(fetcher, deps = []) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const requestIdRef = useRef(0);
+
+  const refresh = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await fetcher();
+
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
+      setData(result);
+    } catch (err) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
+      setError(err.message || "Veri yüklenirken hata oluştu.");
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
+    }
+  }, deps);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { data, loading, error, refresh };
+}
+
+export function useDashboardMetrics() {
+  return useDashboardQuery(() => getDashboardMetrics(), []);
+}
+
+export function useMonthlyCollections(year) {
+  return useDashboardQuery(() => getMonthlyCollections(year), [year]);
+}
+
+export function usePaymentTypeDistribution() {
+  return useDashboardQuery(() => getPaymentTypeDistribution(), []);
+}
+
+export function useTopCustomers(limit = 10) {
+  return useDashboardQuery(() => getTopCustomers(limit), [limit]);
+}
+
+export function useRecentCollections(limit = 10) {
+  return useDashboardQuery(() => getRecentCollections(limit), [limit]);
+}

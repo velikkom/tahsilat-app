@@ -15,6 +15,8 @@ public interface CustomerRepository
 
     Page<Customer> findByActiveTrue(Pageable pageable);
 
+    long countByActiveTrue();
+
     Optional<Customer> findByIdAndActiveTrue(UUID id);
 
     boolean existsByTaxNumber(String taxNumber);
