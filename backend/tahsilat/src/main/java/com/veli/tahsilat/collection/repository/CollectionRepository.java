@@ -10,10 +10,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CollectionRepository
         extends JpaRepository<Collection, UUID> {
+
+    Optional<Collection> findByIdAndActiveTrue(UUID id);
 
     Page<Collection> findByActiveTrue(Pageable pageable);
 

@@ -20,6 +20,15 @@ const createInitialForm = () => ({
   description: "",
 });
 
+const mapCollectionToForm = (collection) => ({
+  customerId: collection?.customerId || "",
+  amount: collection?.amount != null ? String(collection.amount) : "",
+  paymentType: collection?.paymentType || "CASH",
+  collectionDate: collection?.collectionDate || "",
+  maturityDate: collection?.maturityDate || "",
+  description: collection?.description || "",
+});
+
 export default function NewCollectionModal({
   show,
   onClose,
@@ -27,18 +36,25 @@ export default function NewCollectionModal({
   customers = [],
   submitting = false,
   loadingCustomers = false,
+  mode = "create",
+  initialCollection = null,
 }) {
   const [validated, setValidated] = useState(false);
   const [form, setForm] = useState(createInitialForm());
   const submitLockRef = useRef(false);
+  const isEditMode = mode === "edit";
 
   useEffect(() => {
     if (show) {
       setValidated(false);
-      setForm(createInitialForm());
       submitLockRef.current = false;
+      setForm(
+        isEditMode && initialCollection
+          ? mapCollectionToForm(initialCollection)
+          : createInitialForm()
+      );
     }
-  }, [show]);
+  }, [show, isEditMode, initialCollection?.id]);
 
   useEffect(() => {
     if (!submitting) {
@@ -117,6 +133,7 @@ export default function NewCollectionModal({
   };
 
   const isFormDisabled = submitting || loadingCustomers;
+  const modalTitle = isEditMode ? "Tahsilat Düzenle" : "Yeni Tahsilat";
 
   return (
     <Modal
@@ -129,7 +146,7 @@ export default function NewCollectionModal({
     >
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Modal.Header closeButton={!submitting}>
-          <Modal.Title>Yeni Tahsilat</Modal.Title>
+          <Modal.Title>{modalTitle}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -226,6 +243,12 @@ export default function NewCollectionModal({
                   disabled={!requiresMaturityDate || isFormDisabled}
                   required={requiresMaturityDate}
                 />
+
+                {requiresMaturityDate && validated && !form.maturityDate && (
+                  <div className="invalid-feedback d-block">
+                    Vade tarihi zorunludur.
+                  </div>
+                )}
               </Form.Group>
             </Col>
 

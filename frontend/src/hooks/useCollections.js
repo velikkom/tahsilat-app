@@ -1,42 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getCollections }
-from "@/services/collectionService";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getCollections } from "@/services/collectionService";
 
 export default function useCollections() {
-    const [
-        collections,
-        setCollections
-    ] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const requestIdRef = useRef(0);
 
-    const [loading, setLoading] = useState(false);
+  const fetchCollections = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
 
-    useEffect(() => {
-        fetchCollections();
-    }, []);
+    try {
+      setLoading(true);
 
-    async function fetchCollections() {
-        try {
-            setLoading(true);
-            const data =
-                await getCollections({
-                    size: 500
-                });
+      const data = await getCollections({
+        size: 500,
+      });
 
-            setCollections(data.content);
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
 
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
+      setCollections(data.content || []);
+    } catch (error) {
+      if (requestId === requestIdRef.current) {
+        console.error(error);
+      }
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
+  }, []);
 
-    return {
-        collections,
-        loading,
-        refresh:
-            fetchCollections
-    };
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
+
+  return {
+    collections,
+    loading,
+    refresh: fetchCollections,
+  };
 }

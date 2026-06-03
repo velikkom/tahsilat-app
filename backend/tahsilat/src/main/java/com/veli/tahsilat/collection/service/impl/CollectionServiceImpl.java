@@ -1,6 +1,7 @@
 package com.veli.tahsilat.collection.service.impl;
 
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
+import com.veli.tahsilat.collection.dto.request.UpdateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
 import com.veli.tahsilat.collection.entity.Collection;
 import com.veli.tahsilat.collection.enums.CollectionStatus;
@@ -36,66 +37,22 @@ public class CollectionServiceImpl
             CreateCollectionRequest request
     ) {
 
-        Customer customer =
-                customerRepository
-                        .findByIdAndActiveTrue(
-                                request.getCustomerId()
-                        )
-                        .orElseThrow(
-                                () ->
-                                        new ResourceNotFoundException(
-                                                "Customer not found"
-                                        )
-                        );
+        Customer customer = findActiveCustomer(request.getCustomerId());
 
-        boolean requiresMaturityDate =
-                request.getPaymentType() == PaymentType.CHECK
-                        ||
-                        request.getPaymentType() == PaymentType.PROMISSORY_NOTE;
-
-        if (
-                requiresMaturityDate
-                        &&
-                        request.getMaturityDate() == null
-        ) {
-
-            throw new BusinessException(
-                    "Maturity date is required"
-            );
-        }
-
-        if (
-                !requiresMaturityDate
-                        &&
-                        request.getMaturityDate() != null
-        ) {
-
-            throw new BusinessException(
-                    "Maturity date is not allowed"
-            );
-        }
-
-        Collection collection = new Collection();
-
-        collection.setCustomer(customer);
-
-        collection.setAmount(
-                request.getAmount()
-        );
-
-        collection.setCollectionDate(
-                request.getCollectionDate()
-        );
-
-        collection.setMaturityDate(
+        validateMaturityDate(
+                request.getPaymentType(),
                 request.getMaturityDate()
         );
 
-        collection.setPaymentType(
-                request.getPaymentType()
-        );
+        Collection collection = new Collection();
 
-        collection.setDescription(
+        applyCollectionFields(
+                collection,
+                customer,
+                request.getAmount(),
+                request.getCollectionDate(),
+                request.getMaturityDate(),
+                request.getPaymentType(),
                 request.getDescription()
         );
 
@@ -105,6 +62,43 @@ public class CollectionServiceImpl
         return collectionMapper.toResponse(
                 savedCollection
         );
+    }
+
+    @Override
+    public CollectionResponse getCollectionById(UUID id) {
+        Collection collection = findActiveCollection(id);
+
+        return collectionMapper.toResponse(collection);
+    }
+
+    @Override
+    public CollectionResponse updateCollection(
+            UUID id,
+            UpdateCollectionRequest request
+    ) {
+        Collection collection = findActiveCollection(id);
+
+        Customer customer = findActiveCustomer(request.getCustomerId());
+
+        validateMaturityDate(
+                request.getPaymentType(),
+                request.getMaturityDate()
+        );
+
+        applyCollectionFields(
+                collection,
+                customer,
+                request.getAmount(),
+                request.getCollectionDate(),
+                request.getMaturityDate(),
+                request.getPaymentType(),
+                request.getDescription()
+        );
+
+        Collection savedCollection =
+                collectionRepository.save(collection);
+
+        return collectionMapper.toResponse(savedCollection);
     }
 
     @Override
@@ -128,5 +122,63 @@ public class CollectionServiceImpl
         ).map(collectionMapper::toResponse);
     }
 
+    private Collection findActiveCollection(UUID id) {
+        return collectionRepository
+                .findByIdAndActiveTrue(id)
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Collection not found"
+                                )
+                );
+    }
 
+    private Customer findActiveCustomer(UUID customerId) {
+        return customerRepository
+                .findByIdAndActiveTrue(customerId)
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Customer not found"
+                                )
+                );
+    }
+
+    private void validateMaturityDate(
+            PaymentType paymentType,
+            LocalDate maturityDate
+    ) {
+        boolean requiresMaturityDate =
+                paymentType == PaymentType.CHECK
+                        || paymentType == PaymentType.PROMISSORY_NOTE;
+
+        if (requiresMaturityDate && maturityDate == null) {
+            throw new BusinessException(
+                    "Maturity date is required"
+            );
+        }
+
+        if (!requiresMaturityDate && maturityDate != null) {
+            throw new BusinessException(
+                    "Maturity date is not allowed"
+            );
+        }
+    }
+
+    private void applyCollectionFields(
+            Collection collection,
+            Customer customer,
+            java.math.BigDecimal amount,
+            LocalDate collectionDate,
+            LocalDate maturityDate,
+            PaymentType paymentType,
+            String description
+    ) {
+        collection.setCustomer(customer);
+        collection.setAmount(amount);
+        collection.setCollectionDate(collectionDate);
+        collection.setMaturityDate(maturityDate);
+        collection.setPaymentType(paymentType);
+        collection.setDescription(description);
+    }
 }

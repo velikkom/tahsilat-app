@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 
@@ -7,7 +8,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { InputNumber } from "primereact/inputnumber";
 
-import useCollections from "@/hooks/useCollections";
 import useCollectionFilters from "@/hooks/useCollectionFilters";
 
 import CollectionSearch from "./CollectionSearch";
@@ -19,13 +19,12 @@ import {
   statusBodyTemplate,
 } from "./CollectionTemplates";
 
-export default function CollectionsTable() {
-
-  const {
-    collections,
-    loading,
-  } = useCollections();
-
+export default function CollectionsTable({
+  collections = [],
+  loading = false,
+  onEdit,
+  actionsDisabled = false,
+}) {
   const {
     filters,
     setFilters,
@@ -46,161 +45,95 @@ export default function CollectionsTable() {
     "PAID",
   ];
 
-  function paymentTypeFilterTemplate(
-    options
-  ) {
+  const actionsBodyTemplate = useCallback(
+    (rowData) => (
+      <CollectionActions
+        row={rowData}
+        onEdit={onEdit}
+        disabled={actionsDisabled}
+      />
+    ),
+    [onEdit, actionsDisabled]
+  );
 
+  function paymentTypeFilterTemplate(options) {
     return (
-
       <Dropdown
         value={options.value}
         options={paymentTypes}
-        onChange={(e) =>
-          options.filterCallback(
-            e.value
-          )
-        }
+        onChange={(e) => options.filterCallback(e.value)}
         placeholder="Select"
         className="p-column-filter"
         showClear
       />
-
     );
   }
 
-  function statusFilterTemplate(
-    options
-  ) {
-
+  function statusFilterTemplate(options) {
     return (
-
       <Dropdown
         value={options.value}
         options={statuses}
-        onChange={(e) =>
-          options.filterCallback(
-            e.value
-          )
-        }
+        onChange={(e) => options.filterCallback(e.value)}
         placeholder="Select"
         className="p-column-filter"
         showClear
       />
-
     );
   }
 
-  function amountFilterTemplate(
-    options
-  ) {
-
+  function amountFilterTemplate(options) {
     return (
-
       <InputNumber
         value={options.value}
-        onChange={(e) =>
-          options.filterCallback(
-            e.value
-          )
-        }
+        onChange={(e) => options.filterCallback(e.value)}
         mode="currency"
         currency="TRY"
         locale="tr-TR"
       />
-
     );
   }
 
-  function dateFilterTemplate(
-    options
-  ) {
-
+  function dateFilterTemplate(options) {
     return (
-
       <Calendar
         value={options.value}
-        onChange={(e) =>
-          options.filterCallback(
-            e.value
-          )
-        }
+        onChange={(e) => options.filterCallback(e.value)}
         dateFormat="dd/mm/yy"
       />
-
     );
   }
 
   const header = (
-
     <CollectionSearch
-
-      globalFilterValue={
-        globalFilterValue
-      }
-
-      onGlobalFilterChange={
-        onGlobalFilterChange
-      }
-
-      clearFilter={
-        clearFilter
-      }
-
+      globalFilterValue={globalFilterValue}
+      onGlobalFilterChange={onGlobalFilterChange}
+      clearFilter={clearFilter}
     />
-
   );
 
   return (
-
-    <div
-      className="
-        card
-        border-0
-        shadow-sm
-      "
-    >
-
+    <div className="card border-0 shadow-sm">
       <div className="card-body">
-
         <DataTable
-
           value={collections}
-
           paginator
-
           rows={10}
-
           stripedRows
-
           showGridlines
-
           loading={loading}
-
           dataKey="id"
-
           filters={filters}
-
           header={header}
-
-          onFilter={(e) =>
-            setFilters(
-              e.filters
-            )
-          }
-
+          onFilter={(e) => setFilters(e.filters)}
           globalFilterFields={[
             "customerName",
             "paymentType",
             "status",
             "description",
           ]}
-
-          emptyMessage="
-            No collections found.
-          "
-
+          emptyMessage="No collections found."
         >
-
           <Column
             field="customerName"
             header="Customer"
@@ -212,39 +145,27 @@ export default function CollectionsTable() {
             field="amount"
             header="Amount"
             sortable
-            body={
-              amountBodyTemplate
-            }
+            body={amountBodyTemplate}
             filter
-            filterElement={
-              amountFilterTemplate
-            }
+            filterElement={amountFilterTemplate}
           />
 
           <Column
             field="paymentType"
             header="Payment Type"
             sortable
-            body={
-              paymentTypeBodyTemplate
-            }
+            body={paymentTypeBodyTemplate}
             filter
-            filterElement={
-              paymentTypeFilterTemplate
-            }
+            filterElement={paymentTypeFilterTemplate}
           />
 
           <Column
             field="status"
             header="Status"
             sortable
-            body={
-              statusBodyTemplate
-            }
+            body={statusBodyTemplate}
             filter
-            filterElement={
-              statusFilterTemplate
-            }
+            filterElement={statusFilterTemplate}
           />
 
           <Column
@@ -253,9 +174,7 @@ export default function CollectionsTable() {
             sortable
             filter
             dataType="date"
-            filterElement={
-              dateFilterTemplate
-            }
+            filterElement={dateFilterTemplate}
           />
 
           <Column
@@ -266,19 +185,13 @@ export default function CollectionsTable() {
 
           <Column
             header="Actions"
-            body={() =>
-              <CollectionActions />
-            }
+            body={actionsBodyTemplate}
             style={{
               width: "160px",
             }}
           />
-
         </DataTable>
-
       </div>
-
     </div>
-
   );
 }

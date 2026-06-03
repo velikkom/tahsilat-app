@@ -2,39 +2,34 @@
 
 import { Button } from "primereact/button";
 
-export default function CollectionActions() {
+export default function CollectionActions({ row, onEdit, disabled = false }) {
+  return (
+    <div className="d-flex gap-2">
+      <Button
+        icon="pi pi-eye"
+        severity="info"
+        rounded
+        outlined
+        disabled={disabled}
+      />
 
-    return (
+      <Button
+        icon="pi pi-pencil"
+        severity="warning"
+        rounded
+        outlined
+        disabled={disabled}
+        onClick={() => onEdit?.(row)}
+        aria-label="Tahsilat düzenle"
+      />
 
-        <div
-            className="
-                d-flex
-                gap-2
-            "
-        >
-
-            <Button
-                icon="pi pi-eye"
-                severity="info"
-                rounded
-                outlined
-            />
-
-            <Button
-                icon="pi pi-pencil"
-                severity="warning"
-                rounded
-                outlined
-            />
-
-            <Button
-                icon="pi pi-trash"
-                severity="danger"
-                rounded
-                outlined
-            />
-
-        </div>
-
-    );
+      <Button
+        icon="pi pi-trash"
+        severity="danger"
+        rounded
+        outlined
+        disabled={disabled}
+      />
+    </div>
+  );
 }

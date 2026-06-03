@@ -1,6 +1,7 @@
 package com.veli.tahsilat.collection.controller;
 
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
+import com.veli.tahsilat.collection.dto.request.UpdateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
 import com.veli.tahsilat.collection.service.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,5 +63,28 @@ public class CollectionController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<Page<CollectionResponse>> getOverdueCollections(Pageable pageable) {
         return ResponseEntity.ok(collectionService.getOverdueCollections(pageable));
+    }
+
+    @Operation(
+            summary = "Get collection by id"
+    )
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<CollectionResponse> getCollectionById(@PathVariable UUID id) {
+
+        return ResponseEntity.ok(collectionService.getCollectionById(id));
+    }
+
+    @Operation(
+            summary = "Update collection by id"
+    )
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<CollectionResponse> updateCollection(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateCollectionRequest request
+    ) {
+
+        return ResponseEntity.ok(collectionService.updateCollection(id, request));
     }
 }
