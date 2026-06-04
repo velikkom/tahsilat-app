@@ -33,6 +33,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
+import jakarta.servlet.DispatcherType;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -66,21 +68,23 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-
-                                "/api/v1/auth/**",
-
-                                "/api/v1/**",
-
-                                "/swagger-ui/**",
-
-                                "/v3/api-docs/**"
+                        .dispatcherTypeMatchers(
+                                DispatcherType.ERROR,
+                                DispatcherType.FORWARD
                         )
-
                         .permitAll()
 
-                        .anyRequest()
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        )
+                        .permitAll()
 
+                        .requestMatchers("/api/v1/**")
+                        .authenticated()
+
+                        .anyRequest()
                         .authenticated()
                 )
 

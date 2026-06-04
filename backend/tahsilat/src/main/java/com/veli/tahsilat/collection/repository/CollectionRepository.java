@@ -100,12 +100,12 @@ public interface CollectionRepository
     List<Object[]> findTopCustomersByAmount(Pageable pageable);
 
     @Query("""
-            SELECT FUNCTION('MONTH', c.collectionDate), COALESCE(SUM(c.amount), 0)
+            SELECT EXTRACT(MONTH FROM c.collectionDate), COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true
-            AND FUNCTION('YEAR', c.collectionDate) = :year
-            GROUP BY FUNCTION('MONTH', c.collectionDate)
-            ORDER BY FUNCTION('MONTH', c.collectionDate)
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            GROUP BY EXTRACT(MONTH FROM c.collectionDate)
+            ORDER BY EXTRACT(MONTH FROM c.collectionDate)
             """)
     List<Object[]> sumAmountGroupByMonthForYear(@Param("year") int year);
 
