@@ -1,5 +1,6 @@
-const BASE_URL =
-    'http://localhost:8080/api/v1';
+import { API_V1 } from "@/config/api";
+
+const BASE_URL = API_V1;
 
 export async function getDashboardSummary() {
 
