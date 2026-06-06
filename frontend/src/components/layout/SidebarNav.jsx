@@ -29,7 +29,7 @@ export default function SidebarNav({ onNavigate }) {
   }
 
   return (
-    <>
+    <div className="d-flex flex-column h-100 flex-grow-1">
       <div className="sidebar-brand mb-4 mb-lg-5">
         <h3 className="fw-bold mb-0 sidebar-brand__title">Tahsilat ERP</h3>
       </div>
@@ -60,6 +60,6 @@ export default function SidebarNav({ onNavigate }) {
           Logout
         </button>
       </div>
-    </>
+    </div>
   );
 }

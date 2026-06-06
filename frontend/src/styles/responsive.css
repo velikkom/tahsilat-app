@@ -5,38 +5,67 @@
 
 .dashboard-shell {
   overflow-x: hidden;
+  width: 100%;
 }
 
 .dashboard-shell__content {
   min-width: 0;
+  width: 100%;
+  flex: 1 1 100%;
 }
 
 .dashboard-shell__main {
   overflow-x: hidden;
+  width: 100%;
 }
 
 body.sidebar-drawer-open {
   overflow: hidden;
 }
 
-/* Desktop sidebar (>= 1024px) */
+/*
+ * Desktop sidebar (>= 1024px only).
+ * Must use !important to win over any Bootstrap display utilities.
+ */
 .app-sidebar {
-  display: none;
+  display: none !important;
   flex-shrink: 0;
   width: 260px;
   min-height: 100vh;
+  flex-direction: column;
 }
 
 @media (min-width: 1024px) {
   .app-sidebar {
-    display: flex;
+    display: flex !important;
+  }
+
+  .dashboard-shell__content {
+    flex: 1 1 auto;
+    width: auto;
   }
 }
 
-/* Mobile sidebar drawer */
+/* Mobile / tablet: content always full width */
+@media (max-width: 1023px) {
+  .dashboard-shell {
+    flex-direction: column;
+  }
+
+  .dashboard-shell__content {
+    max-width: 100%;
+  }
+}
+
+/* Mobile sidebar drawer — overlay, not in document flow */
 .mobile-sidebar {
-  --bs-offcanvas-width: min(85vw, 300px);
+  --bs-offcanvas-width: min(85vw, 280px);
   background-color: #212529 !important;
+  z-index: 1045;
+}
+
+.mobile-sidebar-backdrop {
+  z-index: 1040;
 }
 
 .mobile-sidebar .btn-close {

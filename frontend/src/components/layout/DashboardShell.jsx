@@ -10,11 +10,13 @@ export default function DashboardShell({ children }) {
 
   return (
     <div className="dashboard-shell d-flex min-vh-100">
+      {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
       <Sidebar />
 
+      {/* Drawer: only visible when hamburger toggles isOpen */}
       <MobileSidebar show={isOpen} onHide={close} />
 
-      <div className="dashboard-shell__content flex-grow-1 d-flex flex-column min-v-0 w-100">
+      <div className="dashboard-shell__content d-flex flex-column min-v-0">
         <Navbar onMenuToggle={toggle} />
 
         <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">

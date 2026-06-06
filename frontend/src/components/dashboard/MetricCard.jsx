@@ -2,7 +2,7 @@
 
 export default function MetricCard({ title, value, subtitle, icon }) {
   return (
-    <div className="col-12 col-md-6 col-xl-3">
+    <div className="col-12 col-md-6 col-lg-3">
       <div className="metric-card card border-0 shadow-sm h-100">
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-start gap-2">
