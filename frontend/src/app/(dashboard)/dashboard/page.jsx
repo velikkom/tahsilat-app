@@ -8,9 +8,9 @@ import RecentCollectionsTable from "@/components/dashboard/RecentCollectionsTabl
 
 export default function DashboardPage() {
   return (
-    <div className="dashboard-page d-flex flex-column gap-4">
+    <div className="dashboard-page d-flex flex-column gap-3 gap-md-4">
       <div>
-        <h1 className="fw-bold mb-1">Tahsilat Analitiği</h1>
+        <h1 className="fw-bold mb-1 page-header__title">Tahsilat Analitiği</h1>
         <p className="text-muted mb-0">
           Tahsilat performansını ve dağılımını gerçek zamanlı izleyin.
         </p>

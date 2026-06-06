@@ -1,46 +1,23 @@
 export default function CustomerInfoCard({ customer }) {
+  const fields = [
+    { label: "Company Name", value: customer.companyName },
+    { label: "Tax Number", value: customer.taxNumber },
+    { label: "Phone", value: customer.phone || "-" },
+    { label: "Authorized Person", value: customer.authorizedPerson || "-" },
+  ];
+
   return (
-    <div
-      className="
-                card
-                border-0
-                shadow-sm
-            "
-    >
+    <div className="card border-0 shadow-sm">
       <div className="card-body">
-        <h5
-          className="
-                        fw-bold
-                        mb-4
-                    "
-        >
-          Company Information
-        </h5>
+        <h5 className="fw-bold mb-4">Company Information</h5>
 
-        <div className="row g-4">
-          <div className="col-md-4">
-            <strong>Company Name</strong>
-
-            <div>{customer.companyName}</div>
-          </div>
-
-          <div className="col-md-4">
-            <strong>Tax Number</strong>
-
-            <div>{customer.taxNumber}</div>
-          </div>
-
-          <div className="col-md-4">
-            <strong>Phone</strong>
-
-            <div>{customer.phone || "-"}</div>
-          </div>
-
-          <div className="col-md-4">
-            <strong>Authorized Person</strong>
-
-            <div>{customer.authorizedPerson || "-"}</div>
-          </div>
+        <div className="row g-3 g-md-4">
+          {fields.map((field) => (
+            <div key={field.label} className="col-12 col-md-6 col-lg-4">
+              <strong className="d-block mb-1">{field.label}</strong>
+              <div className="text-break">{field.value}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

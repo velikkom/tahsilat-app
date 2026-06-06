@@ -1,43 +1,12 @@
 "use client";
 
-import { Button }
-from "primereact/button";
-
-export default function CollectionHeader({
-
-    onCreate
-
-}) {
-
-    return (
-
-        <div
-            className="
-                d-flex
-                justify-content-between
-                align-items-center
-                mb-4
-            "
-        >
-
-            <div>
-
-                <h2 className="fw-bold">
-
-                    Collections
-
-                </h2>
-
-                <p className="text-muted mb-0">
-
-                    Financial collection management
-
-                </p>
-
-            </div>
-
-     
-
-        </div>
-    );
+export default function CollectionHeader() {
+  return (
+    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
+      <div>
+        <h2 className="fw-bold page-header__title mb-1">Collections</h2>
+        <p className="text-muted mb-0">Financial collection management</p>
+      </div>
+    </div>
+  );
 }

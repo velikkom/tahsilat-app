@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "react-bootstrap";
-
 import CollectionHeader from "@/components/collections/CollectionHeader";
+import CollectionsActionsBar from "@/components/sections/CollectionsActionsBar";
 import CollectionsTable from "@/components/collections/CollectionsTable";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
 import ImportCollectionsModal from "@/components/collections/ImportCollectionsModal";
@@ -222,18 +221,12 @@ export default function CollectionsPage() {
 
   return (
     <>
-      <div className="d-flex justify-content-end gap-2 mb-3">
-        <Button
-          variant="outline-secondary"
-          onClick={handleOpenImportModal}
+      <div className="collections-page-content">
+        <CollectionsActionsBar
+          onImport={handleOpenImportModal}
+          onCreate={handleOpenCreateModal}
           disabled={isBusy}
-        >
-          Excel Import
-        </Button>
-        <Button onClick={handleOpenCreateModal} disabled={isBusy}>
-          Yeni Tahsilat
-        </Button>
-      </div>
+        />
 
       <CollectionHeader />
 
@@ -262,6 +255,7 @@ export default function CollectionsPage() {
         onClose={() => setShowImportModal(false)}
         onImported={handleImportCompleted}
       />
+      </div>
     </>
   );
 }

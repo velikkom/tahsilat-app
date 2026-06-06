@@ -27,15 +27,9 @@ export default function CustomerDetailPage() {
   }
 
   return (
-    <div
-      className="
-                d-flex
-                flex-column
-                gap-4
-            "
-    >
+    <div className="customer-detail-page d-flex flex-column gap-3 gap-md-4">
       <div>
-        <h1 className="fw-bold">{customer.companyName}</h1>
+        <h1 className="fw-bold page-header__title mb-1">{customer.companyName}</h1>
 
         <p className="text-muted">Customer detail management</p>
       </div>

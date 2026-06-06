@@ -3,6 +3,7 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useRecentCollections } from "@/hooks/useDashboardMetrics";
+import ResponsiveTableWrapper from "@/components/ui/ResponsiveTableWrapper";
 import {
   amountBodyTemplate,
   paymentTypeBodyTemplate,
@@ -20,28 +21,31 @@ export default function RecentCollectionsTable() {
       error={error}
       onRetry={refresh}
     >
-      <DataTable
-        value={data?.collections || []}
-        stripedRows
-        showGridlines
-        emptyMessage="Henüz tahsilat kaydı bulunmuyor."
-        size="small"
-      >
-        <Column field="customerName" header="Firma" sortable />
-        <Column
-          field="amount"
-          header="Tutar"
-          body={amountBodyTemplate}
-          sortable
-        />
-        <Column
-          field="paymentType"
-          header="Ödeme Türü"
-          body={paymentTypeBodyTemplate}
-        />
-        <Column field="status" header="Durum" body={statusBodyTemplate} />
-        <Column field="collectionDate" header="Tahsilat Tarihi" sortable />
-      </DataTable>
+      <ResponsiveTableWrapper minWidth={640}>
+        <DataTable
+          value={data?.collections || []}
+          stripedRows
+          showGridlines
+          emptyMessage="Henüz tahsilat kaydı bulunmuyor."
+          size="small"
+          responsiveLayout="scroll"
+        >
+          <Column field="customerName" header="Firma" sortable />
+          <Column
+            field="amount"
+            header="Tutar"
+            body={amountBodyTemplate}
+            sortable
+          />
+          <Column
+            field="paymentType"
+            header="Ödeme Türü"
+            body={paymentTypeBodyTemplate}
+          />
+          <Column field="status" header="Durum" body={statusBodyTemplate} />
+          <Column field="collectionDate" header="Tahsilat Tarihi" sortable />
+        </DataTable>
+      </ResponsiveTableWrapper>
     </DashboardWidget>
   );
 }

@@ -155,6 +155,7 @@ export default function ImportCollectionsModal({
       size="xl"
       backdrop="static"
       keyboard={!isBusy}
+      dialogClassName="responsive-modal"
     >
       <Modal.Header closeButton={!isBusy}>
         <Modal.Title>Excel Tahsilat Import</Modal.Title>
@@ -191,7 +192,7 @@ export default function ImportCollectionsModal({
                 <div className="row g-2">
                   {SUMMARY_FIELDS.map((field) => (
                     <div key={field.key} className="col-6 col-md-3">
-                      <div className="border rounded p-3 h-100 bg-light">
+                      <div className="import-summary-card border rounded p-3 h-100 bg-light">
                         <div className="small text-muted">{field.label}</div>
                         <div className="fw-bold fs-5">
                           {formatNumber(activeResult[field.key] ?? 0)}
@@ -214,8 +215,15 @@ export default function ImportCollectionsModal({
               {activeResult.issues?.length > 0 && (
                 <Col md={12}>
                   <h6 className="mb-2">Detay Listesi</h6>
-                  <div className="table-responsive">
-                    <Table striped bordered hover size="sm" className="mb-0">
+                  <div className="table-responsive overflow-x-auto">
+                    <Table
+                      striped
+                      bordered
+                      hover
+                      size="sm"
+                      className="mb-0"
+                      style={{ minWidth: "900px" }}
+                    >
                       <thead>
                         <tr>
                           <th>Satır</th>

@@ -1,29 +1,27 @@
-/* COLLECTIONS PAGE */
-
 .collections-page-title {
-
-    font-weight: 700;
+  font-weight: 700;
 }
 
 .collections-search-input {
-
-    height: 72px !important;
-
-    font-size: 22px !important;
-
-    padding-left: 60px !important;
-
-    border-radius: 16px !important;
+  height: 56px !important;
+  font-size: 18px !important;
+  padding-left: 3rem !important;
+  border-radius: 14px !important;
 }
 
 .collections-search-icon {
-
-    font-size: 22px !important;
-
-    margin-left: 18px;
+  font-size: 18px !important;
+  margin-left: 14px;
 }
 
 .collections-actions-column {
+  width: 160px;
+  min-width: 160px;
+}
 
-    width: 160px;
+@media (max-width: 767px) {
+  .collections-actions-column {
+    width: 140px;
+    min-width: 140px;
+  }
 }

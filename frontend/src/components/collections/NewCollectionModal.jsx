@@ -1,15 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
-
-const COLLECTION_TYPES = [
-  { value: "CASH", label: "Nakit" },
-  { value: "BANK_TRANSFER", label: "Havale / EFT" },
-  { value: "CHECK", label: "Çek" },
-  { value: "PROMISSORY_NOTE", label: "Senet" },
-  { value: "CREDIT_CARD", label: "Kredi Kartı" },
-];
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import CollectionFormFields from "@/components/forms/CollectionFormFields";
 
 const createInitialForm = () => ({
   customerId: "",
@@ -70,16 +63,11 @@ export default function NewCollectionModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePaymentTypeChange = (e) => {
     const value = e.target.value;
-
     setForm((prev) => ({
       ...prev,
       paymentType: value,
@@ -94,7 +82,6 @@ export default function NewCollectionModal({
     if (submitting || submitLockRef.current) {
       return;
     }
-
     onClose();
   };
 
@@ -120,16 +107,14 @@ export default function NewCollectionModal({
 
     submitLockRef.current = true;
 
-    const payload = {
+    await onSubmit({
       customerId: form.customerId,
       amount: Number(form.amount),
       paymentType: form.paymentType,
       collectionDate: form.collectionDate,
       maturityDate: requiresMaturityDate ? form.maturityDate : null,
       description: form.description,
-    };
-
-    await onSubmit(payload);
+    });
   };
 
   const isFormDisabled = submitting || loadingCustomers;
@@ -143,6 +128,7 @@ export default function NewCollectionModal({
       size="lg"
       backdrop="static"
       keyboard={!submitting}
+      dialogClassName="responsive-modal"
     >
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Modal.Header closeButton={!submitting}>
@@ -150,134 +136,22 @@ export default function NewCollectionModal({
         </Modal.Header>
 
         <Modal.Body>
-          <Row className="g-3">
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label>Müşteri</Form.Label>
-
-                <Form.Select
-                  required
-                  name="customerId"
-                  value={form.customerId}
-                  onChange={handleChange}
-                  disabled={isFormDisabled}
-                >
-                  <option value="">
-                    {loadingCustomers
-                      ? "Müşteriler yükleniyor..."
-                      : "Müşteri Seçiniz"}
-                  </option>
-
-                  {customers.map((customer) => (
-                    <option key={customer.id} value={customer.id}>
-                      {customer.name || customer.companyName}
-                    </option>
-                  ))}
-                </Form.Select>
-
-                <Form.Control.Feedback type="invalid">
-                  Müşteri seçiniz.
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Ödeme Türü</Form.Label>
-
-                <Form.Select
-                  value={form.paymentType}
-                  onChange={handlePaymentTypeChange}
-                  disabled={isFormDisabled}
-                >
-                  {COLLECTION_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Tutar</Form.Label>
-
-                <Form.Control
-                  required
-                  type="number"
-                  min="1"
-                  step="0.01"
-                  name="amount"
-                  value={form.amount}
-                  onChange={handleChange}
-                  disabled={isFormDisabled}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Tahsilat Tarihi</Form.Label>
-
-                <Form.Control
-                  required
-                  type="date"
-                  name="collectionDate"
-                  value={form.collectionDate}
-                  onChange={handleChange}
-                  disabled={isFormDisabled}
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>Vade Tarihi</Form.Label>
-
-                <Form.Control
-                  type="date"
-                  name="maturityDate"
-                  value={form.maturityDate}
-                  onChange={handleChange}
-                  disabled={!requiresMaturityDate || isFormDisabled}
-                  required={requiresMaturityDate}
-                />
-
-                {requiresMaturityDate && validated && !form.maturityDate && (
-                  <div className="invalid-feedback d-block">
-                    Vade tarihi zorunludur.
-                  </div>
-                )}
-              </Form.Group>
-            </Col>
-
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label>Açıklama</Form.Label>
-
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  disabled={isFormDisabled}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <CollectionFormFields
+            form={form}
+            validated={validated}
+            requiresMaturityDate={requiresMaturityDate}
+            isFormDisabled={isFormDisabled}
+            onChange={handleChange}
+            onPaymentTypeChange={handlePaymentTypeChange}
+            customers={customers}
+            loadingCustomers={loadingCustomers}
+          />
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={handleClose}
-            disabled={submitting}
-          >
+          <Button variant="secondary" onClick={handleClose} disabled={submitting}>
             İptal
           </Button>
-
           <Button variant="primary" type="submit" disabled={submitting}>
             {submitting ? (
               <>

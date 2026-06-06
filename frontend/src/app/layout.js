@@ -7,6 +7,7 @@ import "@/styles/datatable.css";
 import "@/styles/customers.css";
 import "@/styles/collections.css";
 import "@/styles/dashboard.css";
+import "@/styles/responsive.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 

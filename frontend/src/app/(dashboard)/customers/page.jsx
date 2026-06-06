@@ -5,7 +5,7 @@ export default function CustomersPage() {
 
     return (
 
-        <div className="customers-page">
+    <div className="customers-page">
 
             <CustomersHeader />
 

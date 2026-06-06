@@ -1,0 +1,318 @@
+/* Mobile-first responsive utilities
+   Breakpoints: 320 | 375 | 390 | 414 | 768 | 1024 | 1280 */
+
+/* --- Layout shell --- */
+
+.dashboard-shell {
+  overflow-x: hidden;
+}
+
+.dashboard-shell__content {
+  min-width: 0;
+}
+
+.dashboard-shell__main {
+  overflow-x: hidden;
+}
+
+body.sidebar-drawer-open {
+  overflow: hidden;
+}
+
+/* Desktop sidebar (>= 1024px) */
+.app-sidebar {
+  display: none;
+  flex-shrink: 0;
+  width: 260px;
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .app-sidebar {
+    display: flex;
+  }
+}
+
+/* Mobile sidebar drawer */
+.mobile-sidebar {
+  --bs-offcanvas-width: min(85vw, 300px);
+  background-color: #212529 !important;
+}
+
+.mobile-sidebar .btn-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.sidebar-nav-link {
+  min-height: 44px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-nav-link--active {
+  background-color: #6c757d;
+}
+
+.sidebar-brand__title {
+  font-size: 1.25rem;
+}
+
+/* --- Touch targets --- */
+
+.touch-target {
+  min-height: 44px;
+}
+
+@media (max-width: 767px) {
+  .btn,
+  .p-button,
+  .p-button.p-button-icon-only {
+    min-height: 44px;
+  }
+
+  .btn-sm {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* --- Modals --- */
+
+@media (max-width: 767px) {
+  .modal-dialog {
+    width: 95% !important;
+    max-width: 95% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn {
+    flex: 1 1 auto;
+  }
+}
+
+/* --- Page headers --- */
+
+.page-header__title {
+  font-size: 1.5rem;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .page-header__title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .page-header__title {
+    font-size: 2rem;
+  }
+}
+
+/* --- Login --- */
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 18px;
+}
+
+.login-page {
+  padding: 1rem;
+}
+
+/* --- Collections actions bar --- */
+
+.collections-actions-bar {
+  gap: 0.5rem;
+}
+
+@media (max-width: 575px) {
+  .collections-actions-bar .btn {
+    width: 100%;
+  }
+}
+
+/* --- Search inputs --- */
+
+@media (max-width: 767px) {
+  .customers-search-input,
+  .collections-search-input {
+    height: 48px !important;
+    font-size: 16px !important;
+    padding-left: 2.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .customers-search-icon,
+  .collections-search-icon {
+    font-size: 16px !important;
+    margin-left: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .customers-search-input,
+  .collections-search-input {
+    height: 56px !important;
+    font-size: 18px !important;
+  }
+}
+
+/* --- Customer tabs --- */
+
+@media (max-width: 767px) {
+  .customer-tabs .p-tabview-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+
+  .customer-tabs .p-tabview-nav li .p-tabview-nav-link {
+    padding: 0.75rem 1rem !important;
+    white-space: nowrap;
+    font-size: 0.875rem;
+  }
+}
+
+/* --- DataTable mobile --- */
+
+@media (max-width: 767px) {
+  .p-datatable .p-datatable-tbody > tr > td,
+  .p-datatable .p-datatable-thead > tr > th {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 13px !important;
+  }
+
+  .p-paginator {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .p-paginator .p-paginator-pages .p-paginator-page {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
+/* --- Collection search header --- */
+
+@media (max-width: 575px) {
+  .collection-search-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .collection-search-bar .p-button {
+    width: 100%;
+  }
+}
+
+/* Navbar hamburger: visible below 1024px */
+.sidebar-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-menu-toggle {
+    display: none !important;
+  }
+}
+
+.app-navbar__title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .app-navbar__title {
+    font-size: 1.25rem;
+  }
+}
+
+.app-navbar__welcome {
+  display: none;
+}
+
+@media (min-width: 576px) {
+  .app-navbar__welcome {
+    display: inline;
+  }
+}
+
+/* --- Dashboard metrics grid --- */
+
+@media (max-width: 767px) {
+  .dashboard-page h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* --- Import modal summary cards --- */
+
+@media (max-width: 414px) {
+  .import-summary-card {
+    padding: 0.75rem !important;
+  }
+
+  .import-summary-card .fs-5 {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* --- Horizontal overflow guard --- */
+
+.customers-page,
+.collections-page-content,
+.dashboard-page,
+.customer-detail-page {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* --- 320px smallest screens --- */
+
+@media (max-width: 320px) {
+  .dashboard-shell__main {
+    padding: 0.75rem !important;
+  }
+
+  .sidebar-brand__title {
+    font-size: 1.1rem;
+  }
+
+  .page-header__title {
+    font-size: 1.25rem;
+  }
+}
+
+/* --- 1280px+ desktop polish --- */
+
+@media (min-width: 1280px) {
+  .dashboard-shell__main {
+    padding: 1.5rem 2rem !important;
+  }
+}

@@ -1,9 +1,10 @@
 .dashboard-page {
   width: 100%;
+  max-width: 100%;
 }
 
 .dashboard-widget__state {
-  min-height: 220px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,11 +12,11 @@
 }
 
 .dashboard-chart {
-  height: 320px;
+  height: 260px;
 }
 
 .dashboard-chart--tall {
-  height: 420px;
+  height: 320px;
 }
 
 .metric-card__title {
@@ -24,7 +25,7 @@
 }
 
 .metric-card__value {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   line-height: 1.3;
   word-break: break-word;
 }
@@ -40,19 +41,36 @@
   flex-shrink: 0;
 }
 
-@media (min-width: 768px) and (max-width: 1199px) {
+@media (min-width: 768px) {
+  .dashboard-widget__state {
+    min-height: 220px;
+  }
+
   .dashboard-chart {
     height: 280px;
   }
-}
 
-@media (max-width: 767px) {
-  .dashboard-chart,
   .dashboard-chart--tall {
-    height: 260px;
+    height: 380px;
   }
 
   .metric-card__value {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-chart {
+    height: 320px;
+  }
+
+  .dashboard-chart--tall {
+    height: 420px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .metric-card__value {
+    font-size: 1.35rem;
   }
 }
