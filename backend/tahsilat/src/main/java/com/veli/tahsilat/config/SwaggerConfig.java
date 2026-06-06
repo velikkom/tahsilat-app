@@ -1,15 +1,12 @@
 package com.veli.tahsilat.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
-
 import io.swagger.v3.oas.models.info.Info;
-
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
-
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 import org.springframework.context.annotation.Bean;
-
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -22,42 +19,30 @@ public class SwaggerConfig {
 
         return new OpenAPI()
 
+                .addServersItem(
+                        new Server()
+                                .url("https://tahsilat-app-production.up.railway.app")
+                                .description("Railway Production")
+                )
+
                 .info(
-
                         new Info()
-
-                                .title(
-                                        "Tahsilat API"
-                                )
-
+                                .title("Tahsilat API")
                                 .version("1.0")
-
-                                .description(
-                                        "Tahsilat Management System API"
-                                )
+                                .description("Tahsilat Management System API")
                 )
 
                 .addSecurityItem(
-
                         new SecurityRequirement()
-
-                                .addList(
-                                        securitySchemeName
-                                )
+                                .addList(securitySchemeName)
                 )
 
                 .schemaRequirement(
-
                         securitySchemeName,
-
                         new SecurityScheme()
-
                                 .name(securitySchemeName)
-
                                 .type(SecurityScheme.Type.HTTP)
-
                                 .scheme("bearer")
-
                                 .bearerFormat("JWT")
                 );
     }
