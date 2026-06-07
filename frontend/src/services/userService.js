@@ -80,3 +80,29 @@ export async function deactivateUser(userId) {
 
   return response.json();
 }
+
+export async function getRoles() {
+  const response = await fetch(`${BASE_URL}/roles`, {
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Roller alınamadı"));
+  }
+
+  return response.json();
+}
+
+export async function updateUserRole(userId, role) {
+  const response = await fetch(`${BASE_URL}/${userId}/role`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({ role }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Rol güncellenemedi"));
+  }
+
+  return response.json();
+}

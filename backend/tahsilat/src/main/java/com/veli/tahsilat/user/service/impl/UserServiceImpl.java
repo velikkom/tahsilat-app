@@ -1,9 +1,12 @@
 package com.veli.tahsilat.user.service.impl;
 
+import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
 import com.veli.tahsilat.user.dto.response.PendingUsersCountResponse;
+import com.veli.tahsilat.user.dto.response.RoleResponse;
 import com.veli.tahsilat.user.dto.response.UserResponse;
 import com.veli.tahsilat.user.entity.User;
+import com.veli.tahsilat.user.enums.Role;
 import com.veli.tahsilat.user.repository.UserRepository;
 import com.veli.tahsilat.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +54,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<RoleResponse> getRoles() {
+        return Arrays.stream(Role.values())
+                .map(this::toRoleResponse)
+                .toList();
+    }
+
+    @Override
     public PendingUsersCountResponse getPendingUsersCount() {
         return PendingUsersCountResponse.builder()
                 .count(userRepository.countByActiveFalseAndNewUserTrue())
@@ -73,6 +84,14 @@ public class UserServiceImpl implements UserService {
         return toResponse(userRepository.save(user));
     }
 
+    @Override
+    @Transactional
+    public UserResponse updateUserRole(UUID userId, Role role) {
+        User user = findUserOrThrow(userId);
+        user.setRole(role);
+        return toResponse(userRepository.save(user));
+    }
+
     private User findUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -88,5 +107,18 @@ public class UserServiceImpl implements UserService {
                 .active(user.getActive())
                 .newUser(user.getNewUser())
                 .build();
+    }
+
+    private RoleResponse toRoleResponse(Role role) {
+        return RoleResponse.builder()
+                .name(role.name())
+                .label(formatRoleLabel(role.name()))
+                .build();
+    }
+
+    private String formatRoleLabel(String roleName) {
+        return roleName
+                .replace("ROLE_", "")
+                .replace('_', ' ');
     }
 }

@@ -8,6 +8,7 @@ import "@/styles/customers.css";
 import "@/styles/collections.css";
 import "@/styles/dashboard.css";
 import "@/styles/responsive.css";
+import "@/styles/users.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 

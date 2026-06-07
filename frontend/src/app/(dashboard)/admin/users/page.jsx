@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import UsersManagementTable from "@/components/admin/UsersManagementTable";
+import UsersManagementView from "@/components/users/UsersManagementView";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import usePendingUserCount from "@/context/PendingUsersCountContext";
 
@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
-      <UsersManagementTable onUpdated={() => refreshCount({ silent: true })} />
+      <UsersManagementView onUpdated={() => refreshCount({ silent: true })} />
     </div>
   );
 }
