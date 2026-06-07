@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  getDashboardInsights,
   getDashboardMetrics,
   getMonthlyCollections,
   getPaymentTypeDistribution,
@@ -49,22 +50,28 @@ function useDashboardQuery(fetcher, deps = []) {
   return { data, loading, error, refresh };
 }
 
-export function useDashboardMetrics() {
-  return useDashboardQuery(() => getDashboardMetrics(), []);
+export function useDashboardMetrics(year) {
+  return useDashboardQuery(() => getDashboardMetrics(year), [year]);
 }
 
 export function useMonthlyCollections(year) {
-  return useDashboardQuery(() => getMonthlyCollections(year), [year]);
+  const chartYear = year ?? new Date().getFullYear();
+
+  return useDashboardQuery(() => getMonthlyCollections(chartYear), [chartYear]);
 }
 
-export function usePaymentTypeDistribution() {
-  return useDashboardQuery(() => getPaymentTypeDistribution(), []);
+export function usePaymentTypeDistribution(year) {
+  return useDashboardQuery(() => getPaymentTypeDistribution(year), [year]);
 }
 
-export function useTopCustomers(limit = 10) {
-  return useDashboardQuery(() => getTopCustomers(limit), [limit]);
+export function useTopCustomers(limit = 10, year) {
+  return useDashboardQuery(() => getTopCustomers(limit, year), [limit, year]);
 }
 
-export function useRecentCollections(limit = 10) {
-  return useDashboardQuery(() => getRecentCollections(limit), [limit]);
+export function useRecentCollections(limit = 10, year) {
+  return useDashboardQuery(() => getRecentCollections(limit, year), [limit, year]);
+}
+
+export function useDashboardInsights(year) {
+  return useDashboardQuery(() => getDashboardInsights(year), [year]);
 }

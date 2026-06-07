@@ -1,5 +1,6 @@
 "use client";
 
+import useDashboardYear from "@/context/DashboardYearContext";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import {
   formatCurrency,
@@ -10,7 +11,8 @@ import DashboardWidget from "./DashboardWidget";
 import MetricCard from "./MetricCard";
 
 export default function DashboardMetrics() {
-  const { data, loading, error, refresh } = useDashboardMetrics();
+  const { year } = useDashboardYear();
+  const { data, loading, error, refresh } = useDashboardMetrics(year);
 
   if (loading || error) {
     return (
@@ -27,7 +29,7 @@ export default function DashboardMetrics() {
 
   const metrics = [
     {
-      title: "Toplam Tahsilat",
+      title: year ? `${year} Toplam Tahsilat` : "Toplam Tahsilat",
       value: formatCurrency(data?.totalCollectionsAmount),
     },
     {
@@ -35,7 +37,7 @@ export default function DashboardMetrics() {
       value: formatCurrency(data?.currentMonthCollectionsAmount),
     },
     {
-      title: "Bu Yıl Tahsilat",
+      title: year ? `${year} Yılı Tahsilat` : "Bu Yıl Tahsilat",
       value: formatCurrency(data?.currentYearCollectionsAmount),
     },
     {

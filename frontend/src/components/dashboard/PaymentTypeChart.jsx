@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Chart } from "primereact/chart";
 import useBreakpoint from "@/hooks/useBreakpoint";
+import useDashboardYear from "@/context/DashboardYearContext";
 import { usePaymentTypeDistribution } from "@/hooks/useDashboardMetrics";
 import { formatPaymentType } from "@/utils/dashboardFormatters";
 import { buildLegendOptions } from "@/utils/chartResponsive";
 import DashboardWidget from "./DashboardWidget";
+import PaymentTypeCustomersModal from "./PaymentTypeCustomersModal";
 
 const CHART_COLORS = [
   "#0d6efd",
@@ -18,7 +20,9 @@ const CHART_COLORS = [
 
 export default function PaymentTypeChart() {
   const { isMobile } = useBreakpoint();
-  const { data, loading, error, refresh } = usePaymentTypeDistribution();
+  const { year } = useDashboardYear();
+  const { data, loading, error, refresh } = usePaymentTypeDistribution(year);
+  const [selectedPaymentType, setSelectedPaymentType] = useState(null);
 
   const chartData = useMemo(() => {
     const items = data?.items || [];
@@ -37,6 +41,18 @@ export default function PaymentTypeChart() {
   const chartOptions = useMemo(
     () => ({
       maintainAspectRatio: false,
+      onClick: (_event, elements) => {
+        if (!elements?.length || !data?.items?.length) {
+          return;
+        }
+
+        const index = elements[0].index;
+        const item = data.items[index];
+
+        if (item?.paymentType) {
+          setSelectedPaymentType(item.paymentType);
+        }
+      },
       plugins: {
         legend: buildLegendOptions(isMobile),
         tooltip: {
@@ -58,15 +74,24 @@ export default function PaymentTypeChart() {
   );
 
   return (
-    <DashboardWidget
-      title="Ödeme Türü Dağılımı"
-      loading={loading}
-      error={error}
-      onRetry={refresh}
-    >
-      <div className="dashboard-chart">
-        <Chart type="pie" data={chartData} options={chartOptions} />
-      </div>
-    </DashboardWidget>
+    <>
+      <DashboardWidget
+        title="Ödeme Türü Dağılımı"
+        loading={loading}
+        error={error}
+        onRetry={refresh}
+      >
+        <div className="dashboard-chart">
+          <Chart type="pie" data={chartData} options={chartOptions} />
+        </div>
+      </DashboardWidget>
+
+      <PaymentTypeCustomersModal
+        show={Boolean(selectedPaymentType)}
+        onHide={() => setSelectedPaymentType(null)}
+        paymentType={selectedPaymentType}
+        year={year}
+      />
+    </>
   );
 }

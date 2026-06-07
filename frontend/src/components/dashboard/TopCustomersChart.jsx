@@ -3,13 +3,15 @@
 import { useMemo } from "react";
 import { Chart } from "primereact/chart";
 import useBreakpoint from "@/hooks/useBreakpoint";
+import useDashboardYear from "@/context/DashboardYearContext";
 import { useTopCustomers } from "@/hooks/useDashboardMetrics";
 import { buildHorizontalBarScaleOptions } from "@/utils/chartResponsive";
 import DashboardWidget from "./DashboardWidget";
 
 export default function TopCustomersChart() {
   const { isMobile } = useBreakpoint();
-  const { data, loading, error, refresh } = useTopCustomers(10);
+  const { year } = useDashboardYear();
+  const { data, loading, error, refresh } = useTopCustomers(10, year);
 
   const chartData = useMemo(() => {
     const customers = data?.customers || [];

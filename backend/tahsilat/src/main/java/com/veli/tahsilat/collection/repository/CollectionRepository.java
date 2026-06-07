@@ -100,6 +100,91 @@ public interface CollectionRepository
     List<Object[]> findTopCustomersByAmount(Pageable pageable);
 
     @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            """)
+    BigDecimal sumAmountByActiveTrueAndOptionalYear(@Param("year") Integer year);
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.collectionDate BETWEEN :startDate AND :endDate
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            """)
+    BigDecimal sumAmountByActiveTrueAndCollectionDateBetweenAndOptionalYear(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("year") Integer year
+    );
+
+    @Query("""
+            SELECT c.paymentType, COUNT(c), COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            GROUP BY c.paymentType
+            ORDER BY COUNT(c) DESC
+            """)
+    List<Object[]> findPaymentTypeDistributionRawByOptionalYear(@Param("year") Integer year);
+
+    @Query("""
+            SELECT c.customer.id, c.customer.companyName, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            GROUP BY c.customer.id, c.customer.companyName
+            ORDER BY SUM(c.amount) DESC
+            """)
+    List<Object[]> findTopCustomersByAmountAndOptionalYear(
+            @Param("year") Integer year,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT c
+            FROM Collection c
+            WHERE c.active = true
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            ORDER BY c.createdAt DESC
+            """)
+    Page<Collection> findByActiveTrueAndOptionalYearOrderByCreatedAtDesc(
+            @Param("year") Integer year,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT c.paymentType, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            AND EXTRACT(MONTH FROM c.collectionDate) = :month
+            GROUP BY c.paymentType
+            ORDER BY SUM(c.amount) DESC
+            """)
+    List<Object[]> sumAmountGroupByPaymentTypeForMonth(
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
+    @Query("""
+            SELECT c.customer.id, c.customer.companyName, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.paymentType = :paymentType
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            GROUP BY c.customer.id, c.customer.companyName
+            ORDER BY SUM(c.amount) DESC
+            """)
+    List<Object[]> findTopCustomersByPaymentTypeAndOptionalYear(
+            @Param("paymentType") PaymentType paymentType,
+            @Param("year") Integer year,
+            Pageable pageable
+    );
+
+    @Query("""
             SELECT EXTRACT(MONTH FROM c.collectionDate), COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true

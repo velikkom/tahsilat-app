@@ -5,9 +5,13 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.mapper.CollectionMapper;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
+import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
+import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
+import com.veli.tahsilat.dashboard.dto.response.PaymentTypeAmountItemResponse;
+import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeDistributionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeDistributionResponse;
 import com.veli.tahsilat.dashboard.dto.response.RecentCollectionsResponse;
@@ -44,33 +48,44 @@ public class DashboardServiceImpl implements DashboardService {
     private final CollectionMapper collectionMapper;
 
     @Override
-    public DashboardMetricsResponse getMetrics() {
+    public DashboardMetricsResponse getMetrics(Integer year) {
         LocalDate today = LocalDate.now();
         YearMonth currentMonth = YearMonth.from(today);
-        LocalDate yearStart = LocalDate.of(today.getYear(), 1, 1);
-        LocalDate yearEnd = LocalDate.of(today.getYear(), 12, 31);
+        LocalDate yearStart = year != null
+                ? LocalDate.of(year, 1, 1)
+                : LocalDate.of(today.getYear(), 1, 1);
+        LocalDate yearEnd = year != null
+                ? LocalDate.of(year, 12, 31)
+                : LocalDate.of(today.getYear(), 12, 31);
 
         BigDecimal totalAmount = nullSafe(
-                collectionRepository.sumAmountByActiveTrue()
+                collectionRepository.sumAmountByActiveTrueAndOptionalYear(year)
         );
 
-        BigDecimal monthAmount = nullSafe(
-                collectionRepository.sumAmountByActiveTrueAndCollectionDateBetween(
-                        currentMonth.atDay(1),
-                        currentMonth.atEndOfMonth()
-                )
-        );
+        BigDecimal monthAmount = BigDecimal.ZERO;
+
+        if (year == null || year == today.getYear()) {
+            monthAmount = nullSafe(
+                    collectionRepository.sumAmountByActiveTrueAndCollectionDateBetweenAndOptionalYear(
+                            currentMonth.atDay(1),
+                            currentMonth.atEndOfMonth(),
+                            year
+                    )
+            );
+        }
 
         BigDecimal yearAmount = nullSafe(
-                collectionRepository.sumAmountByActiveTrueAndCollectionDateBetween(
+                collectionRepository.sumAmountByActiveTrueAndCollectionDateBetweenAndOptionalYear(
                         yearStart,
-                        yearEnd
+                        yearEnd,
+                        year
                 )
         );
 
         long totalCustomers = customerRepository.countByActiveTrue();
 
-        List<Object[]> topCustomersRaw = collectionRepository.findTopCustomersByAmount(
+        List<Object[]> topCustomersRaw = collectionRepository.findTopCustomersByAmountAndOptionalYear(
+                year,
                 PageRequest.of(0, 1)
         );
 
@@ -87,7 +102,7 @@ public class DashboardServiceImpl implements DashboardService {
         Long mostUsedPaymentTypeCount = 0L;
 
         List<Object[]> paymentTypeRows =
-                collectionRepository.findPaymentTypeDistributionRaw();
+                collectionRepository.findPaymentTypeDistributionRawByOptionalYear(year);
 
         if (!paymentTypeRows.isEmpty()) {
             Object[] row = paymentTypeRows.get(0);
@@ -146,9 +161,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public PaymentTypeDistributionResponse getPaymentTypeDistribution() {
+    public PaymentTypeDistributionResponse getPaymentTypeDistribution(Integer year) {
         List<Object[]> rawRows =
-                collectionRepository.findPaymentTypeDistributionRaw();
+                collectionRepository.findPaymentTypeDistributionRawByOptionalYear(year);
 
         BigDecimal grandTotal = rawRows.stream()
                 .map(row -> (BigDecimal) row[2])
@@ -188,10 +203,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public TopCustomersResponse getTopCustomers(int limit) {
+    public TopCustomersResponse getTopCustomers(int limit, Integer year) {
         int pageSize = Math.max(1, Math.min(limit, 50));
 
-        List<Object[]> rawRows = collectionRepository.findTopCustomersByAmount(
+        List<Object[]> rawRows = collectionRepository.findTopCustomersByAmountAndOptionalYear(
+                year,
                 PageRequest.of(0, pageSize)
         );
 
@@ -211,11 +227,14 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public RecentCollectionsResponse getRecentCollections(int limit) {
+    public RecentCollectionsResponse getRecentCollections(int limit, Integer year) {
         int pageSize = Math.max(1, Math.min(limit, 50));
 
         List<Collection> collections = collectionRepository
-                .findByActiveTrueOrderByCreatedAtDesc(PageRequest.of(0, pageSize))
+                .findByActiveTrueAndOptionalYearOrderByCreatedAtDesc(
+                        year,
+                        PageRequest.of(0, pageSize)
+                )
                 .getContent();
 
         return RecentCollectionsResponse.builder()
@@ -224,6 +243,121 @@ public class DashboardServiceImpl implements DashboardService {
                                 .map(collectionMapper::toResponse)
                                 .toList()
                 )
+                .build();
+    }
+
+    @Override
+    public MonthPaymentBreakdownResponse getMonthPaymentBreakdown(int year, int month) {
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+
+        List<Object[]> rawRows = collectionRepository.sumAmountGroupByPaymentTypeForMonth(
+                year,
+                month
+        );
+
+        List<PaymentTypeAmountItemResponse> items = rawRows.stream()
+                .map(row ->
+                        PaymentTypeAmountItemResponse.builder()
+                                .paymentType((PaymentType) row[0])
+                                .totalAmount((BigDecimal) row[1])
+                                .build()
+                )
+                .toList();
+
+        BigDecimal totalAmount = items.stream()
+                .map(PaymentTypeAmountItemResponse::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return MonthPaymentBreakdownResponse.builder()
+                .year(year)
+                .month(month)
+                .monthName(TURKISH_MONTH_NAMES[month - 1])
+                .totalAmount(totalAmount)
+                .items(items)
+                .build();
+    }
+
+    @Override
+    public PaymentTypeCustomersResponse getPaymentTypeCustomers(
+            PaymentType paymentType,
+            Integer year,
+            int limit
+    ) {
+        int pageSize = Math.max(1, Math.min(limit, 50));
+
+        List<Object[]> rawRows = collectionRepository.findTopCustomersByPaymentTypeAndOptionalYear(
+                paymentType,
+                year,
+                PageRequest.of(0, pageSize)
+        );
+
+        List<TopCustomerItemResponse> customers = rawRows.stream()
+                .map(row ->
+                        TopCustomerItemResponse.builder()
+                                .customerId((UUID) row[0])
+                                .companyName((String) row[1])
+                                .totalAmount((BigDecimal) row[2])
+                                .build()
+                )
+                .toList();
+
+        return PaymentTypeCustomersResponse.builder()
+                .paymentType(paymentType)
+                .year(year)
+                .customers(customers)
+                .build();
+    }
+
+    @Override
+    public DashboardInsightsResponse getInsights(Integer year) {
+        List<Object[]> paymentTypeRows =
+                collectionRepository.findPaymentTypeDistributionRawByOptionalYear(year);
+
+        PaymentType mostUsedPaymentType = null;
+
+        if (!paymentTypeRows.isEmpty()) {
+            mostUsedPaymentType = (PaymentType) paymentTypeRows.get(0)[0];
+        }
+
+        List<Object[]> topCustomersRaw = collectionRepository.findTopCustomersByAmountAndOptionalYear(
+                year,
+                PageRequest.of(0, 1)
+        );
+
+        String topCustomerName = null;
+        BigDecimal topCustomerAmount = BigDecimal.ZERO;
+
+        if (!topCustomersRaw.isEmpty()) {
+            Object[] row = topCustomersRaw.get(0);
+            topCustomerName = (String) row[1];
+            topCustomerAmount = (BigDecimal) row[2];
+        }
+
+        int targetYear = year != null ? year : LocalDate.now().getYear();
+        MonthlyCollectionsResponse monthlyData = getMonthlyCollections(targetYear);
+
+        int highestMonth = 0;
+        String highestMonthName = null;
+        BigDecimal highestMonthAmount = BigDecimal.ZERO;
+
+        for (MonthlyCollectionItemResponse item : monthlyData.getMonths()) {
+            if (item.getTotalAmount().compareTo(highestMonthAmount) > 0) {
+                highestMonthAmount = item.getTotalAmount();
+                highestMonth = item.getMonth();
+                highestMonthName = item.getMonthName();
+            }
+        }
+
+        return DashboardInsightsResponse.builder()
+                .filterYear(year)
+                .mostUsedPaymentType(mostUsedPaymentType)
+                .topCustomerCompanyName(topCustomerName)
+                .topCustomerTotalAmount(topCustomerAmount)
+                .highestMonth(highestMonth)
+                .highestMonthName(highestMonthName)
+                .highestMonthTotalAmount(highestMonthAmount)
                 .build();
     }
 
