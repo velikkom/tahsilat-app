@@ -55,6 +55,23 @@ export function saveToken(token) {
   document.cookie = `token=${token}; path=/`;
 }
 
+const REMEMBER_ME_KEY = "auth_remember_me";
+
+export function saveRememberMe(remember) {
+  if (remember) {
+    localStorage.setItem(REMEMBER_ME_KEY, "true");
+  } else {
+    localStorage.removeItem(REMEMBER_ME_KEY);
+  }
+}
+
+export function loadRememberMe() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  return localStorage.getItem(REMEMBER_ME_KEY) === "true";
+}
+
 export function getToken() {
   return localStorage.getItem("token");
 }

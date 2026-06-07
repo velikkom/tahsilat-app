@@ -16,19 +16,11 @@ export function middleware(
     const pathname =
         request.nextUrl.pathname;
 
-    /*
-     * PUBLIC ROUTES
-     */
-
     const publicRoutes = [
-
         '/login',
-        '/register'
+        '/register',
+        '/forgot-password'
     ];
-
-    /*
-     * IF USER NOT LOGGED IN
-     */
 
     if (
         !token
@@ -46,11 +38,6 @@ export function middleware(
             )
         );
     }
-
-    /*
-     * IF USER LOGGED IN
-     * AND GOES LOGIN PAGE
-     */
 
     if (
 
@@ -85,6 +72,8 @@ export const config = {
 
         '/login',
 
-        '/register'
+        '/register',
+
+        '/forgot-password'
     ]
 };
