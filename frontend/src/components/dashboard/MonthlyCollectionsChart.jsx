@@ -2,10 +2,13 @@
 
 import { useMemo } from "react";
 import { Chart } from "primereact/chart";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import { useMonthlyCollections } from "@/hooks/useDashboardMetrics";
+import { buildBarChartScaleOptions } from "@/utils/chartResponsive";
 import DashboardWidget from "./DashboardWidget";
 
 export default function MonthlyCollectionsChart() {
+  const { isMobile } = useBreakpoint();
   const currentYear = new Date().getFullYear();
   const { data, loading, error, refresh } = useMonthlyCollections(currentYear);
 
@@ -45,21 +48,9 @@ export default function MonthlyCollectionsChart() {
           },
         },
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback(value) {
-              return new Intl.NumberFormat("tr-TR", {
-                notation: "compact",
-                compactDisplay: "short",
-              }).format(value);
-            },
-          },
-        },
-      },
+      scales: buildBarChartScaleOptions(isMobile),
     }),
-    []
+    [isMobile]
   );
 
   return (

@@ -351,9 +351,46 @@ body.sidebar-drawer-open {
 .customers-page,
 .collections-page-content,
 .dashboard-page,
-.customer-detail-page {
+.customer-detail-page,
+.admin-users-page {
   max-width: 100%;
   overflow-x: hidden;
+}
+
+/* --- Responsive table wrapper --- */
+
+.responsive-table-wrapper {
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table-wrapper__inner {
+  min-width: var(--table-min-width, 900px);
+}
+
+/* --- 375px / 390px phones --- */
+
+@media (max-width: 390px) {
+  .app-navbar__title {
+    font-size: 0.85rem;
+  }
+
+  .dashboard-chart {
+    height: 220px;
+  }
+
+  .dashboard-chart--tall {
+    height: 280px;
+  }
+
+  .auth-card {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (min-width: 391px) and (max-width: 414px) {
+  .dashboard-chart {
+    height: 240px;
+  }
 }
 
 /* --- 320px smallest screens --- */

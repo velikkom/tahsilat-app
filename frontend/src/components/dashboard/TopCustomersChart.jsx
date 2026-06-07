@@ -2,10 +2,13 @@
 
 import { useMemo } from "react";
 import { Chart } from "primereact/chart";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import { useTopCustomers } from "@/hooks/useDashboardMetrics";
+import { buildHorizontalBarScaleOptions } from "@/utils/chartResponsive";
 import DashboardWidget from "./DashboardWidget";
 
 export default function TopCustomersChart() {
+  const { isMobile } = useBreakpoint();
   const { data, loading, error, refresh } = useTopCustomers(10);
 
   const chartData = useMemo(() => {
@@ -45,21 +48,9 @@ export default function TopCustomersChart() {
           },
         },
       },
-      scales: {
-        x: {
-          beginAtZero: true,
-          ticks: {
-            callback(value) {
-              return new Intl.NumberFormat("tr-TR", {
-                notation: "compact",
-                compactDisplay: "short",
-              }).format(value);
-            },
-          },
-        },
-      },
+      scales: buildHorizontalBarScaleOptions(isMobile),
     }),
-    []
+    [isMobile]
   );
 
   return (

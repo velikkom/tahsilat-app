@@ -2,8 +2,10 @@
 
 import { useMemo } from "react";
 import { Chart } from "primereact/chart";
+import useBreakpoint from "@/hooks/useBreakpoint";
 import { usePaymentTypeDistribution } from "@/hooks/useDashboardMetrics";
 import { formatPaymentType } from "@/utils/dashboardFormatters";
+import { buildLegendOptions } from "@/utils/chartResponsive";
 import DashboardWidget from "./DashboardWidget";
 
 const CHART_COLORS = [
@@ -15,6 +17,7 @@ const CHART_COLORS = [
 ];
 
 export default function PaymentTypeChart() {
+  const { isMobile } = useBreakpoint();
   const { data, loading, error, refresh } = usePaymentTypeDistribution();
 
   const chartData = useMemo(() => {
@@ -35,9 +38,7 @@ export default function PaymentTypeChart() {
     () => ({
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: "bottom",
-        },
+        legend: buildLegendOptions(isMobile),
         tooltip: {
           callbacks: {
             label(context) {
@@ -53,7 +54,7 @@ export default function PaymentTypeChart() {
         },
       },
     }),
-    [data]
+    [data, isMobile]
   );
 
   return (

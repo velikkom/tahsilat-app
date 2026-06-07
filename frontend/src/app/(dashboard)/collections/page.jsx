@@ -222,13 +222,13 @@ export default function CollectionsPage() {
   return (
     <>
       <div className="collections-page-content">
+        <CollectionHeader />
+
         <CollectionsActionsBar
           onImport={handleOpenImportModal}
           onCreate={handleOpenCreateModal}
           disabled={isBusy}
         />
-
-      <CollectionHeader />
 
       <CollectionsTable
         collections={collections}

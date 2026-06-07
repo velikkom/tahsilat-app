@@ -215,14 +215,17 @@ export default function ImportCollectionsModal({
               {activeResult.issues?.length > 0 && (
                 <Col md={12}>
                   <h6 className="mb-2">Detay Listesi</h6>
-                  <div className="table-responsive overflow-x-auto">
+                  <div
+                    className="table-responsive overflow-x-auto responsive-table-wrapper"
+                    style={{ "--table-min-width": "900px" }}
+                  >
+                    <div className="responsive-table-wrapper__inner">
                     <Table
                       striped
                       bordered
                       hover
                       size="sm"
                       className="mb-0"
-                      style={{ minWidth: "900px" }}
                     >
                       <thead>
                         <tr>
@@ -257,6 +260,7 @@ export default function ImportCollectionsModal({
                         ))}
                       </tbody>
                     </Table>
+                    </div>
                   </div>
                 </Col>
               )}

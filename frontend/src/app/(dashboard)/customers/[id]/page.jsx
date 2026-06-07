@@ -9,14 +9,7 @@ export default function CustomerDetailPage() {
 
   if (loading) {
     return (
-      <div
-        className="
-                    d-flex
-                    justify-content-center
-                    align-items-center
-                    vh-100
-                "
-      >
+      <div className="d-flex justify-content-center align-items-center py-5 min-vh-50">
         <ProgressSpinner />
       </div>
     );
