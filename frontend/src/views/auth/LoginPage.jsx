@@ -14,6 +14,7 @@ import PasswordInput from "@/components/auth/PasswordInput";
 import RememberMe from "@/components/auth/RememberMe";
 import AuthFooterLinks from "@/components/auth/AuthFooterLinks";
 import AuthSubmitButton from "@/components/auth/AuthSubmitButton";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
 import { loginSchema } from "@/schemas/authSchemas";
 import {
   login,
@@ -101,6 +102,8 @@ export default function LoginPage() {
 
           <AuthSubmitButton loading={isSubmitting}>Log in</AuthSubmitButton>
         </form>
+
+        <SocialAuthButtons />
 
         <AuthFooterLinks
           text="Don't have an account?"

@@ -12,6 +12,7 @@ import AuthInput from "@/components/auth/AuthInput";
 import PasswordInput from "@/components/auth/PasswordInput";
 import AuthFooterLinks from "@/components/auth/AuthFooterLinks";
 import AuthSubmitButton from "@/components/auth/AuthSubmitButton";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
 import {
   registerSchema,
   mapUsernameToRegisterNames,
@@ -109,6 +110,8 @@ export default function RegisterPage() {
 
           <AuthSubmitButton loading={isSubmitting}>Sign up</AuthSubmitButton>
         </form>
+
+        <SocialAuthButtons />
 
         <AuthFooterLinks
           text="Already have an account?"

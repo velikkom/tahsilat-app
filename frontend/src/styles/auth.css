@@ -376,6 +376,84 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
+.auth-divider span {
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Social auth buttons ─── */
+
+.auth-social-section {
+  margin-top: 0.25rem;
+}
+
+.auth-social-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.auth-social-btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.925rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.auth-social-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 20px rgba(15, 5, 40, 0.25);
+}
+
+.auth-social-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(15, 5, 40, 0.18);
+}
+
+.auth-social-btn__icon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+.auth-social-btn__icon--google {
+  font-size: 1.35rem;
+}
+
+.auth-social-btn__icon--facebook {
+  color: #60a5fa;
+}
+
+.auth-social-btn__icon--github {
+  color: #f3f4f6;
+}
+
+.auth-social-btn__label {
+  line-height: 1.2;
+}
+
 /* ─── Animations ─── */
 
 @keyframes authFadeInUp {
