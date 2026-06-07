@@ -3,6 +3,7 @@ package com.veli.tahsilat.user.repository;
 import com.veli.tahsilat.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,10 @@ public interface UserRepository
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    long countByActiveFalseAndNewUserTrue();
+
+    List<User> findByActiveFalseAndNewUserTrueOrderByEmailAsc();
+
+    List<User> findAllByOrderByEmailAsc();
 }

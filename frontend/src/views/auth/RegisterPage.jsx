@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FaEnvelope, FaUser } from "react-icons/fa";
+import { FaCheck, FaEnvelope, FaUser } from "react-icons/fa";
 import AuthLayout from "@/components/auth/AuthLayout";
 import AuthCard from "@/components/auth/AuthCard";
 import AuthHeader from "@/components/auth/AuthHeader";
@@ -17,11 +17,12 @@ import {
   registerSchema,
   mapUsernameToRegisterNames,
 } from "@/schemas/authSchemas";
-import { register, saveToken } from "@/services/authService";
+import { register } from "@/services/authService";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [apiError, setApiError] = useState("");
+  const [registered, setRegistered] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const {
     register: registerField,
@@ -49,11 +50,35 @@ export default function RegisterPage() {
         password: data.password,
       });
 
-      saveToken(response.accessToken);
-      router.push("/dashboard");
-    } catch {
-      setApiError("Kayıt işlemi başarısız. Bilgilerinizi kontrol edin.");
+      setSuccessMessage(
+        response.message ||
+          "Kayıt talebiniz başarıyla oluşturuldu. Yönetici onayından sonra giriş yapabilirsiniz."
+      );
+      setRegistered(true);
+    } catch (err) {
+      setApiError(err.message || "Kayıt işlemi başarısız. Bilgilerinizi kontrol edin.");
     }
+  }
+
+  if (registered) {
+    return (
+      <AuthLayout>
+        <AuthCard>
+          <div className="auth-success-state">
+            <div className="auth-success-state__icon">
+              <FaCheck />
+            </div>
+            <h2 className="auth-success-state__title">
+              Kayıt Talebi Oluşturuldu
+            </h2>
+            <p className="auth-success-state__text">{successMessage}</p>
+            <Link href="/login" className="auth-btn text-decoration-none">
+              Login Sayfasına Dön
+            </Link>
+          </div>
+        </AuthCard>
+      </AuthLayout>
+    );
   }
 
   return (

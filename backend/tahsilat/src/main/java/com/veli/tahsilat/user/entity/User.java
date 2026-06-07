@@ -35,4 +35,7 @@ public class User {
     private Role role;
 
     private Boolean active;
+
+    @Column(name = "new_user")
+    private Boolean newUser;
 }

@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService
@@ -36,17 +34,13 @@ public class CustomUserDetailsService
                         )
                 );
 
-        return new org.springframework.security.core.userdetails.User(
-
-                user.getEmail(),
-
-                user.getPassword(),
-
-                List.of(
-                        new SimpleGrantedAuthority(
-                                user.getRole().name()
-                        )
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .authorities(
+                        new SimpleGrantedAuthority(user.getRole().name())
                 )
-        );
+                .disabled(!Boolean.TRUE.equals(user.getActive()))
+                .build();
     }
 }

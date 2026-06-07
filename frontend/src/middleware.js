@@ -70,6 +70,8 @@ export const config = {
 
         '/collections/:path*',
 
+        '/admin/:path*',
+
         '/login',
 
         '/register',

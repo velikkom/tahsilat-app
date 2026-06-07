@@ -4,20 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FaChartLine,
+  FaUserCog,
   FaUsers,
   FaMoneyCheckAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { logout } from "@/services/authService";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
-const MENUS = [
+const BASE_MENUS = [
   { label: "Dashboard", href: "/dashboard", icon: <FaChartLine /> },
   { label: "Customers", href: "/customers", icon: <FaUsers /> },
   { label: "Collections", href: "/collections", icon: <FaMoneyCheckAlt /> },
 ];
 
+const ADMIN_MENU = {
+  label: "Users",
+  href: "/admin/users",
+  icon: <FaUserCog />,
+};
+
 export default function SidebarNav({ onNavigate }) {
   const pathname = usePathname();
+  const { isAdmin } = useCurrentUser();
+
+  const menus = isAdmin ? [...BASE_MENUS, ADMIN_MENU] : BASE_MENUS;
 
   function handleLogout() {
     logout();
@@ -35,13 +46,15 @@ export default function SidebarNav({ onNavigate }) {
       </div>
 
       <nav className="d-flex flex-column gap-2 flex-grow-1">
-        {MENUS.map((menu) => (
+        {menus.map((menu) => (
           <Link
             key={menu.href}
             href={menu.href}
             onClick={handleLinkClick}
             className={`sidebar-nav-link d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none text-white ${
-              pathname === menu.href ? "sidebar-nav-link--active" : ""
+              pathname === menu.href || pathname.startsWith(`${menu.href}/`)
+                ? "sidebar-nav-link--active"
+                : ""
             }`}
           >
             {menu.icon}

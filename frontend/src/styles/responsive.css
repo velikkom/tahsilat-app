@@ -246,7 +246,41 @@ body.sidebar-drawer-open {
 
 /* --- Collection search header --- */
 
+.new-user-notification {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #6d28d9;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.new-user-notification:hover {
+  background: rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+  color: #5b21b6;
+}
+
+.new-user-notification__icon {
+  font-size: 0.85rem;
+}
+
 @media (max-width: 575px) {
+  .new-user-notification__text {
+    display: none;
+  }
+
+  .new-user-notification {
+    padding: 0.45rem;
+    border-radius: 50%;
+  }
+
   .collection-search-bar {
     flex-direction: column;
     align-items: stretch !important;

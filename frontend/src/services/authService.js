@@ -1,49 +1,54 @@
 import { API_V1 } from "@/config/api";
 
-const BASE_URL = `${API_V1}/auth`;;
+const BASE_URL = `${API_V1}/auth`;
+
+export class AuthError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
+
+async function parseAuthError(response, fallback) {
+  try {
+    const data = await response.json();
+    return data?.message || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export async function login(email, password) {
-  const response = await fetch(
-    `${BASE_URL}/login`,
-
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    }
-  );
+  const response = await fetch(`${BASE_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
   if (!response.ok) {
-    throw new Error("Login failed");
+    throw new AuthError(
+      await parseAuthError(response, "Email veya şifre hatalı")
+    );
   }
 
   return response.json();
 }
 
 export async function register(payload) {
-  const response = await fetch(
-    `${BASE_URL}/register`,
-
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify(payload),
-    }
-  );
+  const response = await fetch(`${BASE_URL}/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
   if (!response.ok) {
-    throw new Error("Register failed");
+    throw new AuthError(
+      await parseAuthError(response, "Kayıt işlemi başarısız")
+    );
   }
 
   return response.json();
@@ -51,7 +56,6 @@ export async function register(payload) {
 
 export function saveToken(token) {
   localStorage.setItem("token", token);
-
   document.cookie = `token=${token}; path=/`;
 }
 
@@ -78,9 +82,9 @@ export function getToken() {
 
 export function logout() {
   localStorage.removeItem("token");
-
   document.cookie = "token=; Max-Age=0; path=/";
 }
+
 export function isAuthenticated() {
   return !!getToken();
 }

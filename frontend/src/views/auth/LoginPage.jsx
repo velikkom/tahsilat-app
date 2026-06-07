@@ -51,8 +51,8 @@ export default function LoginPage() {
       saveToken(response.accessToken);
       saveRememberMe(data.rememberMe);
       router.push("/dashboard");
-    } catch {
-      setApiError("Email veya şifre hatalı");
+    } catch (err) {
+      setApiError(err.message || "Email veya şifre hatalı");
     }
   }
 

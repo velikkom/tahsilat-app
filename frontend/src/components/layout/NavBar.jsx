@@ -1,8 +1,16 @@
 "use client";
 
 import { FaBars } from "react-icons/fa";
+import NewUserNotification from "./NewUserNotification";
+import useCurrentUser from "@/hooks/useCurrentUser";
 
 export default function Navbar({ onMenuToggle }) {
+  const { user, isAdmin } = useCurrentUser();
+
+  const displayName = user?.firstName
+    ? `${user.firstName} ${user.lastName || ""}`.trim()
+    : "Admin";
+
   return (
     <header className="app-navbar bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
       <div className="d-flex align-items-center gap-2 gap-md-3 min-v-0">
@@ -21,8 +29,9 @@ export default function Navbar({ onMenuToggle }) {
       </div>
 
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
+        <NewUserNotification enabled={isAdmin} />
         <span className="app-navbar__welcome text-muted small">
-          Welcome Admin
+          Welcome {displayName}
         </span>
       </div>
     </header>

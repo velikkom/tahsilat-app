@@ -3,6 +3,7 @@ package com.veli.tahsilat.auth.controller;
 import com.veli.tahsilat.auth.dto.request.LoginRequest;
 import com.veli.tahsilat.auth.dto.request.RegisterRequest;
 import com.veli.tahsilat.auth.dto.response.AuthResponse;
+import com.veli.tahsilat.auth.dto.response.RegisterResponse;
 
 import com.veli.tahsilat.auth.service.AuthService.AuthService;
 
@@ -24,7 +25,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(
+    public ResponseEntity<RegisterResponse> register(
 
             @Valid
             @RequestBody RegisterRequest request
