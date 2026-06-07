@@ -1,6 +1,7 @@
 "use client";
 
 import useSidebar from "@/hooks/useSidebar";
+import { PendingUsersCountProvider } from "@/context/PendingUsersCountContext";
 import Sidebar from "./SideBar";
 import MobileSidebar from "./MobileSidebar";
 import Navbar from "./NavBar";
@@ -9,7 +10,8 @@ export default function DashboardShell({ children }) {
   const { isOpen, toggle, close } = useSidebar();
 
   return (
-    <div className="dashboard-shell d-flex min-vh-100">
+    <PendingUsersCountProvider>
+      <div className="dashboard-shell d-flex min-vh-100">
       {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
       <Sidebar />
 
@@ -24,5 +26,6 @@ export default function DashboardShell({ children }) {
         </main>
       </div>
     </div>
+    </PendingUsersCountProvider>
   );
 }

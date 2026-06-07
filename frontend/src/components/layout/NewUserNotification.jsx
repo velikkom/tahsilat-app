@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { FaBell } from "react-icons/fa";
-import usePendingUserCount from "@/hooks/usePendingUserCount";
+import usePendingUserCount from "@/context/PendingUsersCountContext";
 
-export default function NewUserNotification({ enabled = false }) {
-  const { count, loading } = usePendingUserCount(enabled);
+export default function NewUserNotification() {
+  const { count, loading, enabled } = usePendingUserCount();
 
   if (!enabled || loading || count === 0) {
     return null;

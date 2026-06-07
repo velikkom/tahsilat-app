@@ -29,7 +29,7 @@ export default function Navbar({ onMenuToggle }) {
       </div>
 
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
-        <NewUserNotification enabled={isAdmin} />
+        <NewUserNotification />
         <span className="app-navbar__welcome text-muted small">
           Welcome {displayName}
         </span>

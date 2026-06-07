@@ -4,12 +4,12 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import UsersManagementTable from "@/components/admin/UsersManagementTable";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import usePendingUserCount from "@/hooks/usePendingUserCount";
+import usePendingUserCount from "@/context/PendingUsersCountContext";
 
 export default function AdminUsersPage() {
   const router = useRouter();
   const { user, loading, isAdmin } = useCurrentUser();
-  const { refresh: refreshCount } = usePendingUserCount(isAdmin);
+  const { refresh: refreshCount } = usePendingUserCount();
 
   useEffect(() => {
     if (!loading && user && !isAdmin) {
@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
         </p>
       </div>
 
-      <UsersManagementTable onUpdated={refreshCount} />
+      <UsersManagementTable onUpdated={() => refreshCount({ silent: true })} />
     </div>
   );
 }
