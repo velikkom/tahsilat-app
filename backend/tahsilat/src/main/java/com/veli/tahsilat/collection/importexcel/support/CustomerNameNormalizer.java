@@ -24,6 +24,19 @@ public class CustomerNameNormalizer {
         return normalized;
     }
 
+    public String normalizeForDuplicateCheck(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        String normalized = replaceTurkishCharacters(value.trim());
+        normalized = normalized.toUpperCase(Locale.forLanguageTag("tr-TR"));
+        normalized = replaceTurkishCharacters(normalized);
+        normalized = normalized.replaceAll("[^A-Za-z0-9]", "");
+
+        return normalized;
+    }
+
     private String replaceTurkishCharacters(String value) {
         return value
                 .replace('ç', 'c')

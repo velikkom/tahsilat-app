@@ -2,6 +2,7 @@ package com.veli.tahsilat.common.importer;
 
 import com.veli.tahsilat.customer.entity.Customer;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
+import com.veli.tahsilat.customer.validation.CustomerDuplicateValidator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class CustomerExcelImporter
         implements CommandLineRunner {
 
     private final CustomerRepository customerRepository;
+    private final CustomerDuplicateValidator customerDuplicateValidator;
 
     @Override
     public void run(String... args) throws Exception {
@@ -97,12 +99,10 @@ public class CustomerExcelImporter
                 continue;
             }
 
-            if (
-                    customerRepository.existsByTaxNumber(
-                            taxNumber
-                    )
-            ) {
-
+            if (customerDuplicateValidator.isDuplicateForCreate(
+                    taxNumber,
+                    companyName
+            )) {
                 continue;
             }
 

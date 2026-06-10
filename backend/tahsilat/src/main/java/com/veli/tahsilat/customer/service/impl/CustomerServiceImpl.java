@@ -1,6 +1,5 @@
 package com.veli.tahsilat.customer.service.impl;
 
-import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
 import com.veli.tahsilat.customer.dto.request.CreateCustomerRequest;
 
@@ -14,8 +13,8 @@ import com.veli.tahsilat.customer.mapper.CustomerMapper;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
 
 import com.veli.tahsilat.customer.service.CustomerService;
+import com.veli.tahsilat.customer.validation.CustomerDuplicateValidator;
 
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -33,14 +32,16 @@ public class CustomerServiceImpl
 
     private final CustomerMapper customerMapper;
 
+    private final CustomerDuplicateValidator customerDuplicateValidator;
+
     @Override
     public CustomerResponse createCustomer(
             CreateCustomerRequest request
     ) {
-        if(customerRepository.existsByTaxNumber(request.getTaxNumber()))
-        {
-            throw new BusinessException("Tax number already exists");
-        }
+        customerDuplicateValidator.assertNotDuplicateForCreate(
+                request.getTaxNumber(),
+                request.getCompanyName()
+        );
 
         Customer customer =
                 customerMapper.toEntity(request);
@@ -85,9 +86,15 @@ public class CustomerServiceImpl
                         "Customer not found")
                 );
 
-        customerMapper.updateCustomerFromRequest(request,customer);
+        customerDuplicateValidator.assertNotDuplicateForUpdate(
+                request.getTaxNumber(),
+                request.getCompanyName(),
+                id
+        );
 
-        Customer updateCustomer= customerRepository.save(customer);
+        customerMapper.updateCustomerFromRequest(request, customer);
+
+        Customer updateCustomer = customerRepository.save(customer);
 
         return customerMapper.toResponse(updateCustomer);
     }

@@ -22,7 +22,7 @@ public class CustomerNameMatcher {
         Map<String, Customer> index = new HashMap<>();
 
         for (Customer customer : customers) {
-            String normalizedName = customerNameNormalizer.normalizeCustomerName(
+            String normalizedName = customerNameNormalizer.normalizeForDuplicateCheck(
                     customer.getCompanyName()
             );
 
@@ -44,7 +44,7 @@ public class CustomerNameMatcher {
             return CustomerMatchResult.notFound("");
         }
 
-        String normalizedName = customerNameNormalizer.normalizeCustomerName(
+        String normalizedName = customerNameNormalizer.normalizeForDuplicateCheck(
                 customerName
         );
 

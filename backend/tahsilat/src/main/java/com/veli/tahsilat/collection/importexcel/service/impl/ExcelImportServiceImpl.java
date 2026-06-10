@@ -12,6 +12,7 @@ import com.veli.tahsilat.collection.importexcel.service.ExcelImportService;
 import com.veli.tahsilat.collection.importexcel.support.CollectionExcelParser;
 import com.veli.tahsilat.collection.importexcel.support.CustomerNameMatcher;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
+import com.veli.tahsilat.collection.validation.CollectionDuplicateValidator;
 import com.veli.tahsilat.customer.entity.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
     private final CollectionExcelParser collectionExcelParser;
     private final CustomerNameMatcher customerNameMatcher;
     private final CollectionRepository collectionRepository;
+    private final CollectionDuplicateValidator collectionDuplicateValidator;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,7 +62,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         Map<String, Customer> customerIndex =
                 customerNameMatcher.buildCustomerIndex();
         Map<CollectionDuplicateKey, CollectionDuplicateKey> existingKeys =
-                loadExistingDuplicateKeys();
+                collectionDuplicateValidator.loadActiveDuplicateKeys();
         Map<CollectionDuplicateKey, Integer> excelKeyFirstRow = new HashMap<>();
 
         int duplicateRows = 0;
@@ -183,24 +185,6 @@ public class ExcelImportServiceImpl implements ExcelImportService {
                 .invalidRows(invalidRows)
                 .issues(issues)
                 .build();
-    }
-
-    private Map<CollectionDuplicateKey, CollectionDuplicateKey> loadExistingDuplicateKeys() {
-        Map<CollectionDuplicateKey, CollectionDuplicateKey> keys = new HashMap<>();
-
-        for (Object[] row : collectionRepository.findActiveCollectionDuplicateKeys()) {
-            CollectionDuplicateKey key = CollectionDuplicateKey.of(
-                    (UUID) row[0],
-                    (BigDecimal) row[1],
-                    (LocalDate) row[2],
-                    (PaymentType) row[3],
-                    (LocalDate) row[4]
-            );
-
-            keys.put(key, key);
-        }
-
-        return keys;
     }
 
     private CollectionImportIssueResponse buildDuplicateIssue(

@@ -201,4 +201,27 @@ public interface CollectionRepository
             """)
     List<Object[]> findActiveCollectionDuplicateKeys();
 
+    @Query("""
+            SELECT COUNT(c) > 0
+            FROM Collection c
+            WHERE c.active = true
+            AND c.customer.id = :customerId
+            AND c.amount = :amount
+            AND c.collectionDate = :collectionDate
+            AND c.paymentType = :paymentType
+            AND (
+                (:maturityDate IS NULL AND c.maturityDate IS NULL)
+                OR (:maturityDate IS NOT NULL AND c.maturityDate = :maturityDate)
+            )
+            AND (:excludeId IS NULL OR c.id <> :excludeId)
+            """)
+    boolean existsActiveDuplicate(
+            @Param("customerId") UUID customerId,
+            @Param("amount") BigDecimal amount,
+            @Param("collectionDate") LocalDate collectionDate,
+            @Param("paymentType") PaymentType paymentType,
+            @Param("maturityDate") LocalDate maturityDate,
+            @Param("excludeId") UUID excludeId
+    );
+
 }

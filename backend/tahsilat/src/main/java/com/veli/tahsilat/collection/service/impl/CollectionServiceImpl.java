@@ -9,6 +9,7 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.mapper.CollectionMapper;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.collection.service.CollectionService;
+import com.veli.tahsilat.collection.validation.CollectionDuplicateValidator;
 import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
 import com.veli.tahsilat.customer.entity.Customer;
@@ -32,6 +33,8 @@ public class CollectionServiceImpl
 
     private final CollectionMapper collectionMapper;
 
+    private final CollectionDuplicateValidator collectionDuplicateValidator;
+
     @Override
     public CollectionResponse createCollection(
             CreateCollectionRequest request
@@ -40,6 +43,14 @@ public class CollectionServiceImpl
         Customer customer = findActiveCustomer(request.getCustomerId());
 
         validateMaturityDate(
+                request.getPaymentType(),
+                request.getMaturityDate()
+        );
+
+        collectionDuplicateValidator.assertNotDuplicate(
+                request.getCustomerId(),
+                request.getAmount(),
+                request.getCollectionDate(),
                 request.getPaymentType(),
                 request.getMaturityDate()
         );
@@ -83,6 +94,15 @@ public class CollectionServiceImpl
         validateMaturityDate(
                 request.getPaymentType(),
                 request.getMaturityDate()
+        );
+
+        collectionDuplicateValidator.assertNotDuplicate(
+                request.getCustomerId(),
+                request.getAmount(),
+                request.getCollectionDate(),
+                request.getPaymentType(),
+                request.getMaturityDate(),
+                id
         );
 
         applyCollectionFields(
