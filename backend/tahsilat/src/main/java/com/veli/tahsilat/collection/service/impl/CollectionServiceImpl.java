@@ -67,6 +67,13 @@ public class CollectionServiceImpl
                 request.getDescription()
         );
 
+        /*
+         * Bu surumde tum odeme turleri olusturuldugu anda PAID kabul edilir.
+         * TODO: Ileride CHECK / PROMISSORY_NOTE icin odeme hesaba gectiginde
+         * PAID'e cevrilecek ayri bir tahsil akisi tasarlanacak.
+         */
+        collection.setStatus(CollectionStatus.PAID);
+
         Collection savedCollection =
                 collectionRepository.save(collection);
 
