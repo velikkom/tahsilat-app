@@ -68,14 +68,45 @@ public class CollectionDuplicateValidator {
             CollectionDuplicateKey key,
             UUID excludeCollectionId
     ) {
-        return collectionRepository.existsActiveDuplicate(
-                key.getCustomerId(),
-                key.getAmount(),
-                key.getCollectionDate(),
-                key.getPaymentType(),
-                key.getMaturityDate(),
-                excludeCollectionId
-        );
+        boolean hasMaturityDate = key.getMaturityDate() != null;
+
+        if (excludeCollectionId == null) {
+            return hasMaturityDate
+                    ? collectionRepository
+                            .existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateAndActiveTrue(
+                                    key.getCustomerId(),
+                                    key.getAmount(),
+                                    key.getCollectionDate(),
+                                    key.getPaymentType(),
+                                    key.getMaturityDate()
+                            )
+                    : collectionRepository
+                            .existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateIsNullAndActiveTrue(
+                                    key.getCustomerId(),
+                                    key.getAmount(),
+                                    key.getCollectionDate(),
+                                    key.getPaymentType()
+                            );
+        }
+
+        return hasMaturityDate
+                ? collectionRepository
+                        .existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateAndActiveTrueAndIdNot(
+                                key.getCustomerId(),
+                                key.getAmount(),
+                                key.getCollectionDate(),
+                                key.getPaymentType(),
+                                key.getMaturityDate(),
+                                excludeCollectionId
+                        )
+                : collectionRepository
+                        .existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateIsNullAndActiveTrueAndIdNot(
+                                key.getCustomerId(),
+                                key.getAmount(),
+                                key.getCollectionDate(),
+                                key.getPaymentType(),
+                                excludeCollectionId
+                        );
     }
 
     public Map<CollectionDuplicateKey, CollectionDuplicateKey> loadActiveDuplicateKeys() {

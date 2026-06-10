@@ -245,27 +245,43 @@ public interface CollectionRepository
             """)
     List<Object[]> findActiveCollectionDuplicateKeys();
 
-    @Query("""
-            SELECT COUNT(c) > 0
-            FROM Collection c
-            WHERE c.active = true
-            AND c.customer.id = :customerId
-            AND c.amount = :amount
-            AND c.collectionDate = :collectionDate
-            AND c.paymentType = :paymentType
-            AND (
-                (:maturityDate IS NULL AND c.maturityDate IS NULL)
-                OR (:maturityDate IS NOT NULL AND c.maturityDate = :maturityDate)
-            )
-            AND (:excludeId IS NULL OR c.id <> :excludeId)
-            """)
-    boolean existsActiveDuplicate(
-            @Param("customerId") UUID customerId,
-            @Param("amount") BigDecimal amount,
-            @Param("collectionDate") LocalDate collectionDate,
-            @Param("paymentType") PaymentType paymentType,
-            @Param("maturityDate") LocalDate maturityDate,
-            @Param("excludeId") UUID excludeId
+    /*
+     * Duplicate kontrolu icin null durumlarina gore ayri turetilmis sorgular
+     * kullanilir. JPQL'de ":param IS NULL" kalibi PostgreSQL'de
+     * "could not determine data type of parameter" hatasina yol actigi icin
+     * null dallanmasi Java tarafinda (CollectionDuplicateValidator) yapilir.
+     */
+
+    boolean existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateAndActiveTrue(
+            UUID customerId,
+            BigDecimal amount,
+            LocalDate collectionDate,
+            PaymentType paymentType,
+            LocalDate maturityDate
+    );
+
+    boolean existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateIsNullAndActiveTrue(
+            UUID customerId,
+            BigDecimal amount,
+            LocalDate collectionDate,
+            PaymentType paymentType
+    );
+
+    boolean existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateAndActiveTrueAndIdNot(
+            UUID customerId,
+            BigDecimal amount,
+            LocalDate collectionDate,
+            PaymentType paymentType,
+            LocalDate maturityDate,
+            UUID excludeId
+    );
+
+    boolean existsByCustomerIdAndAmountAndCollectionDateAndPaymentTypeAndMaturityDateIsNullAndActiveTrueAndIdNot(
+            UUID customerId,
+            BigDecimal amount,
+            LocalDate collectionDate,
+            PaymentType paymentType,
+            UUID excludeId
     );
 
 }
