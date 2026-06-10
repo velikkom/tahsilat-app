@@ -5,6 +5,7 @@ import "@/styles/theme.css";
 import "@/styles/layout.css";
 import "@/styles/datatable.css";
 import "@/styles/customers.css";
+import "@/styles/customer-collections.css";
 import "@/styles/collections.css";
 import "@/styles/dashboard.css";
 import "@/styles/responsive.css";

@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import CollectionFormFields from "@/components/forms/CollectionFormFields";
 
-const createInitialForm = () => ({
-  customerId: "",
+const createInitialForm = (defaultCustomerId = "") => ({
+  customerId: defaultCustomerId,
   amount: "",
   paymentType: "CASH",
   collectionDate: new Date().toISOString().split("T")[0],
@@ -31,6 +31,7 @@ export default function NewCollectionModal({
   loadingCustomers = false,
   mode = "create",
   initialCollection = null,
+  defaultCustomerId = "",
 }) {
   const [validated, setValidated] = useState(false);
   const [form, setForm] = useState(createInitialForm());
@@ -44,10 +45,10 @@ export default function NewCollectionModal({
       setForm(
         isEditMode && initialCollection
           ? mapCollectionToForm(initialCollection)
-          : createInitialForm()
+          : createInitialForm(defaultCustomerId)
       );
     }
-  }, [show, isEditMode, initialCollection?.id]);
+  }, [show, isEditMode, initialCollection?.id, defaultCustomerId]);
 
   useEffect(() => {
     if (!submitting) {

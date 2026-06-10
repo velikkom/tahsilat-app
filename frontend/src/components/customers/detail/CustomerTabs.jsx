@@ -1,6 +1,6 @@
 import { TabView, TabPanel } from "primereact/tabview";
 import CustomerOverview from "./CustomerOverview";
-import CustomerCollectionsTable from "./CustomerCollectionsTable";
+import CustomerCollectionsTab from "./collections/CustomerCollectionsTab";
 
 export default function CustomerTabs({ customer }) {
   return (
@@ -10,7 +10,7 @@ export default function CustomerTabs({ customer }) {
       </TabPanel>
 
       <TabPanel header="Collections">
-        <CustomerCollectionsTable customer={customer} />
+        <CustomerCollectionsTab customer={customer} />
       </TabPanel>
 
       <TabPanel header="Notes">

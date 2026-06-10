@@ -27,7 +27,6 @@ export default function useCustomerCollections(customerId) {
       setLoading(false);
     }
   }
-  console.log(collections);
 
   return {
     collections,

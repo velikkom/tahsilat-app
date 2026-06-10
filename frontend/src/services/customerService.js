@@ -47,11 +47,11 @@ export async function getCustomerById(id) {
   return response.json();
 }
 
-export async function getCustomerCollections(customerId) {
+export async function getCustomerCollections(customerId, { size = 500 } = {}) {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `${BASE_URL}/collections/customer/${customerId}`,
+    `${BASE_URL}/collections/customer/${customerId}?page=0&size=${size}`,
     {
       method: "GET",
       headers: {
