@@ -74,6 +74,50 @@ public interface CollectionRepository
             SELECT COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true
+            AND c.status = :status
+            """)
+    BigDecimal sumAmountByStatusAndActiveTrue(
+            @Param("status") CollectionStatus status
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.paymentType = :paymentType
+            """)
+    BigDecimal sumAmountByPaymentTypeAndActiveTrue(
+            @Param("paymentType") PaymentType paymentType
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.customer.id = :customerId
+            """)
+    BigDecimal sumAmountByCustomerIdAndActiveTrue(
+            @Param("customerId") UUID customerId
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.customer.id = :customerId
+            AND c.paymentType = :paymentType
+            """)
+    BigDecimal sumAmountByCustomerIdAndPaymentTypeAndActiveTrue(
+            @Param("customerId") UUID customerId,
+            @Param("paymentType") PaymentType paymentType
+    );
+
+    long countByCustomerIdAndActiveTrue(UUID customerId);
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
             AND c.collectionDate BETWEEN :startDate AND :endDate
             """)
     BigDecimal sumAmountByActiveTrueAndCollectionDateBetween(

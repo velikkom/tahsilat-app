@@ -27,6 +27,10 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -75,6 +79,13 @@ public class CollectionExcelImporter
 
         Sheet sheet =
                 workbook.getSheetAt(0);
+
+        // Müşteriler döngü dışında BİR KEZ yüklenir; her satırda findAll()
+        // çağrılması O(satır x müşteri) bellek tüketimine yol açıyordu.
+        Map<Customer, String> normalizedCustomerNames =
+                buildNormalizedCustomerNames();
+
+        List<Collection> batch = new ArrayList<>();
 
         boolean firstRow = true;
 
@@ -133,47 +144,11 @@ public class CollectionExcelImporter
                     continue;
                 }
 
-                Optional<Customer>
-                        optionalCustomer =
-
-                        customerRepository
-                                .findAll()
-                                .stream()
-                                .filter(customer -> {
-
-                                    String dbName =
-                                            normalize(
-                                                    customer.getCompanyName()
-                                            );
-
-                                    String excelName =
-                                            normalize(
-                                                    customerName
-                                            );
-
-                                    String dbNormalized =
-                                            dbName.replace(
-                                                    " ",
-                                                    ""
-                                            );
-
-                                    String excelNormalized =
-                                            excelName.replace(
-                                                    " ",
-                                                    ""
-                                            );
-
-                                    return dbNormalized.contains(
-                                            excelNormalized
-                                    )
-
-                                            ||
-
-                                            excelNormalized.contains(
-                                                    dbNormalized
-                                            );
-                                })
-                                .findFirst();
+                Optional<Customer> optionalCustomer =
+                        matchCustomer(
+                                customerName,
+                                normalizedCustomerNames
+                        );
 
                 if (
                         optionalCustomer.isEmpty()
@@ -216,9 +191,12 @@ public class CollectionExcelImporter
                         CollectionStatus.PAID
                 );
 
-                collectionRepository.save(
-                        collection
-                );
+                batch.add(collection);
+
+                if (batch.size() >= 100) {
+                    collectionRepository.saveAll(batch);
+                    batch.clear();
+                }
 
                 importedCount++;
 
@@ -232,6 +210,10 @@ public class CollectionExcelImporter
             }
         }
 
+        if (!batch.isEmpty()) {
+            collectionRepository.saveAll(batch);
+        }
+
         workbook.close();
 
         inputStream.close();
@@ -240,6 +222,45 @@ public class CollectionExcelImporter
                 "{} collections imported successfully.",
                 importedCount
         );
+    }
+
+    private Map<Customer, String> buildNormalizedCustomerNames() {
+        Map<Customer, String> normalizedNames = new HashMap<>();
+
+        for (Customer customer : customerRepository.findByActiveTrue()) {
+            normalizedNames.put(
+                    customer,
+                    normalize(customer.getCompanyName())
+                            .replace(" ", "")
+            );
+        }
+
+        return normalizedNames;
+    }
+
+    private Optional<Customer> matchCustomer(
+            String customerName,
+            Map<Customer, String> normalizedCustomerNames
+    ) {
+        String excelNormalized =
+                normalize(customerName).replace(" ", "");
+
+        if (excelNormalized.isBlank()) {
+            return Optional.empty();
+        }
+
+        for (Map.Entry<Customer, String> entry
+                : normalizedCustomerNames.entrySet()) {
+
+            String dbNormalized = entry.getValue();
+
+            if (dbNormalized.contains(excelNormalized)
+                    || excelNormalized.contains(dbNormalized)) {
+                return Optional.of(entry.getKey());
+            }
+        }
+
+        return Optional.empty();
     }
 
     private LocalDate parseDate(

@@ -44,42 +44,28 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public DashboardSummaryResponse getDashboardSummary() {
 
-        List<Collection> allCollections =
-                collectionRepository.findByActiveTrue();
+        BigDecimal totalAmount =
+                collectionRepository.sumAmountByActiveTrue();
 
-        List<Collection> pendingCollections =
-                collectionRepository
-                        .findByStatusAndActiveTrue(
-                                CollectionStatus.PENDING
-                        );
+        BigDecimal pendingAmount =
+                collectionRepository.sumAmountByStatusAndActiveTrue(
+                        CollectionStatus.PENDING
+                );
 
-        List<Collection> paidCollections =
-                collectionRepository
-                        .findByStatusAndActiveTrue(
-                                CollectionStatus.PAID
-                        );
+        BigDecimal paidAmount =
+                collectionRepository.sumAmountByStatusAndActiveTrue(
+                        CollectionStatus.PAID
+                );
 
-        List<Collection> cashCollections =
-                collectionRepository
-                        .findByPaymentTypeAndActiveTrue(
-                                PaymentType.CASH
-                        );
+        BigDecimal cashAmount =
+                collectionRepository.sumAmountByPaymentTypeAndActiveTrue(
+                        PaymentType.CASH
+                );
 
-        List<Collection> checkCollections =
-                collectionRepository
-                        .findByPaymentTypeAndActiveTrue(
-                                PaymentType.CHECK
-                        );
-
-        BigDecimal totalAmount =  calculateTotal(allCollections);
-
-        BigDecimal pendingAmount = calculateTotal(pendingCollections);
-
-        BigDecimal paidAmount = calculateTotal(paidCollections);
-
-        BigDecimal cashAmount = calculateTotal(cashCollections);
-
-        BigDecimal checkAmount = calculateTotal(checkCollections);
+        BigDecimal checkAmount =
+                collectionRepository.sumAmountByPaymentTypeAndActiveTrue(
+                        PaymentType.CHECK
+                );
 
         return DashboardSummaryResponse
                 .builder()
@@ -116,44 +102,36 @@ public class ReportServiceImpl implements ReportService {
                                 () -> new ResourceNotFoundException( "Customer not found")
                         );
 
-        List<Collection> allCollections =
-                collectionRepository
-                        .findByCustomerIdAndActiveTrue(
-                                customerId
-                        );
+        BigDecimal totalAmount =
+                collectionRepository.sumAmountByCustomerIdAndActiveTrue(
+                        customerId
+                );
 
-        List<Collection> cashCollections =
-                collectionRepository
-                        .findByCustomerIdAndPaymentTypeAndActiveTrue(
-                                customerId,
-                                PaymentType.CASH
-                        );
+        BigDecimal cashAmount =
+                collectionRepository.sumAmountByCustomerIdAndPaymentTypeAndActiveTrue(
+                        customerId,
+                        PaymentType.CASH
+                );
 
-        List<Collection> checkCollections =
-                collectionRepository
-                        .findByCustomerIdAndPaymentTypeAndActiveTrue(
-                                customerId,
-                                PaymentType.CHECK
-                        );
+        BigDecimal checkAmount =
+                collectionRepository.sumAmountByCustomerIdAndPaymentTypeAndActiveTrue(
+                        customerId,
+                        PaymentType.CHECK
+                );
+
+        long totalCount =
+                collectionRepository.countByCustomerIdAndActiveTrue(
+                        customerId
+                );
 
         return CustomerFinancialSummaryResponse
                 .builder()
                 .customerId(customer.getId())
                 .customerName(customer.getCompanyName())
-                .totalCollections(
-                        calculateTotal(allCollections)
-                )
-                .cashCollections(
-                        calculateTotal(cashCollections)
-                )
-                .checkCollections(
-                        calculateTotal(checkCollections)
-                )
-
-                .totalCollectionCount(
-                        (long) allCollections.size()
-                )
-
+                .totalCollections(totalAmount)
+                .cashCollections(cashAmount)
+                .checkCollections(checkAmount)
+                .totalCollectionCount(totalCount)
                 .build();
     }
 
