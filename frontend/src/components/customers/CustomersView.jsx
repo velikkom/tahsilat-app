@@ -27,7 +27,14 @@ import {
 } from "@/utils/customerUtils";
 
 export default function CustomersView() {
-  const { customers, loading, refresh } = useCustomers();
+  const {
+    customers,
+    loading,
+    refresh,
+    registerCustomerCreated,
+    lastCreatedCustomerId,
+    clearLastCreatedCustomerId,
+  } = useCustomers();
   const { isAdmin } = useCurrentUser();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -123,7 +130,8 @@ export default function CustomersView() {
 
     setShowCollectionModal(false);
     setCollectionCustomerId("");
-  }, [isSubmittingCollection]);
+    clearLastCreatedCustomerId();
+  }, [isSubmittingCollection, clearLastCreatedCustomerId]);
 
   const handleCollectionSubmit = useCallback(async (payload) => {
     setIsSubmittingCollection(true);
@@ -181,18 +189,19 @@ export default function CustomersView() {
             text: "Müşteri başarıyla güncellendi.",
             confirmButtonText: "Tamam",
           });
+          closeCustomerModal();
+          await refresh();
         } else {
-          await createCustomer(payload);
+          const createdCustomer = await createCustomer(payload);
+          await registerCustomerCreated(createdCustomer);
           await Swal.fire({
             icon: "success",
             title: "Başarılı",
             text: "Müşteri başarıyla oluşturuldu.",
             confirmButtonText: "Tamam",
           });
+          closeCustomerModal();
         }
-
-        closeCustomerModal();
-        await refresh();
       } catch (error) {
         await Swal.fire({
           icon: "error",
@@ -203,7 +212,7 @@ export default function CustomersView() {
         setIsSubmitting(false);
       }
     },
-    [modalMode, editingCustomer, closeCustomerModal, refresh]
+    [modalMode, editingCustomer, closeCustomerModal, refresh, registerCustomerCreated]
   );
 
   const handleDeleteCustomer = useCallback(
@@ -363,8 +372,10 @@ export default function CustomersView() {
         customers={customers}
         submitting={isSubmittingCollection}
         loadingCustomers={loading}
-        defaultCustomerId={collectionCustomerId}
-        lockCustomerSelection={Boolean(collectionCustomerId)}
+        defaultCustomerId={collectionCustomerId || lastCreatedCustomerId}
+        lockCustomerSelection={Boolean(
+          collectionCustomerId || lastCreatedCustomerId
+        )}
       />
     </>
   );

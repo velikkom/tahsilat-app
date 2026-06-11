@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import CollectionHeader from "@/components/collections/CollectionHeader";
 import CollectionsActionsBar from "@/components/sections/CollectionsActionsBar";
 import CollectionsTable from "@/components/collections/CollectionsTable";
@@ -12,17 +12,21 @@ import {
   deleteCollection,
   updateCollection,
 } from "@/services/collectionService";
-import { getCustomers } from "@/services/customerService";
 import useCollections from "@/hooks/useCollections";
+import useCustomers from "@/hooks/useCustomers";
 
 export default function CollectionsPage() {
   const { collections, loading, refresh } = useCollections();
+  const {
+    customers,
+    loading: loadingCustomers,
+    lastCreatedCustomerId,
+    clearLastCreatedCustomerId,
+  } = useCustomers();
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [editingCollection, setEditingCollection] = useState(null);
-  const [customers, setCustomers] = useState([]);
-  const [loadingCustomers, setLoadingCustomers] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
@@ -31,29 +35,12 @@ export default function CollectionsPage() {
 
   const isBusy = isSubmitting || isDeleting;
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
-
-  const loadCustomers = async () => {
-    try {
-      setLoadingCustomers(true);
-
-      const response = await getCustomers();
-
-      setCustomers(response.content || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingCustomers(false);
-    }
-  };
-
   const resetModalState = useCallback(() => {
     setShowModal(false);
     setModalMode("create");
     setEditingCollection(null);
-  }, []);
+    clearLastCreatedCustomerId();
+  }, [clearLastCreatedCustomerId]);
 
   const executeSubmission = useCallback(
     async (action, successText) => {
@@ -248,6 +235,12 @@ export default function CollectionsPage() {
         loadingCustomers={loadingCustomers}
         mode={modalMode}
         initialCollection={editingCollection}
+        defaultCustomerId={
+          modalMode === "create" ? lastCreatedCustomerId : ""
+        }
+        lockCustomerSelection={Boolean(
+          modalMode === "create" && lastCreatedCustomerId
+        )}
       />
 
       <ImportCollectionsModal

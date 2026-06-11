@@ -1,6 +1,7 @@
 "use client";
 
 import useSidebar from "@/hooks/useSidebar";
+import { CustomersProvider } from "@/context/CustomersContext";
 import { PendingUsersCountProvider } from "@/context/PendingUsersCountContext";
 import SessionMonitor from "@/components/auth/SessionMonitor";
 import Sidebar from "./SideBar";
@@ -11,6 +12,7 @@ export default function DashboardShell({ children }) {
   const { isOpen, toggle, close } = useSidebar();
 
   return (
+    <CustomersProvider>
     <PendingUsersCountProvider>
       <SessionMonitor />
       <div className="dashboard-shell d-flex min-vh-100">
@@ -29,5 +31,6 @@ export default function DashboardShell({ children }) {
       </div>
     </div>
     </PendingUsersCountProvider>
+    </CustomersProvider>
   );
 }

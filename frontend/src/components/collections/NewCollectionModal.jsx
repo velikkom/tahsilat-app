@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import CollectionFormFields from "@/components/forms/CollectionFormFields";
+import useCustomers from "@/hooks/useCustomers";
 
 const createInitialForm = (defaultCustomerId = "") => ({
   customerId: defaultCustomerId,
@@ -34,10 +35,17 @@ export default function NewCollectionModal({
   defaultCustomerId = "",
   lockCustomerSelection = false,
 }) {
+  const { refreshCustomers } = useCustomers();
   const [validated, setValidated] = useState(false);
   const [form, setForm] = useState(createInitialForm());
   const submitLockRef = useRef(false);
   const isEditMode = mode === "edit";
+
+  useEffect(() => {
+    if (show) {
+      refreshCustomers({ silent: true });
+    }
+  }, [show, refreshCustomers]);
 
   useEffect(() => {
     if (show) {
