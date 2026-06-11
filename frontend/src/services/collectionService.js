@@ -1,112 +1,38 @@
-import { API_V1 } from "@/config/api";
+import { apiFetchJson } from "@/services/apiClient";
 
-
-
-const BASE_URL = API_V1;
-
-function getAuthHeaders(includeJson = false) {
-  const headers = {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
-
-  if (includeJson) {
-    headers["Content-Type"] = "application/json";
-  }
-
-  return headers;
+export function getCollections({ page = 0, size = 100 } = {}) {
+  return apiFetchJson(`/collections?page=${page}&size=${size}`, {
+    errorMessage: "Collections fetch failed",
+  });
 }
 
-async function parseErrorResponse(response, fallbackMessage) {
-  const errorText = await response.text();
-
-  if (!errorText) {
-    return fallbackMessage;
-  }
-
-  try {
-    const parsed = JSON.parse(errorText);
-
-    return parsed.message || parsed.error || errorText;
-  } catch {
-    return errorText;
-  }
-}
-
-export async function getCollections({
-  page = 0,
-  size = 100,
-} = {}) {
-  const response = await fetch(
-    `${BASE_URL}/collections?page=${page}&size=${size}`,
-    {
-      method: "GET",
-      headers: getAuthHeaders(),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Collections fetch failed");
-  }
-
-  return response.json();
-}
-
-export async function createCollection(payload) {
-  const response = await fetch(`${BASE_URL}/collections`, {
+export function createCollection(payload) {
+  return apiFetchJson("/collections", {
     method: "POST",
-    headers: getAuthHeaders(true),
-    body: JSON.stringify(payload),
+    body: payload,
+    errorMessage: "Collection create failed",
   });
-
-  if (!response.ok) {
-    throw new Error(
-      await parseErrorResponse(response, "Collection create failed")
-    );
-  }
-
-  return response.json();
 }
 
-export async function getCollectionById(id) {
-  const response = await fetch(`${BASE_URL}/collections/${id}`, {
-    method: "GET",
-    headers: getAuthHeaders(),
+export function getCollectionById(id) {
+  return apiFetchJson(`/collections/${id}`, {
+    errorMessage: "Collection fetch failed",
   });
-
-  if (!response.ok) {
-    throw new Error("Collection fetch failed");
-  }
-
-  return response.json();
 }
 
-export async function updateCollection(id, payload) {
-  const response = await fetch(`${BASE_URL}/collections/${id}`, {
+export function updateCollection(id, payload) {
+  return apiFetchJson(`/collections/${id}`, {
     method: "PUT",
-    headers: getAuthHeaders(true),
-    body: JSON.stringify(payload),
+    body: payload,
+    errorMessage: "Collection update failed",
   });
-
-  if (!response.ok) {
-    throw new Error(
-      await parseErrorResponse(response, "Collection update failed")
-    );
-  }
-
-  return response.json();
 }
 
 export async function deleteCollection(id) {
-  const response = await fetch(`${BASE_URL}/collections/${id}`, {
+  await apiFetchJson(`/collections/${id}`, {
     method: "DELETE",
-    headers: getAuthHeaders(),
+    errorMessage: "Collection delete failed",
   });
-
-  if (!response.ok) {
-    throw new Error(
-      await parseErrorResponse(response, "Collection delete failed")
-    );
-  }
 
   return true;
 }

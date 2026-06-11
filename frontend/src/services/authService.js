@@ -1,6 +1,21 @@
-import { API_V1 } from "@/config/api";
+import { apiFetch } from "@/services/apiClient";
+import {
+  clearSession,
+  getToken,
+  isAuthenticated,
+  loadRememberMe,
+  saveRememberMe,
+  saveToken,
+} from "@/utils/tokenStorage";
 
-const BASE_URL = `${API_V1}/auth`;
+export {
+  clearSession,
+  getToken,
+  isAuthenticated,
+  loadRememberMe,
+  saveRememberMe,
+  saveToken,
+};
 
 export class AuthError extends Error {
   constructor(message) {
@@ -19,12 +34,10 @@ async function parseAuthError(response, fallback) {
 }
 
 export async function login(email, password) {
-  const response = await fetch(`${BASE_URL}/login`, {
+  const response = await apiFetch("/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
+    auth: false,
+    body: { email, password },
   });
 
   if (!response.ok) {
@@ -37,12 +50,10 @@ export async function login(email, password) {
 }
 
 export async function register(payload) {
-  const response = await fetch(`${BASE_URL}/register`, {
+  const response = await apiFetch("/auth/register", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+    auth: false,
+    body: payload,
   });
 
   if (!response.ok) {
@@ -54,37 +65,6 @@ export async function register(payload) {
   return response.json();
 }
 
-export function saveToken(token) {
-  localStorage.setItem("token", token);
-  document.cookie = `token=${token}; path=/`;
-}
-
-const REMEMBER_ME_KEY = "auth_remember_me";
-
-export function saveRememberMe(remember) {
-  if (remember) {
-    localStorage.setItem(REMEMBER_ME_KEY, "true");
-  } else {
-    localStorage.removeItem(REMEMBER_ME_KEY);
-  }
-}
-
-export function loadRememberMe() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-  return localStorage.getItem(REMEMBER_ME_KEY) === "true";
-}
-
-export function getToken() {
-  return localStorage.getItem("token");
-}
-
 export function logout() {
-  localStorage.removeItem("token");
-  document.cookie = "token=; Max-Age=0; path=/";
-}
-
-export function isAuthenticated() {
-  return !!getToken();
+  clearSession();
 }

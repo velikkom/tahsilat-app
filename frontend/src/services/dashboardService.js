@@ -1,13 +1,4 @@
-import { API_V1 } from "@/config/api";
-
-const BASE_URL = API_V1;
-
-function getAuthHeaders() {
-  return {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-    "Content-Type": "application/json",
-  };
-}
+import { apiFetchJson } from "@/services/apiClient";
 
 function buildYearQuery(year) {
   return year != null ? `year=${year}` : "";
@@ -23,32 +14,10 @@ function appendQuery(path, params) {
   return `${path}?${filtered.join("&")}`;
 }
 
-async function parseErrorResponse(response, fallbackMessage) {
-  const errorText = await response.text();
-
-  if (!errorText) {
-    return fallbackMessage;
-  }
-
-  try {
-    const parsed = JSON.parse(errorText);
-    return parsed.message || parsed.error || errorText;
-  } catch {
-    return errorText;
-  }
-}
-
-async function dashboardFetch(path, fallbackMessage) {
-  const response = await fetch(`${BASE_URL}/dashboard${path}`, {
-    method: "GET",
-    headers: getAuthHeaders(),
+function dashboardFetch(path, fallbackMessage) {
+  return apiFetchJson(`/dashboard${path}`, {
+    errorMessage: fallbackMessage,
   });
-
-  if (!response.ok) {
-    throw new Error(await parseErrorResponse(response, fallbackMessage));
-  }
-
-  return response.json();
 }
 
 export function getDashboardMetrics(year) {

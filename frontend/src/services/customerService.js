@@ -1,68 +1,22 @@
-import { API_V1 } from "@/config/api";
+import { apiFetchJson } from "@/services/apiClient";
 
-const BASE_URL = API_V1;
-
-export async function getCustomers({
-  page = 0,
-  size = 100,
-} = {}) {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch(
-    `${BASE_URL}/customers?page=${page}&size=${size}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Customers fetch failed");
-  }
-
-  return response.json();
+export function getCustomers({ page = 0, size = 100 } = {}) {
+  return apiFetchJson(`/customers?page=${page}&size=${size}`, {
+    errorMessage: "Customers fetch failed",
+  });
 }
 
-export async function getCustomerById(id) {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch(
-    `${BASE_URL}/customers/${id}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Customer fetch failed");
-  }
-
-  return response.json();
+export function getCustomerById(id) {
+  return apiFetchJson(`/customers/${id}`, {
+    errorMessage: "Customer fetch failed",
+  });
 }
 
-export async function getCustomerCollections(customerId, { size = 500 } = {}) {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch(
-    `${BASE_URL}/collections/customer/${customerId}?page=0&size=${size}`,
+export function getCustomerCollections(customerId, { size = 500 } = {}) {
+  return apiFetchJson(
+    `/collections/customer/${customerId}?page=0&size=${size}`,
     {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      errorMessage: "Collections fetch failed",
     }
   );
-
-  if (!response.ok) {
-    throw new Error("Collections fetch failed");
-  }
-
-  return response.json();
 }

@@ -1,108 +1,49 @@
-import { API_V1 } from "@/config/api";
-import { getToken } from "@/services/authService";
+import { apiFetchJson } from "@/services/apiClient";
 
-const BASE_URL = `${API_V1}/users`;
+const BASE_PATH = "/users";
 
-function authHeaders() {
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
-  };
-}
-
-async function parseError(response, fallback) {
-  try {
-    const data = await response.json();
-    return data?.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-export async function getCurrentUser() {
-  const response = await fetch(`${BASE_URL}/me`, {
-    headers: authHeaders(),
+export function getCurrentUser() {
+  return apiFetchJson(`${BASE_PATH}/me`, {
+    errorMessage: "Kullanıcı bilgisi alınamadı",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Kullanıcı bilgisi alınamadı"));
-  }
-
-  return response.json();
 }
 
-export async function getAllUsers() {
-  const response = await fetch(BASE_URL, {
-    headers: authHeaders(),
+export function getAllUsers() {
+  return apiFetchJson(BASE_PATH, {
+    errorMessage: "Kullanıcı listesi alınamadı",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Kullanıcı listesi alınamadı"));
-  }
-
-  return response.json();
 }
 
-export async function getPendingUsersCount() {
-  const response = await fetch(`${BASE_URL}/pending/count`, {
-    headers: authHeaders(),
+export function getPendingUsersCount() {
+  return apiFetchJson(`${BASE_PATH}/pending/count`, {
+    errorMessage: "Bildirim sayısı alınamadı",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Bildirim sayısı alınamadı"));
-  }
-
-  return response.json();
 }
 
-export async function activateUser(userId) {
-  const response = await fetch(`${BASE_URL}/${userId}/activate`, {
+export function activateUser(userId) {
+  return apiFetchJson(`${BASE_PATH}/${userId}/activate`, {
     method: "PATCH",
-    headers: authHeaders(),
+    errorMessage: "Kullanıcı aktifleştirilemedi",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Kullanıcı aktifleştirilemedi"));
-  }
-
-  return response.json();
 }
 
-export async function deactivateUser(userId) {
-  const response = await fetch(`${BASE_URL}/${userId}/deactivate`, {
+export function deactivateUser(userId) {
+  return apiFetchJson(`${BASE_PATH}/${userId}/deactivate`, {
     method: "PATCH",
-    headers: authHeaders(),
+    errorMessage: "Kullanıcı pasifleştirilemedi",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Kullanıcı pasifleştirilemedi"));
-  }
-
-  return response.json();
 }
 
-export async function getRoles() {
-  const response = await fetch(`${BASE_URL}/roles`, {
-    headers: authHeaders(),
+export function getRoles() {
+  return apiFetchJson(`${BASE_PATH}/roles`, {
+    errorMessage: "Roller alınamadı",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Roller alınamadı"));
-  }
-
-  return response.json();
 }
 
-export async function updateUserRole(userId, role) {
-  const response = await fetch(`${BASE_URL}/${userId}/role`, {
+export function updateUserRole(userId, role) {
+  return apiFetchJson(`${BASE_PATH}/${userId}/role`, {
     method: "PATCH",
-    headers: authHeaders(),
-    body: JSON.stringify({ role }),
+    body: { role },
+    errorMessage: "Rol güncellenemedi",
   });
-
-  if (!response.ok) {
-    throw new Error(await parseError(response, "Rol güncellenemedi"));
-  }
-
-  return response.json();
 }
