@@ -32,6 +32,7 @@ export default function NewCollectionModal({
   mode = "create",
   initialCollection = null,
   defaultCustomerId = "",
+  lockCustomerSelection = false,
 }) {
   const [validated, setValidated] = useState(false);
   const [form, setForm] = useState(createInitialForm());
@@ -146,6 +147,7 @@ export default function NewCollectionModal({
             onPaymentTypeChange={handlePaymentTypeChange}
             customers={customers}
             loadingCustomers={loadingCustomers}
+            lockCustomerSelection={lockCustomerSelection}
           />
         </Modal.Body>
 

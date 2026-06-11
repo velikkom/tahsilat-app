@@ -14,6 +14,7 @@ export default function CustomerMobileView({
   onView,
   onEdit,
   onDelete,
+  onNewCollection,
   showEdit = true,
   showDelete = true,
   busy = false,
@@ -45,6 +46,7 @@ export default function CustomerMobileView({
             onView={onView}
             onEdit={onEdit}
             onDelete={onDelete}
+            onNewCollection={onNewCollection}
             showEdit={showEdit}
             showDelete={showDelete}
             disabled={busy}

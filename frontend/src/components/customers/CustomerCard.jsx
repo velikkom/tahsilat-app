@@ -1,14 +1,16 @@
 "use client";
 
+import { Button } from "react-bootstrap";
 import CustomerActionButtons from "./CustomerActionButtons";
 import { formatCustomerField } from "@/utils/customerUtils";
-import { FaBuilding, FaPhone, FaUser } from "react-icons/fa";
+import { FaBuilding, FaMoneyBillWave, FaPhone, FaUser } from "react-icons/fa";
 
 export default function CustomerCard({
   customer,
   onView,
   onEdit,
   onDelete,
+  onNewCollection,
   showEdit = true,
   showDelete = true,
   disabled = false,
@@ -42,7 +44,17 @@ export default function CustomerCard({
           </li>
         </ul>
 
-        <div className="customer-card__actions mt-3 pt-3 border-top">
+        <div className="customer-card__actions mt-3 pt-3 border-top d-flex flex-column gap-2">
+          <Button
+            variant="success"
+            className="customer-card__collection-btn touch-target w-100"
+            onClick={() => onNewCollection?.(customer)}
+            disabled={disabled || deleting}
+          >
+            <FaMoneyBillWave className="me-2" aria-hidden="true" />
+            Yeni Tahsilat
+          </Button>
+
           <CustomerActionButtons
             onView={() => onView?.(customer)}
             onEdit={() => onEdit?.(customer)}

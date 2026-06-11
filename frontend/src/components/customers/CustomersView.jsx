@@ -11,8 +11,10 @@ import CustomersDesktopTable from "@/components/customers/CustomersDesktopTable"
 import CustomerDetailDrawer from "@/components/customers/CustomerDetailDrawer";
 import CustomerFiltersDrawer from "@/components/customers/CustomerFiltersDrawer";
 import CustomerCreateModal from "@/components/customers/CustomerCreateModal";
+import NewCollectionModal from "@/components/collections/NewCollectionModal";
 import useCustomers from "@/hooks/useCustomers";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { createCollection } from "@/services/collectionService";
 import {
   createCustomer,
   deleteCustomer,
@@ -40,11 +42,15 @@ export default function CustomersView() {
   const [modalMode, setModalMode] = useState("create");
   const [editingCustomer, setEditingCustomer] = useState(null);
 
+  const [showCollectionModal, setShowCollectionModal] = useState(false);
+  const [collectionCustomerId, setCollectionCustomerId] = useState("");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingCollection, setIsSubmittingCollection] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  const isBusy = isSubmitting || isDeleting;
+  const isBusy = isSubmitting || isSubmittingCollection || isDeleting;
 
   const filteredCustomers = useMemo(
     () => filterCustomers(customers, searchQuery, filters),
@@ -97,6 +103,52 @@ export default function CustomersView() {
     },
     [isBusy]
   );
+
+  const openCollectionModal = useCallback(
+    (customer) => {
+      if (isBusy || !customer?.id) {
+        return;
+      }
+
+      setCollectionCustomerId(customer.id);
+      setShowCollectionModal(true);
+    },
+    [isBusy]
+  );
+
+  const closeCollectionModal = useCallback(() => {
+    if (isSubmittingCollection) {
+      return;
+    }
+
+    setShowCollectionModal(false);
+    setCollectionCustomerId("");
+  }, [isSubmittingCollection]);
+
+  const handleCollectionSubmit = useCallback(async (payload) => {
+    setIsSubmittingCollection(true);
+
+    try {
+      await createCollection(payload);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Başarılı",
+        text: "Tahsilat başarıyla oluşturuldu.",
+        confirmButtonText: "Tamam",
+      });
+
+      closeCollectionModal();
+    } catch (error) {
+      await Swal.fire({
+        icon: "error",
+        title: "Hata",
+        text: error.message || "Tahsilat kaydedilemedi.",
+      });
+    } finally {
+      setIsSubmittingCollection(false);
+    }
+  }, [closeCollectionModal]);
 
   const closeCustomerModal = useCallback(() => {
     if (isSubmitting) {
@@ -257,6 +309,7 @@ export default function CustomersView() {
             onView={openDetail}
             onEdit={openEditModal}
             onDelete={handleDeleteCustomer}
+            onNewCollection={openCollectionModal}
             showEdit={isAdmin}
             showDelete={isAdmin}
             busy={isBusy}
@@ -300,6 +353,17 @@ export default function CustomersView() {
         submitting={isSubmitting}
         onClose={closeCustomerModal}
         onSubmit={handleModalSubmit}
+      />
+
+      <NewCollectionModal
+        show={showCollectionModal}
+        onClose={closeCollectionModal}
+        onSubmit={handleCollectionSubmit}
+        customers={customers}
+        submitting={isSubmittingCollection}
+        loadingCustomers={loading}
+        defaultCustomerId={collectionCustomerId}
+        lockCustomerSelection={Boolean(collectionCustomerId)}
       />
     </>
   );

@@ -114,6 +114,12 @@
   font-size: 0.92rem;
 }
 
+.customer-card__collection-btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 .customer-action-buttons__btn {
   min-height: 44px;
   border-radius: 12px;

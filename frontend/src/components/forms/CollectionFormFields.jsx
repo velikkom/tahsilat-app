@@ -19,6 +19,7 @@ export default function CollectionFormFields({
   onPaymentTypeChange,
   customers,
   loadingCustomers,
+  lockCustomerSelection = false,
 }) {
   return (
     <Row className="g-3">
@@ -30,7 +31,7 @@ export default function CollectionFormFields({
             name="customerId"
             value={form.customerId}
             onChange={onChange}
-            disabled={isFormDisabled}
+            disabled={isFormDisabled || lockCustomerSelection}
           >
             <option value="">
               {loadingCustomers ? "Müşteriler yükleniyor..." : "Müşteri Seçiniz"}
