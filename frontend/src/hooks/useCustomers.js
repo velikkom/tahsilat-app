@@ -24,5 +24,5 @@ export default function useCustomers() {
     }
   }
 
-  return { customers, loading, loadCustomers };
+  return { customers, loading, loadCustomers, refresh: loadCustomers };
 }

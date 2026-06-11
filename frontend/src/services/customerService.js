@@ -20,3 +20,28 @@ export function getCustomerCollections(customerId, { size = 500 } = {}) {
     }
   );
 }
+
+export function createCustomer(payload) {
+  return apiFetchJson("/customers", {
+    method: "POST",
+    body: payload,
+    errorMessage: "Müşteri oluşturulamadı",
+  });
+}
+
+export function updateCustomer(id, payload) {
+  return apiFetchJson(`/customers/${id}`, {
+    method: "PUT",
+    body: payload,
+    errorMessage: "Müşteri güncellenemedi",
+  });
+}
+
+export async function deleteCustomer(id) {
+  await apiFetchJson(`/customers/${id}`, {
+    method: "DELETE",
+    errorMessage: "Müşteri silinemedi",
+  });
+
+  return true;
+}

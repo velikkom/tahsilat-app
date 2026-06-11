@@ -5,9 +5,9 @@ const CustomersHeader = () => {
     <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
       <div>
         <h2 className="customers-page-title page-header__title mb-1">
-          Customers
+          Müşteriler
         </h2>
-        <p className="text-muted mb-0">Customer Management</p>
+        <p className="text-muted mb-0">Müşteri yönetimi</p>
       </div>
     </div>
   );

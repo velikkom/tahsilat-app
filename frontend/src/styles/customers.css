@@ -2,6 +2,59 @@
   font-weight: 700;
 }
 
+/* ─── Toolbar ─── */
+
+.customers-toolbar__actions .btn {
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+.customers-toolbar__create-btn {
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+  .customers-toolbar__actions {
+    align-items: stretch;
+  }
+
+  .customers-toolbar__filter-btn,
+  .customers-toolbar__create-btn {
+    width: auto;
+    min-width: 160px;
+  }
+
+  .customers-toolbar__create-btn {
+    margin-left: auto;
+  }
+}
+
+/* ─── Search ─── */
+
+.customer-search-bar .input-group-text,
+.customer-search-bar__input {
+  min-height: 52px;
+  border-radius: 14px;
+}
+
+.customer-search-bar .input-group-text {
+  color: #64748b;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.customer-search-bar__input {
+  font-size: 1rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.customer-search-bar__input:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+/* Legacy PrimeReact search (detail pages) */
 .customers-search-input {
   height: 56px !important;
   font-size: 18px !important;
@@ -13,6 +66,116 @@
   font-size: 18px !important;
   margin-left: 14px;
 }
+
+/* ─── Customer cards ─── */
+
+.customer-mobile-view__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.customer-card {
+  background: #ffffff;
+  border-radius: 1rem !important;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  border-left: 4px solid transparent !important;
+}
+
+.customer-card:hover {
+  box-shadow: 0 0.5rem 1.25rem rgba(15, 23, 42, 0.1) !important;
+}
+
+.customer-card--active {
+  border-left-color: #0d6efd !important;
+}
+
+.customer-card--inactive {
+  border-left-color: #6c757d !important;
+}
+
+.customer-card--empty {
+  padding: 2rem 1rem;
+}
+
+.customer-card__title {
+  font-size: 1.05rem;
+  line-height: 1.35;
+  margin: 0;
+  word-break: break-word;
+}
+
+.customer-card__icon {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.customer-card__meta {
+  font-size: 0.92rem;
+}
+
+.customer-action-buttons__btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  padding-inline: 0.5rem;
+}
+
+/* ─── Pagination ─── */
+
+.customer-pagination__btn {
+  min-width: 96px;
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+.customer-pagination__status {
+  min-width: 72px;
+  text-align: center;
+}
+
+/* ─── Drawers ─── */
+
+.customer-detail-drawer--bottom,
+.customer-filters-drawer--bottom {
+  --bs-offcanvas-height: min(88vh, 640px);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.customer-detail-drawer .offcanvas-body,
+.customer-filters-drawer .offcanvas-body {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+.customer-detail-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.customer-detail-field__label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.customer-detail-field__value {
+  font-size: 0.95rem;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.customer-filters-drawer__actions .btn {
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+/* ─── Customer tabs (detail page) ─── */
 
 .customer-tabs .p-tabview-nav {
   border: none !important;
