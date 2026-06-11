@@ -16,6 +16,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +73,10 @@ public class AuthServiceImpl implements AuthService {
             throw new AccountNotActivatedException();
         }
 
+        UUID sessionId = UUID.randomUUID();
+        user.setCurrentSessionId(sessionId);
+        userRepository.save(user);
+
         String jwtToken = jwtService.generateToken(
                 new org.springframework.security.core.userdetails.User(
                         user.getEmail(),
@@ -79,12 +86,23 @@ public class AuthServiceImpl implements AuthService {
                                         user.getRole().name()
                                 )
                         )
-                )
+                ),
+                sessionId
         );
 
         return AuthResponse.builder()
                 .accessToken(jwtToken)
                 .tokenType("Bearer")
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void logout(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow();
+
+        user.setCurrentSessionId(null);
+        userRepository.save(user);
     }
 }

@@ -19,6 +19,7 @@ import java.util.Date;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -38,6 +39,23 @@ public class JwtService {
         );
     }
 
+    public UUID extractSessionId(String token) {
+
+        return extractClaim(
+                token,
+                claims -> {
+                    String sessionId = claims.get(
+                            JwtConstants.CLAIM_SESSION_ID,
+                            String.class
+                    );
+
+                    return sessionId != null
+                            ? UUID.fromString(sessionId)
+                            : null;
+                }
+        );
+    }
+
     public <T> T extractClaim(
             String token,
             Function<Claims, T> resolver
@@ -50,19 +68,25 @@ public class JwtService {
     }
 
     public String generateToken(
-            UserDetails userDetails
+            UserDetails userDetails,
+            UUID sessionId
     ) {
 
         Map<String, Object> claims =
                 new HashMap<>();
 
         claims.put(
-                "role",
+                JwtConstants.CLAIM_ROLE,
                 userDetails
                         .getAuthorities()
                         .iterator()
                         .next()
                         .getAuthority()
+        );
+
+        claims.put(
+                JwtConstants.CLAIM_SESSION_ID,
+                sessionId.toString()
         );
 
         return Jwts.builder()
@@ -91,6 +115,7 @@ public class JwtService {
 
                 .compact();
     }
+
     public boolean isTokenValid(
             String token,
             UserDetails userDetails

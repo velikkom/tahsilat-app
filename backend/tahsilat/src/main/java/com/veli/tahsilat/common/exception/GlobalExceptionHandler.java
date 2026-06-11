@@ -163,4 +163,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+    @ExceptionHandler(SessionTerminatedException.class)
+    public ResponseEntity<ApiErrorResponse> handleSessionTerminated(
+            SessionTerminatedException ex
+    ) {
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .success(false)
+                .message(SessionTerminatedException.MESSAGE)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }

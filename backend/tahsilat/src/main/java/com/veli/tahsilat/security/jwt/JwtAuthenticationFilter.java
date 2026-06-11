@@ -1,6 +1,9 @@
 package com.veli.tahsilat.security.jwt;
 
+import com.veli.tahsilat.common.exception.SessionTerminatedException;
+import com.veli.tahsilat.common.util.HttpErrorResponseWriter;
 import com.veli.tahsilat.security.service.CustomUserDetailsService;
+import com.veli.tahsilat.security.session.SessionValidationService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -31,6 +35,10 @@ public class JwtAuthenticationFilter
     private final JwtService jwtService;
 
     private final CustomUserDetailsService userDetailsService;
+
+    private final SessionValidationService sessionValidationService;
+
+    private final HttpErrorResponseWriter httpErrorResponseWriter;
 
     @Override
     protected void doFilterInternal(
@@ -81,6 +89,23 @@ public class JwtAuthenticationFilter
                     jwtToken,
                     userDetails
             )) {
+
+                UUID jwtSessionId =
+                        jwtService.extractSessionId(jwtToken);
+
+                try {
+                    sessionValidationService.validateSession(
+                            userEmail,
+                            jwtSessionId
+                    );
+                } catch (SessionTerminatedException ex) {
+                    httpErrorResponseWriter.writeUnauthorized(
+                            response,
+                            SessionTerminatedException.MESSAGE
+                    );
+
+                    return;
+                }
 
                 UsernamePasswordAuthenticationToken authToken =
 

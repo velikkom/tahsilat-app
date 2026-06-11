@@ -38,4 +38,7 @@ public class User {
 
     @Column(name = "new_user")
     private Boolean newUser;
+
+    @Column(name = "current_session_id")
+    private UUID currentSessionId;
 }
