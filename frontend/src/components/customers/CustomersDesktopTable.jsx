@@ -25,6 +25,7 @@ export default function CustomersDesktopTable({
   onView,
   onEdit,
   onDelete,
+  onNewCollection,
   showEdit = true,
   showDelete = true,
   busy = false,
@@ -36,10 +37,14 @@ export default function CustomersDesktopTable({
         onView={() => onView?.(rowData)}
         onEdit={() => onEdit?.(rowData)}
         onDelete={() => onDelete?.(rowData)}
+        onNewCollection={
+          onNewCollection ? () => onNewCollection(rowData) : undefined
+        }
         showEdit={showEdit}
         showDelete={showDelete}
         disabled={busy}
         deleting={deletingId === rowData.id}
+        compact
       />
     );
   }
@@ -75,7 +80,7 @@ export default function CustomersDesktopTable({
             <Column
               header="İşlemler"
               body={actionBodyTemplate}
-              style={{ minWidth: "280px" }}
+              style={{ minWidth: "420px" }}
             />
           </DataTable>
         </ResponsiveTableWrapper>

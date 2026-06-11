@@ -324,6 +324,7 @@ export default function CustomersView() {
             onView={openDetail}
             onEdit={openEditModal}
             onDelete={handleDeleteCustomer}
+            onNewCollection={openCollectionModal}
             showEdit={isAdmin}
             showDelete={isAdmin}
             busy={isBusy}
