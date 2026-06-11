@@ -12,6 +12,7 @@ import com.veli.tahsilat.user.entity.User;
 import com.veli.tahsilat.user.enums.Role;
 import com.veli.tahsilat.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -58,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -75,7 +78,13 @@ public class AuthServiceImpl implements AuthService {
 
         UUID sessionId = UUID.randomUUID();
         user.setCurrentSessionId(sessionId);
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+
+        log.info(
+                "Login session created user={} sessionId={}",
+                user.getEmail(),
+                sessionId
+        );
 
         String jwtToken = jwtService.generateToken(
                 new org.springframework.security.core.userdetails.User(
@@ -103,6 +112,8 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow();
 
         user.setCurrentSessionId(null);
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+
+        log.info("Logout session cleared user={}", email);
     }
 }

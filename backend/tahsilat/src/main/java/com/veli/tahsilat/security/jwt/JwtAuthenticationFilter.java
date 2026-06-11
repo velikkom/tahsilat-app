@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -20,14 +21,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
-import org.springframework.stereotype.Component;
-
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter
         extends OncePerRequestFilter {
@@ -54,12 +53,14 @@ public class JwtAuthenticationFilter
         final String authHeader =
                 request.getHeader("Authorization");
 
-        final String jwtToken;
-
-        final String userEmail;
-
         if (authHeader == null
                 || !authHeader.startsWith("Bearer ")) {
+
+            log.debug(
+                    "JWT filter skip: no Bearer token on {} {}",
+                    request.getMethod(),
+                    request.getRequestURI()
+            );
 
             filterChain.doFilter(
                     request,
@@ -69,67 +70,95 @@ public class JwtAuthenticationFilter
             return;
         }
 
-        jwtToken = authHeader.substring(7);
+        final String jwtToken = authHeader.substring(7);
+        final String userEmail = jwtService.extractUsername(jwtToken);
 
-        userEmail =
-                jwtService.extractUsername(jwtToken);
+        log.debug(
+                "JWT filter processing request {} {} for user={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                userEmail
+        );
 
-        if (userEmail != null
-                &&
-                SecurityContextHolder.getContext()
-                        .getAuthentication() == null) {
+        if (userEmail == null) {
+            log.warn(
+                    "JWT filter skip: subject missing on {} {}",
+                    request.getMethod(),
+                    request.getRequestURI()
+            );
 
-            UserDetails userDetails =
-                    userDetailsService
-                            .loadUserByUsername(
-                                    userEmail
-                            );
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (jwtService.isTokenValid(
-                    jwtToken,
-                    userDetails
-            )) {
+        SecurityContextHolder.clearContext();
 
-                UUID jwtSessionId =
-                        jwtService.extractSessionId(jwtToken);
+        UserDetails userDetails =
+                userDetailsService.loadUserByUsername(userEmail);
 
-                try {
-                    sessionValidationService.validateSession(
-                            userEmail,
-                            jwtSessionId
-                    );
-                } catch (SessionTerminatedException ex) {
-                    httpErrorResponseWriter.writeUnauthorized(
-                            response,
-                            SessionTerminatedException.MESSAGE
-                    );
+        if (!jwtService.isTokenValid(jwtToken, userDetails)) {
+            log.warn(
+                    "JWT filter skip: token invalid for user={} on {} {}",
+                    userEmail,
+                    request.getMethod(),
+                    request.getRequestURI()
+            );
 
-                    return;
-                }
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-                UsernamePasswordAuthenticationToken authToken =
+        UUID jwtSessionId = jwtService.extractSessionId(jwtToken);
 
-                        new UsernamePasswordAuthenticationToken(
+        log.debug(
+                "JWT session validation starting user={} jwtSessionId={}",
+                userEmail,
+                jwtSessionId
+        );
 
-                                userDetails,
+        try {
+            sessionValidationService.validateSession(
+                    userEmail,
+                    jwtSessionId
+            );
+        } catch (SessionTerminatedException ex) {
+            log.warn(
+                    "Session terminated user={} jwtSessionId={} on {} {}",
+                    userEmail,
+                    jwtSessionId,
+                    request.getMethod(),
+                    request.getRequestURI()
+            );
 
-                                null,
+            SecurityContextHolder.clearContext();
+            httpErrorResponseWriter.writeUnauthorized(
+                    response,
+                    SessionTerminatedException.MESSAGE
+            );
 
-                                userDetails.getAuthorities()
-                        );
+            return;
+        }
 
-                authToken.setDetails(
-
-                        new WebAuthenticationDetailsSource()
-
-                                .buildDetails(request)
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
                 );
 
-                SecurityContextHolder.getContext()
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource()
+                        .buildDetails(request)
+        );
 
-                        .setAuthentication(authToken);
-            }
-        }
+        SecurityContextHolder.getContext()
+                .setAuthentication(authToken);
+
+        log.debug(
+                "JWT authentication success user={} jwtSessionId={}",
+                userEmail,
+                jwtSessionId
+        );
 
         filterChain.doFilter(
                 request,

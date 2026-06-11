@@ -1,9 +1,12 @@
 package com.veli.tahsilat.security.config;
 
+import com.veli.tahsilat.common.util.HttpErrorResponseWriter;
 import com.veli.tahsilat.security.jwt.JwtAuthenticationFilter;
+import com.veli.tahsilat.security.jwt.JwtService;
 import com.veli.tahsilat.security.service.CustomUserDetailsService;
+import com.veli.tahsilat.security.session.SessionValidationService;
 import jakarta.servlet.DispatcherType;
-import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,11 +25,35 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
+            JwtService jwtService,
+            CustomUserDetailsService userDetailsService,
+            SessionValidationService sessionValidationService,
+            HttpErrorResponseWriter httpErrorResponseWriter
+    ) {
+        return new JwtAuthenticationFilter(
+                jwtService,
+                userDetailsService,
+                sessionValidationService,
+                httpErrorResponseWriter
+        );
+    }
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration =
+                new FilterRegistrationBean<>(jwtAuthenticationFilter);
+
+        registration.setEnabled(false);
+
+        return registration;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,7 +62,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
 
         http
