@@ -65,6 +65,21 @@ export async function register(payload) {
   return response.json();
 }
 
-export function logout() {
+export async function logout() {
+  const { forceStopSessionMonitor } = await import("@/services/sessionMonitor");
+  forceStopSessionMonitor();
   clearSession();
+}
+
+export async function checkSession() {
+  const response = await apiFetch("/auth/session", {
+    method: "GET",
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.message || "Session check failed");
+  }
+
+  return response.json();
 }

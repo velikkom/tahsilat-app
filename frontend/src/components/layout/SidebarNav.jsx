@@ -9,7 +9,7 @@ import {
   FaMoneyCheckAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
-import { clearSession } from "@/utils/tokenStorage";
+import { logout } from "@/services/authService";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const BASE_MENUS = [
@@ -30,8 +30,8 @@ export default function SidebarNav({ onNavigate }) {
 
   const menus = isAdmin ? [...BASE_MENUS, ADMIN_MENU] : BASE_MENUS;
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    await logout();
     window.location.href = "/login";
   }
 

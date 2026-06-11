@@ -26,6 +26,10 @@ export function handleSessionTerminated() {
 
   if (!sessionTerminationPromise) {
     sessionTerminationPromise = (async () => {
+      const { forceStopSessionMonitor } = await import(
+        "@/services/sessionMonitor"
+      );
+      forceStopSessionMonitor();
       clearSession();
 
       await Swal.fire({

@@ -4,6 +4,7 @@ import com.veli.tahsilat.auth.dto.request.LoginRequest;
 import com.veli.tahsilat.auth.dto.request.RegisterRequest;
 import com.veli.tahsilat.auth.dto.response.AuthResponse;
 import com.veli.tahsilat.auth.dto.response.RegisterResponse;
+import com.veli.tahsilat.auth.dto.response.SessionResponse;
 
 import com.veli.tahsilat.auth.service.AuthService.AuthService;
 
@@ -58,5 +59,10 @@ public class AuthController {
         authService.logout(authentication.getName());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/session")
+    public ResponseEntity<SessionResponse> checkSession() {
+        return ResponseEntity.ok(authService.checkSession());
     }
 }

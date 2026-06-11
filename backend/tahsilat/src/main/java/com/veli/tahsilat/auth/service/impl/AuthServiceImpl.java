@@ -2,8 +2,10 @@ package com.veli.tahsilat.auth.service.impl;
 
 import com.veli.tahsilat.auth.dto.request.LoginRequest;
 import com.veli.tahsilat.auth.dto.request.RegisterRequest;
+import com.veli.tahsilat.auth.constants.SessionMessages;
 import com.veli.tahsilat.auth.dto.response.AuthResponse;
 import com.veli.tahsilat.auth.dto.response.RegisterResponse;
+import com.veli.tahsilat.auth.dto.response.SessionResponse;
 import com.veli.tahsilat.auth.service.AuthService.AuthService;
 import com.veli.tahsilat.common.exception.AccountNotActivatedException;
 import com.veli.tahsilat.common.exception.BusinessException;
@@ -115,5 +117,13 @@ public class AuthServiceImpl implements AuthService {
         userRepository.saveAndFlush(user);
 
         log.info("Logout session cleared user={}", email);
+    }
+
+    @Override
+    public SessionResponse checkSession() {
+        return SessionResponse.builder()
+                .success(true)
+                .message(SessionMessages.SESSION_VALID)
+                .build();
     }
 }
