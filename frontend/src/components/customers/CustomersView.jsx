@@ -399,7 +399,7 @@ export default function CustomersView() {
                   />
                 </div>
 
-                <div className="d-lg-none d-flex flex-column gap-3">
+                <div className="customers-page__card-list d-lg-none d-flex flex-column gap-3 min-width-0">
                   <CustomerCardGrid
                     customers={mobilePagination.items}
                     onView={openDetail}

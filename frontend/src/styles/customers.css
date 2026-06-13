@@ -74,7 +74,15 @@
   margin-left: 14px;
 }
 
+.customers-page__card-list {
+  min-width: 0;
+}
+
 /* ─── Customer cards ─── */
+
+.customer-card {
+  overflow: hidden;
+}
 
 .customer-card__title {
   font-size: 1rem;
@@ -99,6 +107,72 @@
 
 .customer-action-buttons__btn {
   min-height: 44px;
+}
+
+.customer-action-buttons--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.customer-action-buttons__primary-row,
+.customer-action-buttons__secondary-row {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.customer-action-buttons__secondary-row > [class*="col-"] {
+  min-width: 0;
+}
+
+.customer-action-buttons--stacked .customer-action-buttons__btn {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-inline: 0.4rem;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 575.98px) {
+  .customer-action-buttons--stacked .customer-action-buttons__btn {
+    font-size: 0.72rem;
+    padding-inline: 0.3rem;
+  }
+
+  .customer-action-buttons--stacked .customer-action-buttons__btn svg {
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 576px) {
+  .customer-action-buttons--stacked .customer-action-buttons__btn {
+    font-size: 0.82rem;
+    padding-inline: 0.5rem;
+  }
+}
+
+.customer-action-buttons--compact .customer-action-buttons__btn {
+  flex: 0 1 auto;
+}
+
+/* ─── Quick filters ─── */
+
+.customer-quick-filters {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.customer-filters-panel .card-body {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.customer-content-panel .card-body {
+  min-width: 0;
 }
 
 /* ─── Pagination ─── */

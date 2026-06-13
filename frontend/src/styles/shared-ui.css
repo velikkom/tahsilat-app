@@ -66,9 +66,12 @@
 
 .ui-filter-scroll {
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-bottom: 0.15rem;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .ui-filter-scroll::-webkit-scrollbar {
@@ -135,7 +138,13 @@
 /* ─── Page layout ─── */
 
 .ui-page-with-fab {
-  padding-bottom: 5rem;
+  padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .ui-page-with-fab {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 @media (min-width: 992px) {

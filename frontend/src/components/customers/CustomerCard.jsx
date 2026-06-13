@@ -33,7 +33,7 @@ function CustomerCard({
           : "ui-entity-card--accent-secondary"
       }`}
     >
-      <div className="card-body d-flex flex-column gap-3 p-3 p-md-4">
+      <div className="card-body d-flex flex-column gap-3 p-3 p-md-4 min-width-0">
         <div className="customer-card__header d-flex justify-content-between align-items-start gap-2">
           <h3 className="customer-card__title fw-bold mb-0 text-truncate min-width-0">
             {formatCustomerField(customer.companyName)}
@@ -62,7 +62,7 @@ function CustomerCard({
           </li>
         </ul>
 
-        <div className="customer-card__actions mt-auto pt-3 border-top">
+        <div className="customer-card__actions mt-auto pt-3 border-top min-width-0">
           <CustomerActionButtons
             onView={() => onView?.(customer)}
             onEdit={() => onEdit?.(customer)}
