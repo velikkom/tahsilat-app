@@ -224,6 +224,37 @@
   word-break: break-word;
 }
 
+.customer-detail-phone__number {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.customer-detail-phone__number:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.customer-detail-phone__actions {
+  width: 100%;
+}
+
+.customer-detail-phone__btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.customer-detail-drawer__action-btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 .customer-filters-drawer__actions .btn {
   min-height: 44px;
   border-radius: 12px;
@@ -231,6 +262,14 @@
 
 body.dark-mode .customer-detail-field__value {
   color: #f3f4f6;
+}
+
+body.dark-mode .customer-detail-phone__number {
+  color: #60a5fa;
+}
+
+body.dark-mode .customer-detail-phone__number:hover {
+  color: #93c5fd;
 }
 
 /* ─── Customer tabs (detail page) ─── */

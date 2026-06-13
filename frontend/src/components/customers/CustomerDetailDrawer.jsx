@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Badge, Button, Offcanvas } from "react-bootstrap";
+import CustomerPhoneActions from "./CustomerPhoneActions";
 import {
   formatCustomerDate,
   formatCustomerField,
@@ -64,7 +65,7 @@ export default function CustomerDetailDrawer({
       </Offcanvas.Header>
 
       <Offcanvas.Body className="d-flex flex-column gap-4">
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center flex-wrap gap-2">
           <span className="customer-detail-drawer__company fw-bold fs-5">
             {formatCustomerField(customer.companyName)}
           </span>
@@ -75,13 +76,15 @@ export default function CustomerDetailDrawer({
           <DetailField label="Yetkili Kişi">
             {formatCustomerField(customer.authorizedPerson)}
           </DetailField>
+
           <DetailField label="Telefon">
             {customer.phone ? (
-              <a href={`tel:${customer.phone}`}>{customer.phone}</a>
+              <CustomerPhoneActions phone={customer.phone} />
             ) : (
               "-"
             )}
           </DetailField>
+
           <DetailField label="Vergi No">
             {formatCustomerField(customer.taxNumber)}
           </DetailField>
@@ -93,10 +96,10 @@ export default function CustomerDetailDrawer({
           </DetailField>
         </div>
 
-        <div className="d-flex flex-column gap-2 mt-auto">
+        <div className="customer-detail-drawer__actions d-flex flex-column gap-2 mt-auto">
           <Button
             variant="success"
-            className="touch-target"
+            className="customer-detail-drawer__action-btn touch-target w-100"
             disabled={busy}
             onClick={() => onNewCollection?.(customer)}
           >
@@ -108,7 +111,7 @@ export default function CustomerDetailDrawer({
             {showEdit && (
               <Button
                 variant="outline-warning"
-                className="flex-fill touch-target"
+                className="customer-detail-drawer__action-btn flex-fill touch-target"
                 disabled={busy}
                 onClick={() => onEdit?.(customer)}
               >
@@ -120,7 +123,7 @@ export default function CustomerDetailDrawer({
             {showDelete && (
               <Button
                 variant="outline-danger"
-                className="flex-fill touch-target"
+                className="customer-detail-drawer__action-btn flex-fill touch-target"
                 disabled={busy}
                 onClick={() => onDelete?.(customer)}
               >
