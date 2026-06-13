@@ -1,11 +1,17 @@
 "use client";
 
-import { Button } from "react-bootstrap";
+import { memo } from "react";
+import { Badge, Button } from "react-bootstrap";
 import CustomerActionButtons from "./CustomerActionButtons";
-import { formatCustomerField } from "@/utils/customerUtils";
-import { FaBuilding, FaMoneyBillWave, FaPhone, FaUser } from "react-icons/fa";
+import {
+  formatCustomerField,
+  getCustomerStatusLabel,
+  getCustomerStatusVariant,
+  isCustomerActive,
+} from "@/utils/customerUtils";
+import { FaBuilding, FaPhone, FaUser } from "react-icons/fa";
 
-export default function CustomerCard({
+function CustomerCard({
   customer,
   onView,
   onEdit,
@@ -16,18 +22,30 @@ export default function CustomerCard({
   disabled = false,
   deleting = false,
 }) {
-  const isActive = customer?.active !== false;
+  const isActive = isCustomerActive(customer);
+  const statusVariant = getCustomerStatusVariant(customer);
 
   return (
     <article
-      className={`customer-card card border-0 shadow-sm rounded-4 ${
-        isActive ? "customer-card--active" : "customer-card--inactive"
+      className={`customer-card ui-entity-card card border-0 shadow-sm h-100 ${
+        isActive
+          ? "ui-entity-card--accent-success"
+          : "ui-entity-card--accent-secondary"
       }`}
     >
-      <div className="card-body p-3 p-md-4">
-        <h3 className="customer-card__title fw-bold mb-3">
-          {formatCustomerField(customer.companyName)}
-        </h3>
+      <div className="card-body d-flex flex-column gap-3 p-3 p-md-4">
+        <div className="customer-card__header d-flex justify-content-between align-items-start gap-2">
+          <h3 className="customer-card__title fw-bold mb-0 text-truncate min-width-0">
+            {formatCustomerField(customer.companyName)}
+          </h3>
+
+          <Badge
+            bg={statusVariant}
+            className="customer-card__status-badge flex-shrink-0"
+          >
+            {getCustomerStatusLabel(customer)}
+          </Badge>
+        </div>
 
         <ul className="customer-card__meta list-unstyled mb-0 d-flex flex-column gap-2">
           <li className="d-flex align-items-start gap-2 text-secondary">
@@ -44,21 +62,12 @@ export default function CustomerCard({
           </li>
         </ul>
 
-        <div className="customer-card__actions mt-3 pt-3 border-top d-flex flex-column gap-2">
-          <Button
-            variant="success"
-            className="customer-card__collection-btn touch-target w-100"
-            onClick={() => onNewCollection?.(customer)}
-            disabled={disabled || deleting}
-          >
-            <FaMoneyBillWave className="me-2" aria-hidden="true" />
-            Yeni Tahsilat
-          </Button>
-
+        <div className="customer-card__actions mt-auto pt-3 border-top">
           <CustomerActionButtons
             onView={() => onView?.(customer)}
             onEdit={() => onEdit?.(customer)}
             onDelete={() => onDelete?.(customer)}
+            onNewCollection={() => onNewCollection?.(customer)}
             showEdit={showEdit}
             showDelete={showDelete}
             disabled={disabled}
@@ -69,3 +78,5 @@ export default function CustomerCard({
     </article>
   );
 }
+
+export default memo(CustomerCard);

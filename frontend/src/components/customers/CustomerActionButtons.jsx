@@ -26,7 +26,7 @@ export default function CustomerActionButtons({
         <Button
           variant="success"
           size={buttonSize}
-          className={`customer-action-buttons__btn touch-target ${
+          className={`customer-action-buttons__btn ui-card-actions__btn touch-target ${
             compact ? "" : "flex-fill"
           }`}
           onClick={onNewCollection}
@@ -41,7 +41,7 @@ export default function CustomerActionButtons({
       <Button
         variant="outline-primary"
         size={buttonSize}
-        className="customer-action-buttons__btn flex-fill touch-target"
+        className="customer-action-buttons__btn ui-card-actions__btn flex-fill touch-target"
         onClick={onView}
         disabled={disabled || deleting}
         aria-label="Görüntüle"
@@ -54,7 +54,7 @@ export default function CustomerActionButtons({
         <Button
           variant="outline-warning"
           size={buttonSize}
-          className="customer-action-buttons__btn flex-fill touch-target"
+          className="customer-action-buttons__btn ui-card-actions__btn flex-fill touch-target"
           onClick={onEdit}
           disabled={disabled || deleting}
           aria-label="Düzenle"
@@ -68,7 +68,7 @@ export default function CustomerActionButtons({
         <Button
           variant="outline-danger"
           size={buttonSize}
-          className="customer-action-buttons__btn flex-fill touch-target"
+          className="customer-action-buttons__btn ui-card-actions__btn flex-fill touch-target"
           onClick={onDelete}
           disabled={disabled || deleting}
           aria-label="Sil"

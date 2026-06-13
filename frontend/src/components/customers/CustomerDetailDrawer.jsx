@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Offcanvas from "react-bootstrap/Offcanvas";
+import { Badge, Button, Offcanvas } from "react-bootstrap";
 import {
   formatCustomerDate,
   formatCustomerField,
+  getCustomerStatusLabel,
+  getCustomerStatusVariant,
 } from "@/utils/customerUtils";
 
 function DetailField({ label, children }) {
@@ -16,11 +18,21 @@ function DetailField({ label, children }) {
   );
 }
 
-export default function CustomerDetailDrawer({ show, customer, onHide }) {
+export default function CustomerDetailDrawer({
+  show,
+  customer,
+  onHide,
+  onEdit,
+  onDelete,
+  onNewCollection,
+  showEdit = true,
+  showDelete = true,
+  busy = false,
+}) {
   const [placement, setPlacement] = useState("end");
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 991px)");
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
 
     function updatePlacement() {
       setPlacement(mediaQuery.matches ? "bottom" : "end");
@@ -36,7 +48,7 @@ export default function CustomerDetailDrawer({ show, customer, onHide }) {
     return null;
   }
 
-  const isActive = customer.active !== false;
+  const statusVariant = getCustomerStatusVariant(customer);
 
   return (
     <Offcanvas
@@ -53,19 +65,13 @@ export default function CustomerDetailDrawer({ show, customer, onHide }) {
 
       <Offcanvas.Body className="d-flex flex-column gap-4">
         <div className="d-flex align-items-center gap-2">
-          <span
-            className={`badge rounded-pill ${
-              isActive ? "text-bg-primary" : "text-bg-secondary"
-            }`}
-          >
-            {isActive ? "Aktif" : "Pasif"}
+          <span className="customer-detail-drawer__company fw-bold fs-5">
+            {formatCustomerField(customer.companyName)}
           </span>
+          <Badge bg={statusVariant}>{getCustomerStatusLabel(customer)}</Badge>
         </div>
 
         <div className="customer-detail-fields">
-          <DetailField label="Şirket Adı">
-            {formatCustomerField(customer.companyName)}
-          </DetailField>
           <DetailField label="Yetkili Kişi">
             {formatCustomerField(customer.authorizedPerson)}
           </DetailField>
@@ -85,6 +91,44 @@ export default function CustomerDetailDrawer({ show, customer, onHide }) {
           <DetailField label="Oluşturulma Tarihi">
             {formatCustomerDate(customer.createdAt)}
           </DetailField>
+        </div>
+
+        <div className="d-flex flex-column gap-2 mt-auto">
+          <Button
+            variant="success"
+            className="touch-target"
+            disabled={busy}
+            onClick={() => onNewCollection?.(customer)}
+          >
+            <i className="pi pi-wallet me-2" aria-hidden="true" />
+            Yeni Tahsilat
+          </Button>
+
+          <div className="d-flex gap-2">
+            {showEdit && (
+              <Button
+                variant="outline-warning"
+                className="flex-fill touch-target"
+                disabled={busy}
+                onClick={() => onEdit?.(customer)}
+              >
+                <i className="pi pi-pencil me-2" aria-hidden="true" />
+                Düzenle
+              </Button>
+            )}
+
+            {showDelete && (
+              <Button
+                variant="outline-danger"
+                className="flex-fill touch-target"
+                disabled={busy}
+                onClick={() => onDelete?.(customer)}
+              >
+                <i className="pi pi-trash me-2" aria-hidden="true" />
+                Sil
+              </Button>
+            )}
+          </div>
         </div>
       </Offcanvas.Body>
     </Offcanvas>

@@ -12,7 +12,7 @@ import CollectionQuickFilters from "@/components/collections/CollectionQuickFilt
 import CollectionTable from "@/components/collections/CollectionTable";
 import CollectionCardGrid from "@/components/collections/CollectionCardGrid";
 import CollectionEmptyState from "@/components/collections/CollectionEmptyState";
-import FloatingAddButton from "@/components/collections/FloatingAddButton";
+import FloatingAddButton from "@/components/ui/FloatingAddButton";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
 import ImportCollectionsModal from "@/components/collections/ImportCollectionsModal";
 import CustomerCollectionDrawer from "@/components/customers/detail/collections/CustomerCollectionDrawer";
@@ -300,7 +300,7 @@ export default function CollectionsView() {
   const hasFilteredResults = filteredCollections.length > 0;
 
   return (
-    <div className="collections-page">
+    <div className="collections-page ui-page-with-fab">
       <CollectionHeader />
 
       {!loading && hasCollections && <CollectionStats stats={stats} />}
@@ -312,7 +312,7 @@ export default function CollectionsView() {
       />
 
       {hasCollections && (
-        <div className="card border-0 shadow-sm collection-filters-panel mb-3">
+        <div className="card border-0 shadow-sm ui-panel-card collection-filters-panel mb-3">
           <div className="card-body d-flex flex-column gap-3">
             <CollectionFilters
               searchQuery={filters.searchQuery}
@@ -335,7 +335,7 @@ export default function CollectionsView() {
         </div>
       )}
 
-      <div className="card border-0 shadow-sm collection-content-panel">
+      <div className="card border-0 shadow-sm ui-panel-card collection-content-panel">
         <div className="card-body">
           {loading ? (
             <div className="d-flex justify-content-center py-5">
@@ -382,7 +382,11 @@ export default function CollectionsView() {
         </div>
       </div>
 
-      <FloatingAddButton onClick={handleOpenCreateModal} disabled={isBusy} />
+      <FloatingAddButton
+        onClick={handleOpenCreateModal}
+        disabled={isBusy}
+        ariaLabel="Yeni tahsilat ekle"
+      />
 
       <CustomerCollectionDrawer
         show={showDrawer}

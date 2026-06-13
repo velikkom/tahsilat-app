@@ -11,13 +11,13 @@ function FilterChipGroup({ label, options, value, onChange, disabled }) {
   return (
     <div className="collection-filter-group">
       <span className="collection-filter-group__label text-muted">{label}</span>
-      <div className="collection-filter-scroll d-flex gap-2">
+      <div className="ui-filter-scroll d-flex gap-2">
         {options.map((option) => (
           <Button
             key={option.value}
             size="sm"
             variant={value === option.value ? "primary" : "outline-secondary"}
-            className="collection-filter-chip flex-shrink-0 touch-target"
+            className="ui-filter-chip flex-shrink-0 touch-target"
             onClick={() => onChange(option.value)}
             disabled={disabled}
             aria-pressed={value === option.value}

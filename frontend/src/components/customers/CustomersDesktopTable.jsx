@@ -2,20 +2,19 @@
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Badge } from "react-bootstrap";
 import ResponsiveTableWrapper from "@/components/ui/ResponsiveTableWrapper";
 import CustomerActionButtons from "./CustomerActionButtons";
+import {
+  getCustomerStatusLabel,
+  getCustomerStatusVariant,
+} from "@/utils/customerUtils";
 
-function StatusBodyTemplate({ active }) {
-  const isActive = active !== false;
-
+function StatusBodyTemplate({ customer }) {
   return (
-    <span
-      className={`badge rounded-pill ${
-        isActive ? "text-bg-primary" : "text-bg-secondary"
-      }`}
-    >
-      {isActive ? "Aktif" : "Pasif"}
-    </span>
+    <Badge bg={getCustomerStatusVariant(customer)}>
+      {getCustomerStatusLabel(customer)}
+    </Badge>
   );
 }
 
@@ -50,9 +49,8 @@ export default function CustomersDesktopTable({
   }
 
   return (
-    <div className="card border-0 shadow-sm">
-      <div className="card-body">
-        <ResponsiveTableWrapper minWidth={760}>
+    <div className="customers-table-wrapper">
+      <ResponsiveTableWrapper minWidth={760}>
           <DataTable
             value={customers}
             paginator
@@ -75,7 +73,7 @@ export default function CustomersDesktopTable({
             <Column
               field="active"
               header="Durum"
-              body={(row) => <StatusBodyTemplate active={row.active} />}
+              body={(row) => <StatusBodyTemplate customer={row} />}
             />
             <Column
               header="İşlemler"
@@ -84,7 +82,6 @@ export default function CustomersDesktopTable({
             />
           </DataTable>
         </ResponsiveTableWrapper>
-      </div>
     </div>
   );
 }

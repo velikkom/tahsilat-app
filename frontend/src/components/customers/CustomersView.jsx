@@ -1,17 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { FaFilter, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
+
 import CustomersHeader from "@/components/customers/CustomersHeader";
+import CustomerStats from "@/components/customers/CustomerStats";
 import CustomerSearchBar from "@/components/customers/CustomerSearchBar";
-import CustomerMobileView from "@/components/customers/CustomerMobileView";
+import CustomerQuickFilters from "@/components/customers/CustomerQuickFilters";
+import CustomerCardGrid from "@/components/customers/CustomerCardGrid";
+import CustomerPagination from "@/components/customers/CustomerPagination";
 import CustomersDesktopTable from "@/components/customers/CustomersDesktopTable";
 import CustomerDetailDrawer from "@/components/customers/CustomerDetailDrawer";
 import CustomerFiltersDrawer from "@/components/customers/CustomerFiltersDrawer";
 import CustomerCreateModal from "@/components/customers/CustomerCreateModal";
+import CustomerEmptyState from "@/components/customers/CustomerEmptyState";
+import FloatingAddButton from "@/components/ui/FloatingAddButton";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
+
 import useCustomers from "@/hooks/useCustomers";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { createCollection } from "@/services/collectionService";
@@ -21,7 +28,11 @@ import {
   updateCustomer,
 } from "@/services/customerService";
 import {
+  CUSTOMER_ACTIVE_FILTER,
+  CUSTOMER_QUICK_FILTER,
   EMPTY_CUSTOMER_FILTERS,
+  applyCustomerQuickFilter,
+  buildPageCustomerStats,
   filterCustomers,
   paginateCustomers,
 } from "@/utils/customerUtils";
@@ -39,6 +50,7 @@ export default function CustomersView() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState(EMPTY_CUSTOMER_FILTERS);
+  const [quickFilter, setQuickFilter] = useState(CUSTOMER_QUICK_FILTER.ALL);
   const [mobilePage, setMobilePage] = useState(1);
 
   const [showFilters, setShowFilters] = useState(false);
@@ -59,19 +71,35 @@ export default function CustomersView() {
 
   const isBusy = isSubmitting || isSubmittingCollection || isDeleting;
 
-  const filteredCustomers = useMemo(
-    () => filterCustomers(customers, searchQuery, filters),
-    [customers, searchQuery, filters]
+  const stats = useMemo(
+    () => buildPageCustomerStats(customers),
+    [customers]
   );
+
+  const filteredCustomers = useMemo(() => {
+    const base = filterCustomers(customers, searchQuery, filters);
+    return applyCustomerQuickFilter(base, quickFilter);
+  }, [customers, searchQuery, filters, quickFilter]);
 
   const mobilePagination = useMemo(
     () => paginateCustomers(filteredCustomers, mobilePage),
     [filteredCustomers, mobilePage]
   );
 
+  const hasActiveFilters = useMemo(() => {
+    return (
+      searchQuery.trim().length > 0 ||
+      quickFilter !== CUSTOMER_QUICK_FILTER.ALL ||
+      Boolean(filters.companyName) ||
+      Boolean(filters.authorizedPerson) ||
+      Boolean(filters.phone) ||
+      filters.active !== CUSTOMER_ACTIVE_FILTER.ALL
+    );
+  }, [searchQuery, quickFilter, filters]);
+
   useEffect(() => {
     setMobilePage(1);
-  }, [searchQuery, filters]);
+  }, [searchQuery, filters, quickFilter]);
 
   useEffect(() => {
     if (mobilePage > mobilePagination.totalPages) {
@@ -104,6 +132,7 @@ export default function CustomersView() {
         return;
       }
 
+      setShowDetailDrawer(false);
       setModalMode("edit");
       setEditingCustomer(customer);
       setShowCustomerModal(true);
@@ -117,6 +146,7 @@ export default function CustomersView() {
         return;
       }
 
+      setShowDetailDrawer(false);
       setCollectionCustomerId(customer.id);
       setShowCollectionModal(true);
     },
@@ -172,8 +202,10 @@ export default function CustomersView() {
     setFilters(nextFilters);
   }, []);
 
-  const handleResetFilters = useCallback(() => {
+  const handleClearAllFilters = useCallback(() => {
     setFilters(EMPTY_CUSTOMER_FILTERS);
+    setQuickFilter(CUSTOMER_QUICK_FILTER.ALL);
+    setSearchQuery("");
   }, []);
 
   const handleModalSubmit = useCallback(
@@ -269,83 +301,162 @@ export default function CustomersView() {
     [isBusy, selectedCustomer, closeDetail, refresh]
   );
 
+  const hasCustomers = customers.length > 0;
+  const hasFilteredResults = filteredCustomers.length > 0;
+
   return (
     <>
-      <div className="customers-page d-flex flex-column gap-3 gap-md-4">
+      <div className="customers-page ui-page-with-fab d-flex flex-column gap-3 gap-md-4">
         <CustomersHeader />
 
-        <div className="customers-toolbar d-flex flex-column gap-2">
-          <CustomerSearchBar value={searchQuery} onChange={setSearchQuery} />
+        {!loading && hasCustomers && <CustomerStats stats={stats} />}
 
-          <div className="customers-toolbar__actions d-flex flex-column flex-lg-row gap-2">
-            <Button
-              variant="outline-secondary"
-              className="customers-toolbar__filter-btn touch-target"
-              onClick={() => setShowFilters(true)}
-            >
-              <FaFilter className="me-2" aria-hidden="true" />
-              Filtrele
-            </Button>
+        {hasCustomers && (
+          <div className="card border-0 shadow-sm ui-panel-card customer-filters-panel">
+            <div className="card-body d-flex flex-column gap-3">
+              <div className="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                <CustomerSearchBar
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                />
 
-            {isAdmin && (
-              <Button
-                variant="primary"
-                className="customers-toolbar__create-btn touch-target"
-                onClick={openCreateModal}
+                {hasActiveFilters && (
+                  <Button
+                    variant="outline-secondary"
+                    className="customer-filters__clear-btn touch-target flex-shrink-0"
+                    onClick={handleClearAllFilters}
+                    disabled={isBusy}
+                  >
+                    <i className="pi pi-filter-slash me-1" aria-hidden="true" />
+                    Temizle
+                  </Button>
+                )}
+              </div>
+
+              <div className="customers-toolbar__actions d-flex flex-column flex-md-row gap-2">
+                <Button
+                  variant="outline-secondary"
+                  className="customers-toolbar__filter-btn touch-target"
+                  onClick={() => setShowFilters(true)}
+                  disabled={isBusy}
+                >
+                  <FaFilter className="me-2" aria-hidden="true" />
+                  Filtrele
+                </Button>
+
+                {isAdmin && (
+                  <Button
+                    variant="primary"
+                    className="customers-toolbar__create-btn touch-target d-none d-lg-inline-flex"
+                    onClick={openCreateModal}
+                    disabled={isBusy}
+                  >
+                    <FaPlus className="me-2" aria-hidden="true" />
+                    Yeni Müşteri
+                  </Button>
+                )}
+              </div>
+
+              <CustomerQuickFilters
+                value={quickFilter}
+                onChange={setQuickFilter}
                 disabled={isBusy}
-              >
-                <FaPlus className="me-2" aria-hidden="true" />
-                Yeni Müşteri
-              </Button>
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="card border-0 shadow-sm ui-panel-card customer-content-panel">
+          <div className="card-body">
+            {loading ? (
+              <div className="d-flex justify-content-center py-5">
+                <Spinner animation="border" role="status" />
+              </div>
+            ) : !hasCustomers ? (
+              <CustomerEmptyState
+                onCreate={openCreateModal}
+                showCreate={isAdmin}
+              />
+            ) : !hasFilteredResults ? (
+              <CustomerEmptyState
+                filtered
+                onClearFilters={handleClearAllFilters}
+              />
+            ) : (
+              <>
+                <div className="d-none d-lg-block">
+                  <CustomersDesktopTable
+                    customers={filteredCustomers}
+                    loading={loading}
+                    onView={openDetail}
+                    onEdit={openEditModal}
+                    onDelete={handleDeleteCustomer}
+                    onNewCollection={openCollectionModal}
+                    showEdit={isAdmin}
+                    showDelete={isAdmin}
+                    busy={isBusy}
+                    deletingId={deletingId}
+                  />
+                </div>
+
+                <div className="d-lg-none d-flex flex-column gap-3">
+                  <CustomerCardGrid
+                    customers={mobilePagination.items}
+                    onView={openDetail}
+                    onEdit={openEditModal}
+                    onDelete={handleDeleteCustomer}
+                    onNewCollection={openCollectionModal}
+                    showEdit={isAdmin}
+                    showDelete={isAdmin}
+                    disabled={isBusy}
+                    deletingId={deletingId}
+                  />
+
+                  {mobilePagination.totalPages > 1 && (
+                    <CustomerPagination
+                      currentPage={mobilePagination.currentPage}
+                      totalPages={mobilePagination.totalPages}
+                      onPrevious={() =>
+                        setMobilePage((page) => Math.max(1, page - 1))
+                      }
+                      onNext={() =>
+                        setMobilePage((page) =>
+                          Math.min(mobilePagination.totalPages, page + 1)
+                        )
+                      }
+                      disabled={isBusy}
+                    />
+                  )}
+                </div>
+
+                <div className="text-muted small mt-3">
+                  {filteredCustomers.length} / {customers.length} kayıt
+                  gösteriliyor
+                </div>
+              </>
             )}
           </div>
         </div>
-
-        <div className="customers-page__mobile d-lg-none">
-          <CustomerMobileView
-            customers={mobilePagination.items}
-            loading={loading}
-            currentPage={mobilePagination.currentPage}
-            totalPages={mobilePagination.totalPages}
-            onPrevious={() =>
-              setMobilePage((page) => Math.max(1, page - 1))
-            }
-            onNext={() =>
-              setMobilePage((page) =>
-                Math.min(mobilePagination.totalPages, page + 1)
-              )
-            }
-            onView={openDetail}
-            onEdit={openEditModal}
-            onDelete={handleDeleteCustomer}
-            onNewCollection={openCollectionModal}
-            showEdit={isAdmin}
-            showDelete={isAdmin}
-            busy={isBusy}
-            deletingId={deletingId}
-          />
-        </div>
-
-        <div className="customers-page__desktop d-none d-lg-block">
-          <CustomersDesktopTable
-            customers={filteredCustomers}
-            loading={loading}
-            onView={openDetail}
-            onEdit={openEditModal}
-            onDelete={handleDeleteCustomer}
-            onNewCollection={openCollectionModal}
-            showEdit={isAdmin}
-            showDelete={isAdmin}
-            busy={isBusy}
-            deletingId={deletingId}
-          />
-        </div>
       </div>
+
+      {isAdmin && (
+        <FloatingAddButton
+          onClick={openCreateModal}
+          disabled={isBusy}
+          ariaLabel="Yeni müşteri ekle"
+        />
+      )}
 
       <CustomerDetailDrawer
         show={showDetailDrawer}
         customer={selectedCustomer}
         onHide={closeDetail}
+        onEdit={openEditModal}
+        onDelete={handleDeleteCustomer}
+        onNewCollection={openCollectionModal}
+        showEdit={isAdmin}
+        showDelete={isAdmin}
+        busy={isBusy}
       />
 
       <CustomerFiltersDrawer
@@ -353,7 +464,7 @@ export default function CustomersView() {
         filters={filters}
         onHide={() => setShowFilters(false)}
         onApply={handleApplyFilters}
-        onReset={handleResetFilters}
+        onReset={handleClearAllFilters}
       />
 
       <CustomerCreateModal

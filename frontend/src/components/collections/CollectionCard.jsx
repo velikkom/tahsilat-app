@@ -24,7 +24,7 @@ function CollectionCard({
   const status = getEffectiveStatus(collection);
 
   return (
-    <article className="collection-card card border-0 shadow-sm h-100">
+    <article className="collection-card ui-entity-card card border-0 shadow-sm h-100">
       <div className="card-body d-flex flex-column gap-3 p-3 p-md-4">
         <div className="collection-card__header d-flex justify-content-between align-items-start gap-2">
           <div className="min-width-0">

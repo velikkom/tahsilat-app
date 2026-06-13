@@ -2,13 +2,13 @@
 
 import { memo } from "react";
 import { Button } from "react-bootstrap";
-import { QUICK_FILTER_OPTIONS } from "@/utils/collectionUtils";
+import { CUSTOMER_QUICK_FILTER_OPTIONS } from "@/utils/customerUtils";
 
-function CollectionQuickFilters({ value, onChange, disabled = false }) {
+function CustomerQuickFilters({ value, onChange, disabled = false }) {
   return (
-    <div className="collection-quick-filters">
+    <div className="customer-quick-filters">
       <div className="ui-filter-scroll d-flex gap-2">
-        {QUICK_FILTER_OPTIONS.map((option) => (
+        {CUSTOMER_QUICK_FILTER_OPTIONS.map((option) => (
           <Button
             key={option.value}
             size="sm"
@@ -26,4 +26,4 @@ function CollectionQuickFilters({ value, onChange, disabled = false }) {
   );
 }
 
-export default memo(CollectionQuickFilters);
+export default memo(CustomerQuickFilters);

@@ -21,7 +21,7 @@ function CollectionActions({
       <div className="collection-card-actions d-flex gap-2">
         <Button
           variant="outline-primary"
-          className="collection-card-actions__btn flex-fill touch-target"
+          className="collection-card-actions__btn ui-card-actions__btn flex-fill touch-target"
           onClick={() => onView?.(row)}
           disabled={isDisabled}
           aria-label="Görüntüle"
@@ -32,7 +32,7 @@ function CollectionActions({
 
         <Button
           variant="outline-warning"
-          className="collection-card-actions__btn flex-fill touch-target"
+          className="collection-card-actions__btn ui-card-actions__btn flex-fill touch-target"
           onClick={() => onEdit?.(row)}
           disabled={isDisabled}
           aria-label="Düzenle"
@@ -43,7 +43,7 @@ function CollectionActions({
 
         <Button
           variant="outline-danger"
-          className="collection-card-actions__btn flex-fill touch-target"
+          className="collection-card-actions__btn ui-card-actions__btn flex-fill touch-target"
           onClick={() => onDelete?.(row)}
           disabled={isDisabled}
           aria-label="Sil"

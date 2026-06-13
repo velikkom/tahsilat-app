@@ -1,32 +1,37 @@
 "use client";
 
 import { memo } from "react";
-import { formatCurrency } from "@/utils/collectionUtils";
 
 const STAT_CARDS = [
   {
-    key: "totalAmount",
-    label: "Toplam Tahsilat",
-    icon: "pi pi-wallet",
+    key: "totalCount",
+    label: "Toplam Müşteri",
+    icon: "pi pi-users",
     tone: "primary",
   },
   {
-    key: "thisMonthAmount",
-    label: "Bu Ay",
-    icon: "pi pi-calendar",
-    tone: "info",
+    key: "activeCount",
+    label: "Aktif Müşteri",
+    icon: "pi pi-check-circle",
+    tone: "success",
   },
   {
-    key: "pendingAmount",
-    label: "Bekleyen",
-    icon: "pi pi-clock",
-    tone: "warning",
+    key: "inactiveCount",
+    label: "Pasif Müşteri",
+    icon: "pi pi-ban",
+    tone: "secondary",
+  },
+  {
+    key: "thisMonthCount",
+    label: "Bu Ay Eklenen",
+    icon: "pi pi-calendar-plus",
+    tone: "info",
   },
 ];
 
-function CollectionStats({ stats }) {
+function CustomerStats({ stats }) {
   return (
-    <div className="row row-cols-1 row-cols-sm-3 g-2 g-md-3 mb-3 mb-md-4">
+    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-2 g-md-3 mb-3 mb-md-4">
       {STAT_CARDS.map((card) => (
         <div className="col" key={card.key}>
           <div
@@ -45,7 +50,7 @@ function CollectionStats({ stats }) {
                   {card.label}
                 </div>
                 <div className="ui-stat-card__value fw-bold text-truncate">
-                  {formatCurrency(stats?.[card.key] ?? 0)}
+                  {stats?.[card.key] ?? 0}
                 </div>
               </div>
             </div>
@@ -56,4 +61,4 @@ function CollectionStats({ stats }) {
   );
 }
 
-export default memo(CollectionStats);
+export default memo(CustomerStats);

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import "@/styles/theme.css";
 import "@/styles/layout.css";
+import "@/styles/shared-ui.css";
 import "@/styles/datatable.css";
 import "@/styles/customers.css";
 import "@/styles/customer-collections.css";

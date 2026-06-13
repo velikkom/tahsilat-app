@@ -6,34 +6,41 @@
 
 .customers-toolbar__actions .btn {
   min-height: 48px;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .customers-toolbar__create-btn {
   width: 100%;
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .customers-toolbar__actions {
+    justify-content: flex-end;
+  }
 }
 
 @media (min-width: 992px) {
-  .customers-toolbar__actions {
-    align-items: stretch;
-  }
-
   .customers-toolbar__filter-btn,
   .customers-toolbar__create-btn {
     width: auto;
     min-width: 160px;
   }
+}
 
-  .customers-toolbar__create-btn {
-    margin-left: auto;
-  }
+.customer-filters__clear-btn {
+  border-radius: 12px;
+}
+
+.customers-table-wrapper {
+  overflow-x: auto;
 }
 
 /* ─── Search ─── */
 
 .customer-search-bar .input-group-text,
 .customer-search-bar__input {
-  min-height: 52px;
+  min-height: 48px;
   border-radius: 14px;
 }
 
@@ -69,40 +76,16 @@
 
 /* ─── Customer cards ─── */
 
-.customer-mobile-view__cards {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
-.customer-card {
-  background: #ffffff;
-  border-radius: 1rem !important;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  border-left: 4px solid transparent !important;
-}
-
-.customer-card:hover {
-  box-shadow: 0 0.5rem 1.25rem rgba(15, 23, 42, 0.1) !important;
-}
-
-.customer-card--active {
-  border-left-color: #0d6efd !important;
-}
-
-.customer-card--inactive {
-  border-left-color: #6c757d !important;
-}
-
-.customer-card--empty {
-  padding: 2rem 1rem;
-}
-
 .customer-card__title {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.35;
-  margin: 0;
-  word-break: break-word;
+}
+
+.customer-card__status-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .customer-card__icon {
@@ -114,17 +97,8 @@
   font-size: 0.92rem;
 }
 
-.customer-card__collection-btn {
-  min-height: 44px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
 .customer-action-buttons__btn {
   min-height: 44px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  padding-inline: 0.5rem;
 }
 
 /* ─── Pagination ─── */
@@ -162,12 +136,12 @@
 
 .customer-detail-field__label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #64748b;
   margin-bottom: 0.35rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .customer-detail-field__value {
@@ -179,6 +153,10 @@
 .customer-filters-drawer__actions .btn {
   min-height: 44px;
   border-radius: 12px;
+}
+
+body.dark-mode .customer-detail-field__value {
+  color: #f3f4f6;
 }
 
 /* ─── Customer tabs (detail page) ─── */

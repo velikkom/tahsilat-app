@@ -1,51 +1,6 @@
-.collections-page {
-  padding-bottom: 5rem;
-}
-
 .collections-page-title,
 .collection-header__title {
   font-weight: 700;
-}
-
-/* ===== Stats ===== */
-
-.collection-stat-card {
-  border-radius: 14px;
-  border-left: 4px solid transparent !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.collection-stat-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08) !important;
-}
-
-.collection-stat-card--primary {
-  border-left-color: #2563eb !important;
-}
-
-.collection-stat-card--info {
-  border-left-color: #0ea5e9 !important;
-}
-
-.collection-stat-card--warning {
-  border-left-color: #f59e0b !important;
-}
-
-.collection-stat-card__icon {
-  font-size: 1.35rem;
-  flex-shrink: 0;
-}
-
-.collection-stat-card__label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.collection-stat-card__value {
-  font-size: 1.1rem;
 }
 
 /* ===== Actions ===== */
@@ -67,11 +22,6 @@
 
 /* ===== Filters ===== */
 
-.collection-filters-panel,
-.collection-content-panel {
-  border-radius: 16px;
-}
-
 .collection-filter-group {
   display: flex;
   flex-direction: column;
@@ -83,22 +33,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-}
-
-.collection-filter-scroll {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 0.15rem;
-}
-
-.collection-filter-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.collection-filter-chip {
-  border-radius: 999px !important;
-  white-space: nowrap;
 }
 
 .collection-search-input-wrapper__icon {
@@ -164,16 +98,6 @@
 
 /* ===== Cards ===== */
 
-.collection-card {
-  border-radius: 16px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.collection-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.1) !important;
-}
-
 .collection-card__company {
   font-size: 1rem;
   line-height: 1.3;
@@ -215,44 +139,11 @@
 }
 
 .collection-card-actions__btn {
-  border-radius: 12px !important;
   font-size: 0.82rem;
   font-weight: 600;
 }
 
-/* ===== FAB ===== */
-
-.collection-fab {
-  position: fixed;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 1030;
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
-  min-height: 56px;
-  border-radius: 50% !important;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0.5rem 1.25rem rgba(37, 99, 235, 0.35);
-  font-size: 1.25rem;
-}
-
-@media (min-width: 992px) {
-  .collections-page {
-    padding-bottom: 0;
-  }
-}
-
-/* ===== Empty State ===== */
-
-.collection-empty-state__icon {
-  font-size: 2.5rem;
-  display: block;
-}
-
-/* ===== Dark Mode ===== */
+/* ===== Empty State (collection-specific overrides) */
 
 body.dark-mode .collection-card__amount {
   color: #f3f4f6;
