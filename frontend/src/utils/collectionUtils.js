@@ -209,6 +209,121 @@ export function buildCollectionsSummary(collections) {
   return summary;
 }
 
+export const EMPTY_COLLECTION_FILTERS = {
+  searchQuery: "",
+  paymentType: "ALL",
+  status: "ALL",
+  quickFilter: "ALL",
+};
+
+const PAYMENT_TYPE_FILTER_OPTIONS = [
+  { value: "ALL", label: "Tümü" },
+  { value: "CASH", label: "Nakit" },
+  { value: "CREDIT_CARD", label: "Kredi Kartı" },
+  { value: "CHECK", label: "Çek" },
+  { value: "PROMISSORY_NOTE", label: "Müşteri Senedi" },
+  { value: "BANK_TRANSFER", label: "Havale" },
+];
+
+const STATUS_FILTER_OPTIONS = [
+  { value: "ALL", label: "Tümü" },
+  { value: "PAID", label: "Tahsil Edildi" },
+  { value: "PENDING", label: "Bekliyor" },
+  { value: "OVERDUE", label: "Vadesi Geçti" },
+];
+
+const QUICK_FILTER_OPTIONS = [
+  { value: "ALL", label: "Tümü" },
+  { value: "THIS_MONTH", label: "Bu Ay" },
+  { value: "PENDING", label: "Bekleyen" },
+  { value: "OVERDUE", label: "Vadesi Geçen" },
+];
+
+export { PAYMENT_TYPE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, QUICK_FILTER_OPTIONS };
+
+function isCollectionInCurrentMonth(collectionDate) {
+  if (!collectionDate) {
+    return false;
+  }
+
+  const date = new Date(collectionDate);
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth()
+  );
+}
+
+export function filterCollections(collections, filters = EMPTY_COLLECTION_FILTERS) {
+  const normalizedSearch = (filters.searchQuery || "").trim().toLocaleLowerCase("tr-TR");
+
+  return collections.filter((collection) => {
+    const effectiveStatus = getEffectiveStatus(collection);
+
+    if (filters.paymentType !== "ALL" && collection.paymentType !== filters.paymentType) {
+      return false;
+    }
+
+    if (filters.status !== "ALL" && effectiveStatus !== filters.status) {
+      return false;
+    }
+
+    if (filters.quickFilter === "THIS_MONTH" && !isCollectionInCurrentMonth(collection.collectionDate)) {
+      return false;
+    }
+
+    if (filters.quickFilter === "PENDING" && effectiveStatus !== "PENDING") {
+      return false;
+    }
+
+    if (filters.quickFilter === "OVERDUE" && effectiveStatus !== "OVERDUE") {
+      return false;
+    }
+
+    if (!normalizedSearch) {
+      return true;
+    }
+
+    const haystack = [
+      collection.customerName || "",
+      collection.description || "",
+      collection.paymentType || "",
+      getPaymentTypeLabel(collection.paymentType),
+      getStatusLabel(effectiveStatus),
+      String(collection.amount ?? ""),
+      formatCurrency(collection.amount),
+      formatDate(collection.collectionDate),
+      formatDate(collection.maturityDate),
+    ]
+      .join(" ")
+      .toLocaleLowerCase("tr-TR");
+
+    return haystack.includes(normalizedSearch);
+  });
+}
+
+export function buildPageCollectionStats(collections) {
+  const summary = buildCollectionsSummary(collections);
+
+  let thisMonthAmount = 0;
+
+  for (const collection of collections) {
+    if (isCollectionInCurrentMonth(collection.collectionDate)) {
+      thisMonthAmount += Number(collection.amount) || 0;
+    }
+  }
+
+  return {
+    totalAmount: summary.totalAmount,
+    thisMonthAmount,
+    pendingAmount: summary.pendingAmount + summary.overdueAmount,
+  };
+}
+
 export function groupCollectionsByMonth(collections) {
   const groups = new Map();
 
