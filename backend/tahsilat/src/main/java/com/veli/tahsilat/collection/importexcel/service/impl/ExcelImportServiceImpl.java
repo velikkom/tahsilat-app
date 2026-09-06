@@ -14,7 +14,11 @@ import com.veli.tahsilat.collection.importexcel.support.CustomerNameMatcher;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.collection.validation.CollectionDuplicateValidator;
 import com.veli.tahsilat.customer.entity.Customer;
+import com.veli.tahsilat.user.entity.User;
+import com.veli.tahsilat.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +43,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
     private final CustomerNameMatcher customerNameMatcher;
     private final CollectionRepository collectionRepository;
     private final CollectionDuplicateValidator collectionDuplicateValidator;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,6 +75,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         int validRows = 0;
         List<CollectionImportIssueResponse> issues = new ArrayList<>();
         List<Collection> batch = new ArrayList<>();
+        User collectedBy = resolveCurrentUser();
 
         for (ParsedCollectionImportRow row : parsedRows) {
             Optional<String> validationError = validateRow(row);
@@ -164,7 +170,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
             validRows++;
 
             if (persist) {
-                batch.add(buildCollection(row, customer));
+                batch.add(buildCollection(row, customer, collectedBy));
 
                 if (batch.size() >= BATCH_SIZE) {
                     collectionRepository.saveAll(batch);
@@ -251,7 +257,8 @@ public class ExcelImportServiceImpl implements ExcelImportService {
 
     private Collection buildCollection(
             ParsedCollectionImportRow row,
-            Customer customer
+            Customer customer,
+            User collectedBy
     ) {
         Collection collection = new Collection();
         collection.setCustomer(customer);
@@ -261,7 +268,20 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         collection.setPaymentType(row.getPaymentType());
         collection.setStatus(CollectionStatus.PAID);
         collection.setDescription("Excel import");
+        collection.setCollectedBy(collectedBy);
         return collection;
+    }
+
+    private User resolveCurrentUser() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            return null;
+        }
+
+        return userRepository.findByEmail(authentication.getName())
+                .orElse(null);
     }
 
     private void addIssue(

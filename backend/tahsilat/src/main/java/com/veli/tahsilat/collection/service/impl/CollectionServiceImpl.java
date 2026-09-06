@@ -14,9 +14,13 @@ import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
 import com.veli.tahsilat.customer.entity.Customer;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
+import com.veli.tahsilat.user.entity.User;
+import com.veli.tahsilat.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,6 +38,8 @@ public class CollectionServiceImpl
     private final CollectionMapper collectionMapper;
 
     private final CollectionDuplicateValidator collectionDuplicateValidator;
+
+    private final UserRepository userRepository;
 
     @Override
     public CollectionResponse createCollection(
@@ -71,6 +77,7 @@ public class CollectionServiceImpl
         // TODO: Cek/senet icin vade gunu odeme hesaba gectiginde PAID'e cekilecek
         // ayri bir odeme takip akisi tasarlanacak.
         collection.setStatus(CollectionStatus.PAID);
+        collection.setCollectedBy(getCurrentUser());
 
         Collection savedCollection =
                 collectionRepository.save(collection);
@@ -82,7 +89,7 @@ public class CollectionServiceImpl
 
     @Override
     public CollectionResponse getCollectionById(UUID id) {
-        Collection collection = findActiveCollection(id);
+        Collection collection = findAccessibleCollection(id);
 
         return collectionMapper.toResponse(collection);
     }
@@ -92,7 +99,7 @@ public class CollectionServiceImpl
             UUID id,
             UpdateCollectionRequest request
     ) {
-        Collection collection = findActiveCollection(id);
+        Collection collection = findAccessibleCollection(id);
 
         Customer customer = findActiveCustomer(request.getCustomerId());
 
@@ -128,7 +135,7 @@ public class CollectionServiceImpl
 
     @Override
     public void deleteCollection(UUID id) {
-        Collection collection = findActiveCollection(id);
+        Collection collection = findAccessibleCollection(id);
 
         collection.setActive(false);
 
@@ -137,21 +144,44 @@ public class CollectionServiceImpl
 
     @Override
     public Page<CollectionResponse> getAllCollections(Pageable pageable) {
-        return collectionRepository.findByActiveTrue(pageable)
+        if (isAdmin()) {
+            return collectionRepository.findByActiveTrue(pageable)
+                    .map(collectionMapper::toResponse);
+        }
+
+        return collectionRepository
+                .findByCollectedByIdAndActiveTrue(getCurrentUser().getId(), pageable)
                 .map(collectionMapper::toResponse);
     }
 
     @Override
     public Page<CollectionResponse> getCollectionsByCustomerId(UUID customerId, Pageable pageable) {
-        return collectionRepository.findByCustomerIdAndActiveTrue(customerId, pageable)
-                .map(collectionMapper::toResponse);
+        if (isAdmin()) {
+            return collectionRepository.findByCustomerIdAndActiveTrue(customerId, pageable)
+                    .map(collectionMapper::toResponse);
+        }
+
+        return collectionRepository.findByCustomerIdAndCollectedByIdAndActiveTrue(
+                customerId,
+                getCurrentUser().getId(),
+                pageable
+        ).map(collectionMapper::toResponse);
     }
 
     @Override
     public Page<CollectionResponse> getOverdueCollections(Pageable pageable) {
-        return collectionRepository.findByStatusAndMaturityDateBeforeAndActiveTrue(
+        if (isAdmin()) {
+            return collectionRepository.findByStatusAndMaturityDateBeforeAndActiveTrue(
+                    CollectionStatus.PENDING,
+                    LocalDate.now(),
+                    pageable
+            ).map(collectionMapper::toResponse);
+        }
+
+        return collectionRepository.findByStatusAndMaturityDateBeforeAndCollectedByIdAndActiveTrue(
                 CollectionStatus.PENDING,
                 LocalDate.now(),
+                getCurrentUser().getId(),
                 pageable
         ).map(collectionMapper::toResponse);
     }
@@ -164,6 +194,54 @@ public class CollectionServiceImpl
                                 new ResourceNotFoundException(
                                         "Collection not found"
                                 )
+                );
+    }
+
+    private Collection findAccessibleCollection(UUID id) {
+        Collection collection = findActiveCollection(id);
+        assertCanAccessCollection(collection);
+        return collection;
+    }
+
+    private void assertCanAccessCollection(Collection collection) {
+        if (isAdmin()) {
+            return;
+        }
+
+        User currentUser = getCurrentUser();
+        User collectedBy = collection.getCollectedBy();
+
+        if (collectedBy == null
+                || !currentUser.getId().equals(collectedBy.getId())) {
+            throw new ResourceNotFoundException("Collection not found");
+        }
+    }
+
+    private User getCurrentUser() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
+            throw new ResourceNotFoundException("Collection not found");
+        }
+
+        return userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Collection not found")
+                );
+    }
+
+    private boolean isAdmin() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            return false;
+        }
+
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority ->
+                        "ROLE_ADMIN".equals(authority.getAuthority())
                 );
     }
 

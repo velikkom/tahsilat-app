@@ -23,11 +23,28 @@ public interface CollectionRepository
 
     Page<Collection> findByActiveTrue(Pageable pageable);
 
+    Page<Collection> findByCollectedByIdAndActiveTrue(UUID collectedById, Pageable pageable);
+
+    long countByCollectedByIsNull();
+
     Page<Collection> findByCustomerIdAndActiveTrue(UUID customerId, Pageable pageable);
+
+    Page<Collection> findByCustomerIdAndCollectedByIdAndActiveTrue(
+            UUID customerId,
+            UUID collectedById,
+            Pageable pageable
+    );
 
     Page<Collection> findByStatusAndMaturityDateBeforeAndActiveTrue(
             CollectionStatus status,
             LocalDate maturityDate,
+            Pageable pageable
+    );
+
+    Page<Collection> findByStatusAndMaturityDateBeforeAndCollectedByIdAndActiveTrue(
+            CollectionStatus status,
+            LocalDate maturityDate,
+            UUID collectedById,
             Pageable pageable
     );
 

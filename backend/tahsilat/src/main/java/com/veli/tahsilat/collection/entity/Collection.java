@@ -6,6 +6,7 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.common.entity.BaseEntity;
 
 import com.veli.tahsilat.customer.entity.Customer;
+import com.veli.tahsilat.user.entity.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -50,4 +51,8 @@ public class Collection
     @Enumerated(EnumType.STRING)
     private CollectionStatus status =
             CollectionStatus.PENDING;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collected_by")
+    private User collectedBy;
 }
