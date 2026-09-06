@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
@@ -53,11 +55,17 @@ public class CustomerController {
             description = "Get all customers"
     )
     @GetMapping
-   // @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')" )
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<Page<CustomerResponse>> getAllCustomers(Pageable pageable)
     {
+        if (isAdmin()) {
+            return ResponseEntity.ok(
+                    customerService.getAllCustomers(pageable)
+            );
+        }
+
         return ResponseEntity.ok(
-                customerService.getAllCustomers(pageable)
+                customerService.getAllActiveCustomers(pageable)
         );
     }
 
@@ -151,6 +159,20 @@ public class CustomerController {
                         pageable
                 )
         );
+    }
+
+    private boolean isAdmin() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            return false;
+        }
+
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority ->
+                        "ROLE_ADMIN".equals(authority.getAuthority())
+                );
     }
 
 }
