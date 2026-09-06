@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -99,6 +100,35 @@ class JwtAuthenticationFilterSessionTest {
                 SessionTerminatedException.MESSAGE
         );
         verify(filterChain, never()).doFilter(request, response);
+    }
+
+    @Test
+    void shouldRejectRequestWhenUserIsDisabled() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        request.addHeader("Authorization", "Bearer " + validToken);
+
+        User disabledUserDetails = new User(
+                "user@test.com",
+                "password",
+                false,
+                true,
+                true,
+                true,
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
+
+        when(jwtService.extractUsername(validToken)).thenReturn("user@test.com");
+        when(userDetailsService.loadUserByUsername("user@test.com")).thenReturn(disabledUserDetails);
+
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        verify(httpErrorResponseWriter).writeUnauthorized(
+                response,
+                "Unauthorized"
+        );
+        verify(filterChain, never()).doFilter(request, response);
+        verify(sessionValidationService, never()).validateSession(any(), any());
     }
 
     @Test

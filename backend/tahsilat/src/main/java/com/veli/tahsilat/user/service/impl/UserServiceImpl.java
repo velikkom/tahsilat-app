@@ -80,7 +80,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse deactivateUser(UUID userId) {
         User user = findUserOrThrow(userId);
+
+        if (isCurrentUser(user)) {
+            throw new BusinessException("Kendi hesabınızı deaktive edemezsiniz.");
+        }
+
         user.setActive(false);
+        user.setCurrentSessionId(null);
         return toResponse(userRepository.save(user));
     }
 
@@ -90,6 +96,14 @@ public class UserServiceImpl implements UserService {
         User user = findUserOrThrow(userId);
         user.setRole(role);
         return toResponse(userRepository.save(user));
+    }
+
+    private boolean isCurrentUser(User user) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        return authentication != null
+                && user.getEmail().equals(authentication.getName());
     }
 
     private User findUserOrThrow(UUID userId) {

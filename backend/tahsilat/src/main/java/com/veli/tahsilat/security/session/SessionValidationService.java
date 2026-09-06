@@ -21,41 +21,26 @@ public class SessionValidationService {
     @Transactional(readOnly = true)
     public void validateSession(String email, UUID jwtSessionId) {
         if (jwtSessionId == null) {
-            log.warn(
-                    "Session validation failed: missing jwtSessionId for user={}",
-                    email
-            );
+            log.warn("Session validation failed: missing session claim");
             throw new SessionTerminatedException();
         }
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.warn(
-                            "Session validation failed: user not found email={}",
-                            email
-                    );
+                    log.warn("Session validation failed: user not found");
                     return new SessionTerminatedException();
                 });
 
-        UUID dbSessionId = user.getCurrentSessionId();
-
-        log.debug(
-                "Session validation user={} jwtSessionId={} dbSessionId={}",
-                email,
-                jwtSessionId,
-                dbSessionId
-        );
-
-        if (!Objects.equals(jwtSessionId, dbSessionId)) {
-            log.warn(
-                    "Session validation mismatch user={} jwtSessionId={} dbSessionId={}",
-                    email,
-                    jwtSessionId,
-                    dbSessionId
-            );
+        if (!Boolean.TRUE.equals(user.getActive())) {
+            log.warn("Session validation failed: account disabled");
             throw new SessionTerminatedException();
         }
 
-        log.debug("Session validation passed user={}", email);
+        UUID dbSessionId = user.getCurrentSessionId();
+
+        if (!Objects.equals(jwtSessionId, dbSessionId)) {
+            log.warn("Session validation mismatch");
+            throw new SessionTerminatedException();
+        }
     }
 }
