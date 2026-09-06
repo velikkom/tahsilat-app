@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,6 +32,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter
         extends OncePerRequestFilter {
+
+    private static final String UNAUTHORIZED_MESSAGE = "Unauthorized";
 
     private final JwtService jwtService;
 
@@ -71,13 +75,24 @@ public class JwtAuthenticationFilter
         }
 
         final String jwtToken = authHeader.substring(7);
-        final String userEmail = jwtService.extractUsername(jwtToken);
+        final String userEmail;
+
+        try {
+            userEmail = jwtService.extractUsername(jwtToken);
+        } catch (Exception exception) {
+            SecurityContextHolder.clearContext();
+            httpErrorResponseWriter.writeUnauthorized(
+                    response,
+                    UNAUTHORIZED_MESSAGE
+            );
+            return;
+        }
 
         log.debug(
                 "JWT filter processing request {} {} for user={}",
                 request.getMethod(),
                 request.getRequestURI(),
-                userEmail
+                maskEmail(userEmail)
         );
 
         if (userEmail == null) {
@@ -87,33 +102,49 @@ public class JwtAuthenticationFilter
                     request.getRequestURI()
             );
 
-            filterChain.doFilter(request, response);
+            SecurityContextHolder.clearContext();
+            httpErrorResponseWriter.writeUnauthorized(
+                    response,
+                    UNAUTHORIZED_MESSAGE
+            );
             return;
         }
 
         SecurityContextHolder.clearContext();
 
-        UserDetails userDetails =
-                userDetailsService.loadUserByUsername(userEmail);
+        final UserDetails userDetails;
 
-        if (!jwtService.isTokenValid(jwtToken, userDetails)) {
+        try {
+            userDetails = userDetailsService.loadUserByUsername(userEmail);
+        } catch (UsernameNotFoundException exception) {
+            httpErrorResponseWriter.writeUnauthorized(
+                    response,
+                    UNAUTHORIZED_MESSAGE
+            );
+            return;
+        }
+
+        if (!userDetails.isEnabled()
+                || !jwtService.isTokenValid(jwtToken, userDetails)) {
             log.warn(
-                    "JWT filter skip: token invalid for user={} on {} {}",
-                    userEmail,
+                    "JWT filter reject: token invalid or account disabled on {} {}",
                     request.getMethod(),
                     request.getRequestURI()
             );
 
-            filterChain.doFilter(request, response);
+            httpErrorResponseWriter.writeUnauthorized(
+                    response,
+                    UNAUTHORIZED_MESSAGE
+            );
             return;
         }
 
         UUID jwtSessionId = jwtService.extractSessionId(jwtToken);
 
         log.debug(
-                "JWT session validation starting user={} jwtSessionId={}",
-                userEmail,
-                jwtSessionId
+                "JWT session validation starting on {} {}",
+                request.getMethod(),
+                request.getRequestURI()
         );
 
         try {
@@ -123,9 +154,7 @@ public class JwtAuthenticationFilter
             );
         } catch (SessionTerminatedException ex) {
             log.warn(
-                    "Session terminated user={} jwtSessionId={} on {} {}",
-                    userEmail,
-                    jwtSessionId,
+                    "Session terminated on {} {}",
                     request.getMethod(),
                     request.getRequestURI()
             );
@@ -155,14 +184,28 @@ public class JwtAuthenticationFilter
                 .setAuthentication(authToken);
 
         log.debug(
-                "JWT authentication success user={} jwtSessionId={}",
-                userEmail,
-                jwtSessionId
+                "JWT authentication success on {} {}",
+                request.getMethod(),
+                request.getRequestURI()
         );
 
         filterChain.doFilter(
                 request,
                 response
         );
+    }
+
+    private static String maskEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return "***";
+        }
+
+        int atIndex = email.indexOf('@');
+
+        if (atIndex <= 0) {
+            return "***";
+        }
+
+        return email.charAt(0) + "***" + email.substring(atIndex);
     }
 }
