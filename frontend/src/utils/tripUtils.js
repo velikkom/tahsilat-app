@@ -18,7 +18,13 @@ function toLocalDate(value) {
 }
 
 function toIsoDate(date) {
-  return date.toISOString().split("T")[0];
+  // toISOString() converts to UTC first, which shifts the calendar day
+  // backward in timezones ahead of UTC (e.g. Turkey, UTC+3) for local
+  // midnight dates. Read the local Y/M/D components instead.
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**
