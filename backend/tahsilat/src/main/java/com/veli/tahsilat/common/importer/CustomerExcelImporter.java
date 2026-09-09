@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import org.springframework.core.io.ClassPathResource;
 
@@ -24,6 +25,11 @@ import java.io.InputStream;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        prefix = "app.customer-import",
+        name = "startup-enabled",
+        havingValue = "true"
+)
 public class CustomerExcelImporter
         implements CommandLineRunner {
 
