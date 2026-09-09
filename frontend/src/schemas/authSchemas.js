@@ -21,7 +21,11 @@ export const registerSchema = yup.object({
   password: yup
     .string()
     .required("Şifre zorunludur")
-    .min(6, "Şifre en az 6 karakter olmalıdır"),
+    .min(8, "Şifre en az 8 karakter olmalıdır")
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d).+$/,
+      "Şifre en az bir harf ve bir rakam içermelidir"
+    ),
   confirmPassword: yup
     .string()
     .required("Şifre tekrarı zorunludur")
