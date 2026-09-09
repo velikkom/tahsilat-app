@@ -21,19 +21,22 @@ class SwaggerAccessControlTest {
 
     @Test
     void apiDocsAreNotPubliclyAccessibleWhenSwaggerPublicIsFalse() throws Exception {
+        // Anonymous request against a denyAll() matcher is routed through the
+        // AuthenticationEntryPoint (401), not the AccessDeniedHandler (403).
+        // It must never be 2xx / actually public.
         mockMvc.perform(get("/v3/api-docs"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void swaggerUiIsNotPubliclyAccessibleWhenSwaggerPublicIsFalse() throws Exception {
         mockMvc.perform(get("/swagger-ui.html"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     void swaggerUiIndexIsNotPubliclyAccessibleWhenSwaggerPublicIsFalse() throws Exception {
         mockMvc.perform(get("/swagger-ui/index.html"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

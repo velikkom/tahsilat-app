@@ -24,7 +24,6 @@ import com.veli.tahsilat.common.importer.CustomerExcelImporter;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -111,14 +110,14 @@ class CustomerAccessControlTest {
 
     @Test
     void unauthenticatedRequestWithoutTokenIsRejected() throws Exception {
-        // No Authorization header at all: Spring Security's default entry point
-        // rejects this with a bare 403 (empty body) before it ever reaches
-        // GlobalExceptionHandler. This differs from the ACCOUNTING case above,
-        // which is an authenticated-but-insufficient-role AccessDeniedException
-        // that IS routed through GlobalExceptionHandler and returns a JSON body.
+        // No Authorization header at all: the custom AuthenticationEntryPoint
+        // rejects this with 401 + a JSON body. This differs from the ACCOUNTING
+        // case above, which is an authenticated-but-insufficient-role
+        // AccessDeniedException routed through GlobalExceptionHandler (403).
         mockMvc.perform(get("/api/v1/customers"))
-                .andExpect(status().isForbidden())
-                .andExpect(content().string(""));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Unauthorized"));
     }
 
     private User saveUser(String email, Role role) {

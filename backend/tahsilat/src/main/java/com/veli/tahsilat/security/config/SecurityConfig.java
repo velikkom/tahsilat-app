@@ -90,12 +90,22 @@ public class SecurityConfig {
             HttpSecurity http,
             JwtAuthenticationFilter jwtAuthenticationFilter,
             AuthRateLimitFilter authRateLimitFilter,
+            HttpErrorResponseWriter httpErrorResponseWriter,
             @Value("${app.swagger.public:false}") boolean swaggerPublic
     ) throws Exception {
 
         http
                 .cors(cors -> {})
                 .csrf(AbstractHttpConfigurer::disable)
+
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) ->
+                                httpErrorResponseWriter.writeUnauthorized(
+                                        response,
+                                        "Unauthorized"
+                                )
+                        )
+                )
 
                 .headers(headers -> headers
                         .contentTypeOptions(Customizer.withDefaults())
