@@ -32,4 +32,12 @@ public class UpdateCollectionRequest {
     private LocalDate maturityDate;
 
     private String description;
+
+    private String receiptNumber;
+
+    private String mikroSr;
+
+    private String mikroNo;
+
+    private String bankName;
 }

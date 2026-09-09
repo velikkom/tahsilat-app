@@ -114,6 +114,58 @@ export default function CollectionFormFields({
         </Form.Group>
       </Col>
 
+      <Col xs={12} md={6} lg={3}>
+        <Form.Group>
+          <Form.Label>Tahsilat Makbuz No</Form.Label>
+          <Form.Control
+            type="text"
+            name="receiptNumber"
+            value={form.receiptNumber}
+            onChange={onChange}
+            disabled={isFormDisabled}
+          />
+        </Form.Group>
+      </Col>
+
+      <Col xs={12} md={6} lg={3}>
+        <Form.Group>
+          <Form.Label>Mikro Kay.No SR</Form.Label>
+          <Form.Control
+            type="text"
+            name="mikroSr"
+            value={form.mikroSr}
+            onChange={onChange}
+            disabled={isFormDisabled}
+          />
+        </Form.Group>
+      </Col>
+
+      <Col xs={12} md={6} lg={3}>
+        <Form.Group>
+          <Form.Label>Mikro Kay.No NO</Form.Label>
+          <Form.Control
+            type="text"
+            name="mikroNo"
+            value={form.mikroNo}
+            onChange={onChange}
+            disabled={isFormDisabled}
+          />
+        </Form.Group>
+      </Col>
+
+      <Col xs={12} md={6} lg={3}>
+        <Form.Group>
+          <Form.Label>Banka Adı</Form.Label>
+          <Form.Control
+            type="text"
+            name="bankName"
+            value={form.bankName}
+            onChange={onChange}
+            disabled={isFormDisabled}
+          />
+        </Form.Group>
+      </Col>
+
       <Col xs={12}>
         <Form.Group>
           <Form.Label>Açıklama</Form.Label>

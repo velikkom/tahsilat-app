@@ -37,21 +37,22 @@ public class TripCollectionDocumentGenerator {
 
     private static final int COL_SIRA_NO = 0;
     private static final int COL_MAKBUZ_NO = 1;
-    private static final int COL_MIKRO_KAY_NO = 2;
-    private static final int COL_UNVANI = 3;
-    private static final int COL_TARIH = 4;
-    private static final int COL_NAKIT_TUTARI = 5;
-    private static final int COL_SENET_VADE = 6;
-    private static final int COL_SENET_TUTAR = 7;
-    private static final int COL_BANKA_ADI = 8;
-    private static final int COL_CEK_VADE = 9;
-    private static final int COL_CEK_TUTAR = 10;
-    private static final int COL_MAILORDER_KARLAND = 11;
-    private static final int COL_MAILORDER_OTOKOC = 12;
-    private static final int COL_HAVALE_BANKA = 13;
-    private static final int COL_HAVALE_TUTAR = 14;
-    private static final int COL_POS_YKB = 15;
-    private static final int COL_POS_TEB = 16;
+    private static final int COL_MIKRO_SR = 2;
+    private static final int COL_MIKRO_NO = 3;
+    private static final int COL_UNVANI = 4;
+    private static final int COL_TARIH = 5;
+    private static final int COL_NAKIT_TUTARI = 6;
+    private static final int COL_SENET_VADE = 7;
+    private static final int COL_SENET_TUTAR = 8;
+    private static final int COL_BANKA_ADI = 9;
+    private static final int COL_CEK_VADE = 10;
+    private static final int COL_CEK_TUTAR = 11;
+    private static final int COL_MAILORDER_KARLAND = 12;
+    private static final int COL_MAILORDER_OTOKOC = 13;
+    private static final int COL_HAVALE_BANKA = 14;
+    private static final int COL_HAVALE_TUTAR = 15;
+    private static final int COL_POS_YKB = 16;
+    private static final int COL_POS_TEB = 17;
 
     private static final int LAST_COLUMN = COL_POS_TEB;
 
@@ -137,7 +138,9 @@ public class TripCollectionDocumentGenerator {
 
         setSingleColumnHeader(sheet, groupRow, subRow, COL_SIRA_NO, "SIRA NO", headerStyle);
         setSingleColumnHeader(sheet, groupRow, subRow, COL_MAKBUZ_NO, "TAHSİLAT MAKBUZ NO", headerStyle);
-        setSingleColumnHeader(sheet, groupRow, subRow, COL_MIKRO_KAY_NO, "MİKRO KAY.NO SR/NO", headerStyle);
+
+        setGroupHeader(sheet, groupRow, subRow, COL_MIKRO_SR, COL_MIKRO_NO, "MİKRO KAY.NO", "SR", "NO", headerStyle);
+
         setSingleColumnHeader(sheet, groupRow, subRow, COL_UNVANI, "ÜNVANI", headerStyle);
         setSingleColumnHeader(sheet, groupRow, subRow, COL_TARIH, "TARİH", headerStyle);
         setSingleColumnHeader(sheet, groupRow, subRow, COL_NAKIT_TUTARI, "NAKİT TUTARI", headerStyle);
@@ -163,9 +166,13 @@ public class TripCollectionDocumentGenerator {
         Row row = sheet.createRow(rowIndex);
         row.createCell(COL_SIRA_NO).setCellValue(siraNo);
 
+        setCell(sheet, rowIndex, COL_MAKBUZ_NO, collection.getReceiptNumber());
+        setCell(sheet, rowIndex, COL_MIKRO_SR, collection.getMikroSr());
+        setCell(sheet, rowIndex, COL_MIKRO_NO, collection.getMikroNo());
         setCell(sheet, rowIndex, COL_UNVANI, customerName(collection));
         setCell(sheet, rowIndex, COL_TARIH,
                 collection.getCollectionDate() == null ? null : collection.getCollectionDate().format(DATE_FORMATTER));
+        setCell(sheet, rowIndex, COL_BANKA_ADI, collection.getBankName());
 
         PaymentType paymentType = collection.getPaymentType();
 
@@ -180,11 +187,12 @@ public class TripCollectionDocumentGenerator {
                     collection.getMaturityDate() == null ? null : collection.getMaturityDate().format(DATE_FORMATTER));
             setCell(sheet, rowIndex, COL_CEK_TUTAR, collection.getAmount());
         } else if (paymentType == PaymentType.BANK_TRANSFER) {
+            setCell(sheet, rowIndex, COL_HAVALE_BANKA, collection.getBankName());
             setCell(sheet, rowIndex, COL_HAVALE_TUTAR, collection.getAmount());
         }
 
         // CREDIT_CARD (and any other/unknown type) is intentionally written
-        // to no column - there is no matching slot on the paper form yet.
+        // to no amount column - there is no matching slot on the paper form yet.
     }
 
     private void writeTotalsRow(Sheet sheet, CellStyle labelStyle, int rowIndex, List<Collection> collections) {

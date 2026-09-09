@@ -35,6 +35,14 @@ public class CollectionResponse {
 
     private String description;
 
+    private String receiptNumber;
+
+    private String mikroSr;
+
+    private String mikroNo;
+
+    private String bankName;
+
     private Boolean active;
 
     private LocalDateTime createdAt;

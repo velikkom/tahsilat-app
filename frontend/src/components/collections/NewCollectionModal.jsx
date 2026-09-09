@@ -12,6 +12,10 @@ const createInitialForm = (defaultCustomerId = "") => ({
   collectionDate: new Date().toISOString().split("T")[0],
   maturityDate: "",
   description: "",
+  receiptNumber: "",
+  mikroSr: "",
+  mikroNo: "",
+  bankName: "",
 });
 
 const mapCollectionToForm = (collection) => ({
@@ -21,6 +25,10 @@ const mapCollectionToForm = (collection) => ({
   collectionDate: collection?.collectionDate || "",
   maturityDate: collection?.maturityDate || "",
   description: collection?.description || "",
+  receiptNumber: collection?.receiptNumber || "",
+  mikroSr: collection?.mikroSr || "",
+  mikroNo: collection?.mikroNo || "",
+  bankName: collection?.bankName || "",
 });
 
 export default function NewCollectionModal({
@@ -124,6 +132,10 @@ export default function NewCollectionModal({
       collectionDate: form.collectionDate,
       maturityDate: requiresMaturityDate ? form.maturityDate : null,
       description: form.description,
+      receiptNumber: form.receiptNumber || null,
+      mikroSr: form.mikroSr || null,
+      mikroNo: form.mikroNo || null,
+      bankName: form.bankName || null,
     });
   };
 

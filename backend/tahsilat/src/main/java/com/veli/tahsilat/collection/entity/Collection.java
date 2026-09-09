@@ -55,4 +55,12 @@ public class Collection
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collected_by")
     private User collectedBy;
+
+    private String receiptNumber;
+
+    private String mikroSr;
+
+    private String mikroNo;
+
+    private String bankName;
 }

@@ -84,6 +84,42 @@ class TripCollectionDocumentGeneratorTest {
     }
 
     @Test
+    void receiptMikroAndBankFieldsAreWrittenToDocument() throws IOException {
+        Trip trip = baseTrip();
+        Collection bankTransferCollection = collection(
+                "Havale Musteri",
+                PaymentType.BANK_TRANSFER,
+                new BigDecimal("200"),
+                null,
+                "MKB-001",
+                "12",
+                "345",
+                "Ziraat Bankası"
+        );
+
+        byte[] bytes = generator.generate(trip, List.of(bankTransferCollection));
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            int rowIndex = findRowByUnvani(sheet, "Havale Musteri");
+
+            assertEquals("MKB-001", stringValue(sheet, rowIndex, findColumnIndex(sheet, "TAHSİLAT MAKBUZ NO")));
+            assertEquals("12", stringValue(sheet, rowIndex, findColumnIndex(sheet, "SR")));
+            assertEquals("345", stringValue(sheet, rowIndex, findColumnIndex(sheet, "NO")));
+            assertEquals("Ziraat Bankası", stringValue(sheet, rowIndex, findColumnIndex(sheet, "BANKA ADI")));
+
+            // BANK_TRANSFER also copies the bank name into the HAVALE group's
+            // own BANKA sub-column, alongside the amount.
+            int havaleBankaColumn = findColumnIndex(sheet, "BANKA");
+            int havaleTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
+
+            assertEquals("Ziraat Bankası", stringValue(sheet, rowIndex, havaleBankaColumn));
+            assertEquals(200.0, numericValue(sheet, rowIndex, havaleTutarColumn), 0.001);
+        }
+    }
+
+    @Test
     void salesmanFullNameIsWrittenToDocument() throws IOException {
         Trip trip = baseTrip();
 
@@ -127,6 +163,19 @@ class TripCollectionDocumentGeneratorTest {
             BigDecimal amount,
             LocalDate maturityDate
     ) {
+        return collection(customerName, paymentType, amount, maturityDate, null, null, null, null);
+    }
+
+    private Collection collection(
+            String customerName,
+            PaymentType paymentType,
+            BigDecimal amount,
+            LocalDate maturityDate,
+            String receiptNumber,
+            String mikroSr,
+            String mikroNo,
+            String bankName
+    ) {
         Customer customer = new Customer();
         customer.setCompanyName(customerName);
 
@@ -136,6 +185,10 @@ class TripCollectionDocumentGeneratorTest {
         collectionEntity.setAmount(amount);
         collectionEntity.setCollectionDate(LocalDate.of(2026, 3, 3));
         collectionEntity.setMaturityDate(maturityDate);
+        collectionEntity.setReceiptNumber(receiptNumber);
+        collectionEntity.setMikroSr(mikroSr);
+        collectionEntity.setMikroNo(mikroNo);
+        collectionEntity.setBankName(bankName);
         return collectionEntity;
     }
 
@@ -193,6 +246,20 @@ class TripCollectionDocumentGeneratorTest {
     private double numericValueOrZero(Sheet sheet, int rowIndex, int columnIndex) {
         Double value = numericValue(sheet, rowIndex, columnIndex);
         return value == null ? 0.0 : value;
+    }
+
+    private String stringValue(Sheet sheet, int rowIndex, int columnIndex) {
+        Row row = sheet.getRow(rowIndex);
+        if (row == null) {
+            return null;
+        }
+
+        Cell cell = row.getCell(columnIndex);
+        if (cell == null) {
+            return null;
+        }
+
+        return cell.getStringCellValue();
     }
 
     private String findStringValueAfterLabel(Sheet sheet, String label) {

@@ -73,6 +73,11 @@ public class CollectionServiceImpl
                 request.getDescription()
         );
 
+        collection.setReceiptNumber(request.getReceiptNumber());
+        collection.setMikroSr(request.getMikroSr());
+        collection.setMikroNo(request.getMikroNo());
+        collection.setBankName(request.getBankName());
+
         // Bu versiyonda tum odeme turleri olusturuldugu anda PAID kabul edilir.
         // TODO: Cek/senet icin vade gunu odeme hesaba gectiginde PAID'e cekilecek
         // ayri bir odeme takip akisi tasarlanacak.
@@ -126,6 +131,11 @@ public class CollectionServiceImpl
                 request.getPaymentType(),
                 request.getDescription()
         );
+
+        collection.setReceiptNumber(request.getReceiptNumber());
+        collection.setMikroSr(request.getMikroSr());
+        collection.setMikroNo(request.getMikroNo());
+        collection.setBankName(request.getBankName());
 
         Collection savedCollection =
                 collectionRepository.save(collection);
