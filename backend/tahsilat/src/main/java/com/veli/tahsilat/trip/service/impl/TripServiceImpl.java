@@ -1,5 +1,6 @@
 package com.veli.tahsilat.trip.service.impl;
 
+import com.veli.tahsilat.collection.entity.Collection;
 import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.common.exception.BusinessException;
@@ -9,6 +10,7 @@ import com.veli.tahsilat.trip.dto.request.TripRequest;
 import com.veli.tahsilat.trip.dto.response.TripResponse;
 import com.veli.tahsilat.trip.entity.Trip;
 import com.veli.tahsilat.trip.entity.TripDailyExpense;
+import com.veli.tahsilat.trip.export.TripCollectionDocumentGenerator;
 import com.veli.tahsilat.trip.export.TripExpenseDocumentGenerator;
 import com.veli.tahsilat.trip.mapper.TripMapper;
 import com.veli.tahsilat.trip.repository.TripRepository;
@@ -30,6 +32,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +52,8 @@ public class TripServiceImpl implements TripService {
     private final TripMapper tripMapper;
 
     private final TripExpenseDocumentGenerator tripExpenseDocumentGenerator;
+
+    private final TripCollectionDocumentGenerator tripCollectionDocumentGenerator;
 
     @Override
     @Transactional
@@ -125,6 +130,21 @@ public class TripServiceImpl implements TripService {
         }
 
         return tripExpenseDocumentGenerator.generate(trip, collectionSumsByType);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generateCollectionDocument(UUID id) {
+        Trip trip = findAccessibleTrip(id);
+
+        List<Collection> collections =
+                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
+                        trip.getSalesman().getId(),
+                        trip.getStartDate(),
+                        trip.getEndDate()
+                );
+
+        return tripCollectionDocumentGenerator.generate(trip, collections);
     }
 
     private Trip findAccessibleTrip(UUID id) {

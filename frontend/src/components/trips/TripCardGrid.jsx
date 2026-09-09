@@ -3,23 +3,26 @@
 import { memo } from "react";
 import Link from "next/link";
 import { Button } from "react-bootstrap";
-import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaFileInvoice, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
 
 function TripCardGrid({
   trips = [],
   onDelete,
-  onDownload,
+  onDownloadExpense,
+  onDownloadCollection,
   disabled = false,
   deletingId = null,
-  downloadingId = null,
+  downloadingExpenseId = null,
+  downloadingCollectionId = null,
 }) {
   return (
     <div className="d-flex flex-column gap-3">
       {trips.map((trip) => {
         const isDeleting = deletingId === trip.id;
-        const isDownloading = downloadingId === trip.id;
+        const isDownloadingExpense = downloadingExpenseId === trip.id;
+        const isDownloadingCollection = downloadingCollectionId === trip.id;
         const isDisabled = disabled || isDeleting;
 
         return (
@@ -35,16 +38,27 @@ function TripCardGrid({
                 <div className="text-muted small">{trip.salesmanName}</div>
               </div>
 
-              <div className="d-flex gap-2">
+              <div className="d-flex flex-wrap gap-2">
                 <Button
                   variant="outline-success"
                   className="flex-fill touch-target"
-                  onClick={() => onDownload?.(trip)}
-                  disabled={disabled || isDownloading}
-                  aria-label="Excel indir"
+                  onClick={() => onDownloadExpense?.(trip)}
+                  disabled={disabled || isDownloadingExpense}
+                  aria-label="Harcama dökümü indir"
                 >
                   <FaDownload className="me-1" aria-hidden="true" />
-                  Excel
+                  Harcama
+                </Button>
+
+                <Button
+                  variant="outline-info"
+                  className="flex-fill touch-target"
+                  onClick={() => onDownloadCollection?.(trip)}
+                  disabled={disabled || isDownloadingCollection}
+                  aria-label="Tahsilat dökümü indir"
+                >
+                  <FaFileInvoice className="me-1" aria-hidden="true" />
+                  Tahsilat
                 </Button>
 
                 <Link

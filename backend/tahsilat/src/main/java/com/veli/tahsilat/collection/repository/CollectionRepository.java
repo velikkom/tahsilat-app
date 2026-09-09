@@ -315,4 +315,10 @@ public interface CollectionRepository
             @Param("endDate") LocalDate endDate
     );
 
+    List<Collection> findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
+            UUID collectedById,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
 }

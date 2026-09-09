@@ -21,4 +21,6 @@ public interface TripService {
     Page<TripResponse> getAllTrips(Pageable pageable);
 
     byte[] generateExpenseDocument(UUID id);
+
+    byte[] generateCollectionDocument(UUID id);
 }

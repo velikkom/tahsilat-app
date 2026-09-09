@@ -11,7 +11,11 @@ import TripCardGrid from "@/components/trips/TripCardGrid";
 import FloatingAddButton from "@/components/ui/FloatingAddButton";
 
 import useTrips from "@/hooks/useTrips";
-import { deleteTrip, downloadTripExpenseDocument } from "@/services/tripService";
+import {
+  deleteTrip,
+  downloadTripCollectionDocument,
+  downloadTripExpenseDocument,
+} from "@/services/tripService";
 
 export default function TripsView() {
   const router = useRouter();
@@ -19,7 +23,8 @@ export default function TripsView() {
 
   const [isBusy, setIsBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [downloadingId, setDownloadingId] = useState(null);
+  const [downloadingExpenseId, setDownloadingExpenseId] = useState(null);
+  const [downloadingCollectionId, setDownloadingCollectionId] = useState(null);
 
   const handleDelete = useCallback(
     async (trip) => {
@@ -74,12 +79,12 @@ export default function TripsView() {
     [isBusy, refresh]
   );
 
-  const handleDownload = useCallback(async (trip) => {
+  const handleDownloadExpense = useCallback(async (trip) => {
     if (!trip?.id) {
       return;
     }
 
-    setDownloadingId(trip.id);
+    setDownloadingExpenseId(trip.id);
 
     try {
       await downloadTripExpenseDocument(trip.id);
@@ -92,7 +97,29 @@ export default function TripsView() {
         text: error.message || "Harcama dokümanı indirilemedi.",
       });
     } finally {
-      setDownloadingId(null);
+      setDownloadingExpenseId(null);
+    }
+  }, []);
+
+  const handleDownloadCollection = useCallback(async (trip) => {
+    if (!trip?.id) {
+      return;
+    }
+
+    setDownloadingCollectionId(trip.id);
+
+    try {
+      await downloadTripCollectionDocument(trip.id);
+    } catch (error) {
+      console.error(error);
+
+      await Swal.fire({
+        icon: "error",
+        title: "Hata",
+        text: error.message || "Tahsilat dökümü indirilemedi.",
+      });
+    } finally {
+      setDownloadingCollectionId(null);
     }
   }, []);
 
@@ -104,7 +131,7 @@ export default function TripsView() {
         <div>
           <h2 className="fw-bold page-header__title mb-1">Turlar</h2>
           <p className="text-muted mb-0">
-            Saha turu ve harcama dökümü yönetimi
+            Saha turu, harcama ve tahsilat dökümü yönetimi
           </p>
         </div>
 
@@ -135,10 +162,12 @@ export default function TripsView() {
                 <TripTable
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownload={handleDownload}
+                  onDownloadExpense={handleDownloadExpense}
+                  onDownloadCollection={handleDownloadCollection}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingId={downloadingId}
+                  downloadingExpenseId={downloadingExpenseId}
+                  downloadingCollectionId={downloadingCollectionId}
                 />
               </div>
 
@@ -146,10 +175,12 @@ export default function TripsView() {
                 <TripCardGrid
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownload={handleDownload}
+                  onDownloadExpense={handleDownloadExpense}
+                  onDownloadCollection={handleDownloadCollection}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingId={downloadingId}
+                  downloadingExpenseId={downloadingExpenseId}
+                  downloadingCollectionId={downloadingCollectionId}
                 />
               </div>
             </>

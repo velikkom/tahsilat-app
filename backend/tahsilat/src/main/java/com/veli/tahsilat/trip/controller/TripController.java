@@ -91,4 +91,19 @@ public class TripController {
                 )
                 .body(document);
     }
+
+    @Operation(summary = "Download Form 1 collection statement as xlsx")
+    @GetMapping("/{id}/collection-document.xlsx")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<byte[]> downloadCollectionDocument(@PathVariable UUID id) {
+        byte[] document = tripService.generateCollectionDocument(id);
+
+        return ResponseEntity.ok()
+                .contentType(XLSX_MEDIA_TYPE)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"tahsilat-dokumu-" + id + ".xlsx\""
+                )
+                .body(document);
+    }
 }

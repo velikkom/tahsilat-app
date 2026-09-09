@@ -3,17 +3,19 @@
 import { memo } from "react";
 import Link from "next/link";
 import { Button, Table } from "react-bootstrap";
-import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaFileInvoice, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
 
 function TripTable({
   trips = [],
   onDelete,
-  onDownload,
+  onDownloadExpense,
+  onDownloadCollection,
   disabled = false,
   deletingId = null,
-  downloadingId = null,
+  downloadingExpenseId = null,
+  downloadingCollectionId = null,
 }) {
   return (
     <div className="trip-table-wrapper">
@@ -30,7 +32,8 @@ function TripTable({
         <tbody>
           {trips.map((trip) => {
             const isDeleting = deletingId === trip.id;
-            const isDownloading = downloadingId === trip.id;
+            const isDownloadingExpense = downloadingExpenseId === trip.id;
+            const isDownloadingCollection = downloadingCollectionId === trip.id;
             const isDisabled = disabled || isDeleting;
 
             return (
@@ -49,11 +52,24 @@ function TripTable({
                       variant="outline-success"
                       size="sm"
                       className="touch-target"
-                      onClick={() => onDownload?.(trip)}
-                      disabled={disabled || isDownloading}
-                      aria-label="Excel indir"
+                      onClick={() => onDownloadExpense?.(trip)}
+                      disabled={disabled || isDownloadingExpense}
+                      aria-label="Harcama dökümü indir"
+                      title="Harcama dökümü (Form 2)"
                     >
                       <FaDownload aria-hidden="true" />
+                    </Button>
+
+                    <Button
+                      variant="outline-info"
+                      size="sm"
+                      className="touch-target"
+                      onClick={() => onDownloadCollection?.(trip)}
+                      disabled={disabled || isDownloadingCollection}
+                      aria-label="Tahsilat dökümü indir"
+                      title="Tahsilat dökümü (Form 1)"
+                    >
+                      <FaFileInvoice aria-hidden="true" />
                     </Button>
 
                     <Link
