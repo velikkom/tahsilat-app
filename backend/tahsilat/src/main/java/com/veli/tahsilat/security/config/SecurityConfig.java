@@ -6,6 +6,7 @@ import com.veli.tahsilat.security.jwt.JwtService;
 import com.veli.tahsilat.security.service.CustomUserDetailsService;
 import com.veli.tahsilat.security.session.SessionValidationService;
 import jakarta.servlet.DispatcherType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,7 +64,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            @Value("${app.swagger.public:false}") boolean swaggerPublic
     ) throws Exception {
 
         http
@@ -76,35 +78,45 @@ public class SecurityConfig {
                         )
                 )
 
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> {
+                    var requests = auth
+                            .dispatcherTypeMatchers(
+                                    DispatcherType.ERROR,
+                                    DispatcherType.FORWARD
+                            )
+                            .permitAll()
+                            .requestMatchers(
+                                    "/api/v1/auth/register",
+                                    "/api/v1/auth/login"
+                            )
+                            .permitAll();
 
-                        .dispatcherTypeMatchers(
-                                DispatcherType.ERROR,
-                                DispatcherType.FORWARD
-                        )
-                        .permitAll()
-
-                        .requestMatchers(
-                                "/api/v1/auth/register",
-                                "/api/v1/auth/login",
-
+                    if (swaggerPublic) {
+                        requests.requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-
                                 "/v1/api-docs/**",
                                 "/v3/api-docs/**",
-
                                 "/swagger-resources/**",
                                 "/webjars/**"
-                        )
-                        .permitAll()
+                        ).permitAll();
+                    } else {
+                        requests.requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v1/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).denyAll();
+                    }
 
-                        .requestMatchers("/api/v1/**")
-                        .authenticated()
-
-                        .anyRequest()
-                        .authenticated()
-                )
+                    requests
+                            .requestMatchers("/api/v1/**")
+                            .authenticated()
+                            .anyRequest()
+                            .authenticated();
+                })
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,

@@ -82,11 +82,7 @@ public class AuthServiceImpl implements AuthService {
         user.setCurrentSessionId(sessionId);
         userRepository.saveAndFlush(user);
 
-        log.info(
-                "Login session created user={} sessionId={}",
-                user.getEmail(),
-                sessionId
-        );
+        log.info("Login session created");
 
         String jwtToken = jwtService.generateToken(
                 new org.springframework.security.core.userdetails.User(
@@ -116,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
         user.setCurrentSessionId(null);
         userRepository.saveAndFlush(user);
 
-        log.info("Logout session cleared user={}", email);
+        log.info("Logout session cleared");
     }
 
     @Override
