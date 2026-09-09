@@ -301,4 +301,18 @@ public interface CollectionRepository
             UUID excludeId
     );
 
+    @Query("""
+            SELECT c.paymentType, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.collectedBy.id = :collectedById
+            AND c.collectionDate BETWEEN :startDate AND :endDate
+            GROUP BY c.paymentType
+            """)
+    List<Object[]> sumAmountGroupByPaymentTypeForCollectedByAndDateRange(
+            @Param("collectedById") UUID collectedById,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
 }
