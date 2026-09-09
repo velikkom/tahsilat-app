@@ -3,6 +3,7 @@ package com.veli.tahsilat.security.config;
 import com.veli.tahsilat.common.util.HttpErrorResponseWriter;
 import com.veli.tahsilat.security.jwt.JwtAuthenticationFilter;
 import com.veli.tahsilat.security.jwt.JwtService;
+import com.veli.tahsilat.security.ratelimit.AuthRateLimitFilter;
 import com.veli.tahsilat.security.service.CustomUserDetailsService;
 import com.veli.tahsilat.security.session.SessionValidationService;
 import jakarta.servlet.DispatcherType;
@@ -57,6 +58,27 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthRateLimitFilter authRateLimitFilter(
+            @Value("${app.auth.rate-limit.enabled:true}") boolean rateLimitEnabled,
+            @Value("${app.auth.rate-limit.max-attempts:5}") int maxAttempts,
+            @Value("${app.auth.rate-limit.window-seconds:60}") long windowSeconds
+    ) {
+        return new AuthRateLimitFilter(rateLimitEnabled, maxAttempts, windowSeconds * 1000);
+    }
+
+    @Bean
+    public FilterRegistrationBean<AuthRateLimitFilter> authRateLimitFilterRegistration(
+            AuthRateLimitFilter authRateLimitFilter
+    ) {
+        FilterRegistrationBean<AuthRateLimitFilter> registration =
+                new FilterRegistrationBean<>(authRateLimitFilter);
+
+        registration.setEnabled(false);
+
+        return registration;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -65,6 +87,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             JwtAuthenticationFilter jwtAuthenticationFilter,
+            AuthRateLimitFilter authRateLimitFilter,
             @Value("${app.swagger.public:false}") boolean swaggerPublic
     ) throws Exception {
 
@@ -121,6 +144,10 @@ public class SecurityConfig {
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterBefore(
+                        authRateLimitFilter,
+                        JwtAuthenticationFilter.class
                 );
 
         return http.build();
