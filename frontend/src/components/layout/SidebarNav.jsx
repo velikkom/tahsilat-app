@@ -7,6 +7,7 @@ import {
   FaUserCog,
   FaUsers,
   FaMoneyCheckAlt,
+  FaRoute,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { logout } from "@/services/authService";
@@ -16,6 +17,7 @@ const BASE_MENUS = [
   { label: "Dashboard", href: "/dashboard", icon: <FaChartLine /> },
   { label: "Customers", href: "/customers", icon: <FaUsers /> },
   { label: "Collections", href: "/collections", icon: <FaMoneyCheckAlt /> },
+  { label: "Turlar", href: "/trips", icon: <FaRoute /> },
 ];
 
 const ADMIN_MENU = {

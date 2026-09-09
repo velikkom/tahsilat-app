@@ -51,6 +51,7 @@ public class TripExpenseDocumentGenerator {
             int rowIndex = 0;
 
             rowIndex = writeTitle(sheet, titleStyle, rowIndex, lastColumn);
+            rowIndex = writeSalesmanRow(sheet, labelStyle, rowIndex, trip);
             rowIndex = writeVehicleRow(sheet, labelStyle, rowIndex, trip);
             rowIndex++;
 
@@ -80,6 +81,17 @@ public class TripExpenseDocumentGenerator {
         titleCell.setCellValue("DENOTO KOLL. ŞTİ. AİT SATIŞ PERSONELİ HARCAMA DÖKÜMANIDIR");
         titleCell.setCellStyle(titleStyle);
         sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, lastColumn));
+        return rowIndex + 1;
+    }
+
+    private int writeSalesmanRow(Sheet sheet, CellStyle labelStyle, int rowIndex, Trip trip) {
+        String salesmanName = trip.getSalesman() == null
+                ? null
+                : (trip.getSalesman().getFirstName() + " " + trip.getSalesman().getLastName()).trim();
+
+        Row row = sheet.createRow(rowIndex);
+        writeLabelValue(row, labelStyle, 0, "SATIŞ PERSONELİ", salesmanName);
+
         return rowIndex + 1;
     }
 

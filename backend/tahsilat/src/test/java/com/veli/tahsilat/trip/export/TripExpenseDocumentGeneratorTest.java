@@ -81,6 +81,19 @@ class TripExpenseDocumentGeneratorTest {
     }
 
     @Test
+    void salesmanFullNameIsWrittenToDocument() throws IOException {
+        Trip trip = baseTrip();
+
+        byte[] bytes = generator.generate(trip, new EnumMap<>(PaymentType.class));
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            assertEquals("Test Salesman", findStringValueAfterLabel(sheet, "SATIŞ PERSONELİ"));
+        }
+    }
+
+    @Test
     void generatedFileHasXlsxMagicBytes() {
         Trip trip = baseTrip();
 
@@ -112,6 +125,20 @@ class TripExpenseDocumentGeneratorTest {
                         && label.equals(cell.getStringCellValue())) {
                     Cell valueCell = row.getCell(cell.getColumnIndex() + 1);
                     return valueCell == null ? 0.0 : valueCell.getNumericCellValue();
+                }
+            }
+        }
+
+        throw new AssertionError("Label not found in sheet: " + label);
+    }
+
+    private String findStringValueAfterLabel(Sheet sheet, String label) {
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                if (cell.getCellType() == CellType.STRING
+                        && label.equals(cell.getStringCellValue())) {
+                    Cell valueCell = row.getCell(cell.getColumnIndex() + 1);
+                    return valueCell == null ? null : valueCell.getStringCellValue();
                 }
             }
         }
