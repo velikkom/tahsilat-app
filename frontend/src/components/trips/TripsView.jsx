@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Spinner } from "react-bootstrap";
+import { Button, Col, Form, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 
 import TripTable from "@/components/trips/TripTable";
@@ -17,14 +17,51 @@ import {
   downloadTripExpenseDocument,
 } from "@/services/tripService";
 
+const EMPTY_DATE_FILTERS = { fromDate: "", toDate: "" };
+
 export default function TripsView() {
   const router = useRouter();
-  const { trips, loading, refresh } = useTrips();
+
+  const [appliedFilters, setAppliedFilters] = useState(EMPTY_DATE_FILTERS);
+  const [draftFilters, setDraftFilters] = useState(EMPTY_DATE_FILTERS);
+
+  const { trips, loading, refresh } = useTrips(appliedFilters);
 
   const [isBusy, setIsBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [downloadingExpenseId, setDownloadingExpenseId] = useState(null);
   const [downloadingCollectionId, setDownloadingCollectionId] = useState(null);
+
+  const isRangeInvalid = useMemo(() => {
+    return Boolean(
+      draftFilters.fromDate &&
+        draftFilters.toDate &&
+        draftFilters.toDate < draftFilters.fromDate
+    );
+  }, [draftFilters]);
+
+  const handleFilterFieldChange = useCallback((event) => {
+    const { name, value } = event.target;
+    setDraftFilters((previous) => ({ ...previous, [name]: value }));
+  }, []);
+
+  const handleApplyFilters = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      if (isRangeInvalid) {
+        return;
+      }
+
+      setAppliedFilters(draftFilters);
+    },
+    [draftFilters, isRangeInvalid]
+  );
+
+  const handleClearFilters = useCallback(() => {
+    setDraftFilters(EMPTY_DATE_FILTERS);
+    setAppliedFilters(EMPTY_DATE_FILTERS);
+  }, []);
 
   const handleDelete = useCallback(
     async (trip) => {
@@ -143,6 +180,52 @@ export default function TripsView() {
         </Link>
       </div>
 
+      <div className="card border-0 shadow-sm ui-panel-card mb-3">
+        <div className="card-body">
+          <Form className="d-flex flex-wrap align-items-end gap-3" onSubmit={handleApplyFilters}>
+            <Col xs={12} sm="auto">
+              <Form.Group>
+                <Form.Label>Başlangıç Tarihi</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="fromDate"
+                  value={draftFilters.fromDate}
+                  onChange={handleFilterFieldChange}
+                  isInvalid={isRangeInvalid}
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} sm="auto">
+              <Form.Group>
+                <Form.Label>Bitiş Tarihi</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="toDate"
+                  value={draftFilters.toDate}
+                  onChange={handleFilterFieldChange}
+                  isInvalid={isRangeInvalid}
+                />
+                {isRangeInvalid && (
+                  <div className="invalid-feedback d-block">
+                    Bitiş tarihi başlangıç tarihinden önce olamaz.
+                  </div>
+                )}
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} sm="auto" className="d-flex gap-2">
+              <Button type="submit" variant="primary" disabled={isRangeInvalid}>
+                Filtrele
+              </Button>
+              <Button type="button" variant="outline-secondary" onClick={handleClearFilters}>
+                Temizle
+              </Button>
+            </Col>
+          </Form>
+        </div>
+      </div>
+
       <div className="card border-0 shadow-sm ui-panel-card">
         <div className="card-body">
           {loading ? (
@@ -151,7 +234,11 @@ export default function TripsView() {
             </div>
           ) : !hasTrips ? (
             <div className="text-center py-5">
-              <p className="text-muted mb-3">Henüz tur kaydı yok.</p>
+              <p className="text-muted mb-3">
+                {appliedFilters.fromDate || appliedFilters.toDate
+                  ? "Seçilen tarih aralığında tur bulunamadı."
+                  : "Henüz tur kaydı yok."}
+              </p>
               <Link href="/trips/new" className="btn btn-primary">
                 İlk turu oluştur
               </Link>

@@ -47,48 +47,51 @@ function TripTable({
                 <td>{trip.salesmanName || "-"}</td>
 
                 <td className="text-end">
-                  <div className="d-flex justify-content-end gap-1">
+                  <div className="d-flex justify-content-end gap-2">
                     <Button
                       variant="outline-success"
-                      size="sm"
-                      className="touch-target"
+                      className="touch-target d-inline-flex align-items-center gap-2"
                       onClick={() => onDownloadExpense?.(trip)}
                       disabled={disabled || isDownloadingExpense}
                       aria-label="Harcama dökümü indir"
                       title="Harcama dökümü (Form 2)"
                     >
                       <FaDownload aria-hidden="true" />
+                      Harcama
                     </Button>
 
                     <Button
                       variant="outline-info"
-                      size="sm"
-                      className="touch-target"
+                      className="touch-target d-inline-flex align-items-center gap-2"
                       onClick={() => onDownloadCollection?.(trip)}
                       disabled={disabled || isDownloadingCollection}
                       aria-label="Tahsilat dökümü indir"
                       title="Tahsilat dökümü (Form 1)"
                     >
                       <FaFileInvoice aria-hidden="true" />
+                      Tahsilat
                     </Button>
 
                     <Link
                       href={`/trips/${trip.id}`}
-                      className="btn btn-outline-warning btn-sm touch-target"
+                      className="btn btn-outline-warning touch-target d-inline-flex align-items-center gap-2"
                       aria-label="Düzenle"
+                      title="Düzenle"
                     >
                       <FaEdit aria-hidden="true" />
+                      Düzenle
                     </Link>
 
                     <Button
                       variant="outline-danger"
-                      size="sm"
-                      className="touch-target"
+                      className="touch-target d-inline-flex align-items-center gap-2"
                       onClick={() => onDelete?.(trip)}
                       disabled={isDisabled}
                       aria-label="Sil"
+                      title="Sil"
                     >
                       <FaTrash aria-hidden="true" />
+                      Sil
                     </Button>
                   </div>
                 </td>

@@ -1,7 +1,19 @@
 import { apiFetch, apiFetchJson } from "@/services/apiClient";
 
-export function getTrips({ page = 0, size = 100 } = {}) {
-  return apiFetchJson(`/trips?page=${page}&size=${size}`, {
+export function getTrips({ page = 0, size = 100, fromDate, toDate } = {}) {
+  const params = new URLSearchParams({ page: String(page), size: String(size) });
+  params.append("sort", "startDate,desc");
+  params.append("sort", "createdAt,desc");
+
+  if (fromDate) {
+    params.append("fromDate", fromDate);
+  }
+
+  if (toDate) {
+    params.append("toDate", toDate);
+  }
+
+  return apiFetchJson(`/trips?${params.toString()}`, {
     errorMessage: "Turlar getirilemedi",
   });
 }

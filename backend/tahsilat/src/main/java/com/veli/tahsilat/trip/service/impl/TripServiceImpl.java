@@ -21,7 +21,9 @@ import com.veli.tahsilat.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -102,15 +104,41 @@ public class TripServiceImpl implements TripService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<TripResponse> getAllTrips(Pageable pageable) {
+    public Page<TripResponse> getAllTrips(Pageable pageable, LocalDate fromDate, LocalDate toDate) {
+        validateDateFilterRange(fromDate, toDate);
+
+        Pageable sortedPageable = applyDefaultSort(pageable);
+
         if (isAdmin()) {
-            return tripRepository.findByActiveTrue(pageable)
+            return tripRepository
+                    .findByActiveTrueAndDateRangeOverlap(fromDate, toDate, sortedPageable)
                     .map(tripMapper::toResponse);
         }
 
         return tripRepository
-                .findBySalesmanIdAndActiveTrue(getCurrentUser().getId(), pageable)
+                .findBySalesmanIdAndActiveTrueAndDateRangeOverlap(
+                        getCurrentUser().getId(), fromDate, toDate, sortedPageable
+                )
                 .map(tripMapper::toResponse);
+    }
+
+    private Pageable applyDefaultSort(Pageable pageable) {
+        if (pageable.getSort().isSorted()) {
+            return pageable;
+        }
+
+        Sort defaultSort = Sort.by(
+                Sort.Order.desc("startDate"),
+                Sort.Order.desc("createdAt")
+        );
+
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), defaultSort);
+    }
+
+    private void validateDateFilterRange(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate != null && toDate != null && toDate.isBefore(fromDate)) {
+            throw new BusinessException("Bitiş tarihi başlangıç tarihinden önce olamaz.");
+        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.veli.tahsilat.trip.dto.response.TripResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public interface TripService {
@@ -18,7 +19,7 @@ public interface TripService {
 
     void deleteTrip(UUID id);
 
-    Page<TripResponse> getAllTrips(Pageable pageable);
+    Page<TripResponse> getAllTrips(Pageable pageable, LocalDate fromDate, LocalDate toDate);
 
     byte[] generateExpenseDocument(UUID id);
 

@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getTrips } from "@/services/tripService";
 
-export default function useTrips() {
+export default function useTrips(filters = {}) {
+  const { fromDate, toDate } = filters;
+
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(false);
   const requestIdRef = useRef(0);
@@ -16,6 +18,8 @@ export default function useTrips() {
 
       const data = await getTrips({
         size: 200,
+        fromDate,
+        toDate,
       });
 
       if (requestId !== requestIdRef.current) {
@@ -32,7 +36,7 @@ export default function useTrips() {
         setLoading(false);
       }
     }
-  }, []);
+  }, [fromDate, toDate]);
 
   useEffect(() => {
     fetchTrips();
