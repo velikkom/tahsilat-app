@@ -84,6 +84,29 @@ class TripCollectionDocumentGeneratorTest {
     }
 
     @Test
+    void mailOrderKarlandAmountIsWrittenToKarlandColumnOnly() throws IOException {
+        Trip trip = baseTrip();
+        Collection karlandCollection =
+                collection("Karland Musteri", PaymentType.MAIL_ORDER_KARLAND, new BigDecimal("300"), null);
+
+        byte[] bytes = generator.generate(trip, List.of(karlandCollection));
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            int rowIndex = findRowByUnvani(sheet, "Karland Musteri");
+            int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
+            int karlandColumn = findColumnIndex(sheet, "MAILORDER KARLAND");
+
+            assertEquals(300.0, numericValue(sheet, rowIndex, karlandColumn), 0.001);
+            assertNull(numericValue(sheet, rowIndex, nakitColumn));
+
+            int totalRowIndex = findRowByUnvani(sheet, "GENEL TOPLAM");
+            assertEquals(300.0, numericValue(sheet, totalRowIndex, karlandColumn), 0.001);
+        }
+    }
+
+    @Test
     void receiptMikroAndBankFieldsAreWrittenToDocument() throws IOException {
         Trip trip = baseTrip();
         Collection bankTransferCollection = collection(

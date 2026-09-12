@@ -1,9 +1,13 @@
 export const PAYMENT_TYPE_LABELS = {
   CASH: "Nakit",
   CHECK: "Çek",
-  CREDIT_CARD: "Kredi Kartı",
+  CREDIT_CARD: "Kredi Kartı — diğer",
   BANK_TRANSFER: "Havale / EFT",
   PROMISSORY_NOTE: "Senet",
+  MAIL_ORDER_KARLAND: "Mailorder Karland",
+  MAIL_ORDER_OTOKOC: "Mailorder Otokoç",
+  POS_YKB: "POS YKB",
+  POS_TEB: "POS TEB",
 };
 
 export function formatCurrency(value) {

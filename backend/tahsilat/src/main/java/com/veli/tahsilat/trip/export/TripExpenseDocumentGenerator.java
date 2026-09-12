@@ -177,10 +177,10 @@ public class TripExpenseDocumentGenerator {
         BigDecimal promissoryNote = sumFor(collectionSumsByType, PaymentType.PROMISSORY_NOTE);
         BigDecimal check = sumFor(collectionSumsByType, PaymentType.CHECK);
         BigDecimal bankTransfer = sumFor(collectionSumsByType, PaymentType.BANK_TRANSFER);
-        BigDecimal mailorderKarland = BigDecimal.ZERO;
-        BigDecimal mailorderOtokoc = BigDecimal.ZERO;
-        BigDecimal posYkb = BigDecimal.ZERO;
-        BigDecimal posTeb = BigDecimal.ZERO;
+        BigDecimal mailorderKarland = sumFor(collectionSumsByType, PaymentType.MAIL_ORDER_KARLAND);
+        BigDecimal mailorderOtokoc = sumFor(collectionSumsByType, PaymentType.MAIL_ORDER_OTOKOC);
+        BigDecimal posYkb = sumFor(collectionSumsByType, PaymentType.POS_YKB);
+        BigDecimal posTeb = sumFor(collectionSumsByType, PaymentType.POS_TEB);
 
         BigDecimal genelToplam = cash
                 .add(promissoryNote)

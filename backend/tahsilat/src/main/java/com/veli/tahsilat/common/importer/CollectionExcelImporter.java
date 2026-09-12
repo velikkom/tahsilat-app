@@ -399,6 +399,18 @@ public class CollectionExcelImporter
             case "havale" ->
                     PaymentType.BANK_TRANSFER;
 
+            case "karland", "mailorder karland" ->
+                    PaymentType.MAIL_ORDER_KARLAND;
+
+            case "otokoc" ->
+                    PaymentType.MAIL_ORDER_OTOKOC;
+
+            case "ykb", "yapi kredi", "pos ykb" ->
+                    PaymentType.POS_YKB;
+
+            case "teb", "pos teb" ->
+                    PaymentType.POS_TEB;
+
             default ->
                     PaymentType.CREDIT_CARD;
         };

@@ -189,6 +189,14 @@ public class TripCollectionDocumentGenerator {
         } else if (paymentType == PaymentType.BANK_TRANSFER) {
             setCell(sheet, rowIndex, COL_HAVALE_BANKA, collection.getBankName());
             setCell(sheet, rowIndex, COL_HAVALE_TUTAR, collection.getAmount());
+        } else if (paymentType == PaymentType.MAIL_ORDER_KARLAND) {
+            setCell(sheet, rowIndex, COL_MAILORDER_KARLAND, collection.getAmount());
+        } else if (paymentType == PaymentType.MAIL_ORDER_OTOKOC) {
+            setCell(sheet, rowIndex, COL_MAILORDER_OTOKOC, collection.getAmount());
+        } else if (paymentType == PaymentType.POS_YKB) {
+            setCell(sheet, rowIndex, COL_POS_YKB, collection.getAmount());
+        } else if (paymentType == PaymentType.POS_TEB) {
+            setCell(sheet, rowIndex, COL_POS_TEB, collection.getAmount());
         }
 
         // CREDIT_CARD (and any other/unknown type) is intentionally written
@@ -200,6 +208,10 @@ public class TripCollectionDocumentGenerator {
         BigDecimal promissoryNoteTotal = BigDecimal.ZERO;
         BigDecimal checkTotal = BigDecimal.ZERO;
         BigDecimal bankTransferTotal = BigDecimal.ZERO;
+        BigDecimal mailOrderKarlandTotal = BigDecimal.ZERO;
+        BigDecimal mailOrderOtokocTotal = BigDecimal.ZERO;
+        BigDecimal posYkbTotal = BigDecimal.ZERO;
+        BigDecimal posTebTotal = BigDecimal.ZERO;
 
         for (Collection collection : collections) {
             BigDecimal amount = collection.getAmount() == null ? BigDecimal.ZERO : collection.getAmount();
@@ -213,6 +225,14 @@ public class TripCollectionDocumentGenerator {
                 checkTotal = checkTotal.add(amount);
             } else if (paymentType == PaymentType.BANK_TRANSFER) {
                 bankTransferTotal = bankTransferTotal.add(amount);
+            } else if (paymentType == PaymentType.MAIL_ORDER_KARLAND) {
+                mailOrderKarlandTotal = mailOrderKarlandTotal.add(amount);
+            } else if (paymentType == PaymentType.MAIL_ORDER_OTOKOC) {
+                mailOrderOtokocTotal = mailOrderOtokocTotal.add(amount);
+            } else if (paymentType == PaymentType.POS_YKB) {
+                posYkbTotal = posYkbTotal.add(amount);
+            } else if (paymentType == PaymentType.POS_TEB) {
+                posTebTotal = posTebTotal.add(amount);
             }
         }
 
@@ -225,6 +245,10 @@ public class TripCollectionDocumentGenerator {
         setCell(sheet, rowIndex, COL_SENET_TUTAR, promissoryNoteTotal);
         setCell(sheet, rowIndex, COL_CEK_TUTAR, checkTotal);
         setCell(sheet, rowIndex, COL_HAVALE_TUTAR, bankTransferTotal);
+        setCell(sheet, rowIndex, COL_MAILORDER_KARLAND, mailOrderKarlandTotal);
+        setCell(sheet, rowIndex, COL_MAILORDER_OTOKOC, mailOrderOtokocTotal);
+        setCell(sheet, rowIndex, COL_POS_YKB, posYkbTotal);
+        setCell(sheet, rowIndex, COL_POS_TEB, posTebTotal);
     }
 
     private String customerName(Collection collection) {

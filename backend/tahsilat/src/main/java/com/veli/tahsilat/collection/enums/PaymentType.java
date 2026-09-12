@@ -10,5 +10,13 @@ public enum PaymentType {
 
     CHECK,
 
-    PROMISSORY_NOTE
+    PROMISSORY_NOTE,
+
+    MAIL_ORDER_KARLAND,
+
+    MAIL_ORDER_OTOKOC,
+
+    POS_YKB,
+
+    POS_TEB
 }

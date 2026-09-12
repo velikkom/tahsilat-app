@@ -7,7 +7,11 @@ const COLLECTION_TYPES = [
   { value: "BANK_TRANSFER", label: "Havale / EFT" },
   { value: "CHECK", label: "Çek" },
   { value: "PROMISSORY_NOTE", label: "Senet" },
-  { value: "CREDIT_CARD", label: "Kredi Kartı" },
+  { value: "MAIL_ORDER_KARLAND", label: "Mailorder Karland" },
+  { value: "MAIL_ORDER_OTOKOC", label: "Mailorder Otokoç" },
+  { value: "POS_YKB", label: "POS YKB" },
+  { value: "POS_TEB", label: "POS TEB" },
+  { value: "CREDIT_CARD", label: "Kredi Kartı — diğer" },
 ];
 
 export default function CollectionFormFields({

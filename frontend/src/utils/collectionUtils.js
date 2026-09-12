@@ -26,9 +26,13 @@ const MONTH_FORMATTER = new Intl.DateTimeFormat("tr-TR", {
 export const PAYMENT_TYPE_LABELS = {
   CASH: "Nakit",
   BANK_TRANSFER: "Havale",
-  CREDIT_CARD: "Kredi Kartı",
+  CREDIT_CARD: "Kredi Kartı — diğer",
   CHECK: "Çek",
   PROMISSORY_NOTE: "Müşteri Senedi",
+  MAIL_ORDER_KARLAND: "Mailorder Karland",
+  MAIL_ORDER_OTOKOC: "Mailorder Otokoç",
+  POS_YKB: "POS YKB",
+  POS_TEB: "POS TEB",
 };
 
 export const STATUS_LABELS = {
@@ -219,10 +223,14 @@ export const EMPTY_COLLECTION_FILTERS = {
 const PAYMENT_TYPE_FILTER_OPTIONS = [
   { value: "ALL", label: "Tümü" },
   { value: "CASH", label: "Nakit" },
-  { value: "CREDIT_CARD", label: "Kredi Kartı" },
+  { value: "CREDIT_CARD", label: "Kredi Kartı — diğer" },
   { value: "CHECK", label: "Çek" },
   { value: "PROMISSORY_NOTE", label: "Müşteri Senedi" },
   { value: "BANK_TRANSFER", label: "Havale" },
+  { value: "MAIL_ORDER_KARLAND", label: "Mailorder Karland" },
+  { value: "MAIL_ORDER_OTOKOC", label: "Mailorder Otokoç" },
+  { value: "POS_YKB", label: "POS YKB" },
+  { value: "POS_TEB", label: "POS TEB" },
 ];
 
 const STATUS_FILTER_OPTIONS = [
