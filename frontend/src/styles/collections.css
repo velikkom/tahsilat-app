@@ -3,6 +3,14 @@
   font-weight: 700;
 }
 
+/* ===== Stat cards =====
+   Scoped to .collections-page only — .ui-stat-card__value is shared with
+   Customers, whose current size must stay untouched. */
+
+.collections-page .ui-stat-card__value {
+  font-size: 1.25rem;
+}
+
 /* ===== Actions ===== */
 
 .collection-page-actions__create {
@@ -29,10 +37,17 @@
 }
 
 .collection-filter-group__label {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+}
+
+/* Chip buttons use Bootstrap's size="sm", which crushes longer labels
+   (e.g. "Kredi Kartı — diğer") — give them a bit more room to breathe. */
+.collections-page .ui-filter-chip {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
 }
 
 .collection-search-input-wrapper__icon {
@@ -62,21 +77,32 @@
 }
 
 .collection-table th {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted, #6b7280);
   white-space: nowrap;
   border-bottom-width: 1px;
+  padding: 0.75rem 0.5rem;
 }
 
 .collection-table td {
   vertical-align: middle;
+  font-size: 14px;
+  padding: 0.75rem 0.5rem;
+}
+
+/* Match the Customers table's PrimeReact scale (see datatable.css) */
+@media (min-width: 768px) {
+  .collection-table th,
+  .collection-table td {
+    font-size: 15px;
+    padding: 1rem;
+  }
 }
 
 .collection-table__customer {
   display: inline-block;
-  max-width: 220px;
+  max-width: 280px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -88,8 +114,9 @@
 }
 
 .collection-table-actions__btn {
-  width: 40px;
-  min-width: 40px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
