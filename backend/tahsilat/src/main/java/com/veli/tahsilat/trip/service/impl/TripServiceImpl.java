@@ -7,11 +7,13 @@ import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.common.exception.ResourceNotFoundException;
 import com.veli.tahsilat.trip.dto.request.TripDailyExpenseRequest;
 import com.veli.tahsilat.trip.dto.request.TripRequest;
+import com.veli.tahsilat.trip.dto.response.TripPrintPreviewResponse;
 import com.veli.tahsilat.trip.dto.response.TripResponse;
 import com.veli.tahsilat.trip.entity.Trip;
 import com.veli.tahsilat.trip.entity.TripDailyExpense;
 import com.veli.tahsilat.trip.export.TripCollectionDocumentGenerator;
 import com.veli.tahsilat.trip.export.TripExpenseDocumentGenerator;
+import com.veli.tahsilat.trip.export.TripPrintPreviewBuilder;
 import com.veli.tahsilat.trip.mapper.TripMapper;
 import com.veli.tahsilat.trip.repository.TripRepository;
 import com.veli.tahsilat.trip.service.TripService;
@@ -56,6 +58,8 @@ public class TripServiceImpl implements TripService {
     private final TripExpenseDocumentGenerator tripExpenseDocumentGenerator;
 
     private final TripCollectionDocumentGenerator tripCollectionDocumentGenerator;
+
+    private final TripPrintPreviewBuilder tripPrintPreviewBuilder;
 
     @Override
     @Transactional
@@ -173,6 +177,21 @@ public class TripServiceImpl implements TripService {
                 );
 
         return tripCollectionDocumentGenerator.generate(trip, collections);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TripPrintPreviewResponse getPrintPreview(UUID id) {
+        Trip trip = findAccessibleTrip(id);
+
+        List<Collection> collections =
+                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
+                        trip.getSalesman().getId(),
+                        trip.getStartDate(),
+                        trip.getEndDate()
+                );
+
+        return tripPrintPreviewBuilder.build(trip, collections);
     }
 
     private Trip findAccessibleTrip(UUID id) {

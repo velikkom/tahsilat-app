@@ -11,6 +11,7 @@ import "@/styles/collections.css";
 import "@/styles/dashboard.css";
 import "@/styles/responsive.css";
 import "@/styles/users.css";
+import "@/styles/trip-print.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 

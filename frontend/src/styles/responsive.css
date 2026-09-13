@@ -409,6 +409,34 @@ body.sidebar-drawer-open {
   }
 }
 
+/* --- Trip card actions (narrow phones <424px) --- */
+
+.trip-card-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.trip-card-actions__btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  width: 100%;
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.trip-card-actions__icon,
+.trip-card-actions__btn svg {
+  width: 1rem !important;
+  height: 1rem !important;
+  flex-shrink: 0;
+}
+
 /* --- 1280px+ desktop polish --- */
 
 @media (min-width: 1280px) {

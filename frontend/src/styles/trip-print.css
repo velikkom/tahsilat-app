@@ -1,0 +1,111 @@
+/* --- Trip print preview (Form 1 + Form 2 A4 pages) --- */
+
+.trip-print-page {
+  background: #e9ecef;
+  min-height: 100vh;
+  padding: 1.5rem 0 3rem;
+}
+
+.trip-print-page__toolbar {
+  max-width: 900px;
+  margin: 0 auto 1.5rem;
+  padding: 0 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.trip-print-page__sheet {
+  width: 900px;
+  max-width: calc(100% - 2rem);
+  min-height: 620px;
+  margin: 0 auto 2rem;
+  background: #fff;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.trip-print-page__title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.trip-print-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.trip-print-page__meta strong {
+  margin-right: 0.35rem;
+}
+
+.trip-print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.trip-print-table th,
+.trip-print-table td {
+  border: 1px solid #adb5bd;
+  padding: 0.25rem 0.4rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.trip-print-table th {
+  background: #f1f3f5;
+  font-weight: 600;
+}
+
+.trip-print-table tfoot td {
+  font-weight: 700;
+  background: #f8f9fa;
+}
+
+.trip-print-page__section-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+@media print {
+  body.trip-print-active .app-sidebar,
+  body.trip-print-active .app-navbar,
+  body.trip-print-active .mobile-sidebar,
+  body.trip-print-active .trip-print-page__toolbar {
+    display: none !important;
+  }
+
+  body.trip-print-active .dashboard-shell__main {
+    padding: 0 !important;
+  }
+
+  body.trip-print-active .trip-print-page {
+    background: #fff;
+    padding: 0;
+  }
+
+  body.trip-print-active .trip-print-page__sheet {
+    box-shadow: none;
+    width: auto;
+    max-width: none;
+    min-height: auto;
+    margin: 0;
+    page-break-after: always;
+  }
+
+  body.trip-print-active .trip-print-page__sheet:last-child {
+    page-break-after: auto;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}

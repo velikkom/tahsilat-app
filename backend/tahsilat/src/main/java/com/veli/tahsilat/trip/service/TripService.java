@@ -1,6 +1,7 @@
 package com.veli.tahsilat.trip.service;
 
 import com.veli.tahsilat.trip.dto.request.TripRequest;
+import com.veli.tahsilat.trip.dto.response.TripPrintPreviewResponse;
 import com.veli.tahsilat.trip.dto.response.TripResponse;
 
 import org.springframework.data.domain.Page;
@@ -24,4 +25,6 @@ public interface TripService {
     byte[] generateExpenseDocument(UUID id);
 
     byte[] generateCollectionDocument(UUID id);
+
+    TripPrintPreviewResponse getPrintPreview(UUID id);
 }

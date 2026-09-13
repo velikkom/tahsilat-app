@@ -24,6 +24,12 @@ export function getTripById(id) {
   });
 }
 
+export function getTripPrintPreview(id) {
+  return apiFetchJson(`/trips/${id}/print-preview`, {
+    errorMessage: "Çıktı önizlemesi getirilemedi",
+  });
+}
+
 export function createTrip(payload) {
   return apiFetchJson("/trips", {
     method: "POST",

@@ -2,6 +2,7 @@
 
 import { memo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "react-bootstrap";
 import { FaDownload, FaEdit, FaFileInvoice, FaTrash } from "react-icons/fa";
 
@@ -17,6 +18,8 @@ function TripCardGrid({
   downloadingExpenseId = null,
   downloadingCollectionId = null,
 }) {
+  const router = useRouter();
+
   return (
     <div className="d-flex flex-column gap-3">
       {trips.map((trip) => {
@@ -26,7 +29,11 @@ function TripCardGrid({
         const isDisabled = disabled || isDeleting;
 
         return (
-          <div key={trip.id} className="card border-0 shadow-sm trip-card">
+          <div
+            key={trip.id}
+            className="card border-0 shadow-sm trip-card"
+            onDoubleClick={() => router.push(`/trips/${trip.id}/print`)}
+          >
             <div className="card-body">
               <div className="mb-3">
                 <div className="fw-semibold">
@@ -38,46 +45,60 @@ function TripCardGrid({
                 <div className="text-muted small">{trip.salesmanName}</div>
               </div>
 
-              <div className="d-flex flex-wrap gap-2">
+              <div className="trip-card-actions">
                 <Button
                   variant="outline-success"
-                  className="flex-fill touch-target"
-                  onClick={() => onDownloadExpense?.(trip)}
+                  className="trip-card-actions__btn touch-target"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDownloadExpense?.(trip);
+                  }}
+                  onDoubleClick={(event) => event.stopPropagation()}
                   disabled={disabled || isDownloadingExpense}
                   aria-label="Harcama dökümü indir"
                 >
-                  <FaDownload className="me-1" aria-hidden="true" />
+                  <FaDownload size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Harcama
                 </Button>
 
                 <Button
                   variant="outline-info"
-                  className="flex-fill touch-target"
-                  onClick={() => onDownloadCollection?.(trip)}
+                  className="trip-card-actions__btn touch-target"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDownloadCollection?.(trip);
+                  }}
+                  onDoubleClick={(event) => event.stopPropagation()}
                   disabled={disabled || isDownloadingCollection}
                   aria-label="Tahsilat dökümü indir"
                 >
-                  <FaFileInvoice className="me-1" aria-hidden="true" />
+                  <FaFileInvoice size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Tahsilat
                 </Button>
 
                 <Link
                   href={`/trips/${trip.id}`}
-                  className="btn btn-outline-warning flex-fill touch-target"
+                  className="btn btn-outline-warning trip-card-actions__btn touch-target"
                   aria-label="Düzenle"
+                  onClick={(event) => event.stopPropagation()}
+                  onDoubleClick={(event) => event.stopPropagation()}
                 >
-                  <FaEdit className="me-1" aria-hidden="true" />
+                  <FaEdit size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Düzenle
                 </Link>
 
                 <Button
                   variant="outline-danger"
-                  className="flex-fill touch-target"
-                  onClick={() => onDelete?.(trip)}
+                  className="trip-card-actions__btn touch-target"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete?.(trip);
+                  }}
+                  onDoubleClick={(event) => event.stopPropagation()}
                   disabled={isDisabled}
                   aria-label="Sil"
                 >
-                  <FaTrash className="me-1" aria-hidden="true" />
+                  <FaTrash size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Sil
                 </Button>
               </div>

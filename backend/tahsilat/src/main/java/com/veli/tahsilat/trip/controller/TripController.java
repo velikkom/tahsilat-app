@@ -1,6 +1,7 @@
 package com.veli.tahsilat.trip.controller;
 
 import com.veli.tahsilat.trip.dto.request.TripRequest;
+import com.veli.tahsilat.trip.dto.response.TripPrintPreviewResponse;
 import com.veli.tahsilat.trip.dto.response.TripResponse;
 import com.veli.tahsilat.trip.service.TripService;
 
@@ -112,5 +113,12 @@ public class TripController {
                         "attachment; filename=\"tahsilat-dokumu-" + id + ".xlsx\""
                 )
                 .body(document);
+    }
+
+    @Operation(summary = "Get Form 1 + Form 2 print preview data")
+    @GetMapping("/{id}/print-preview")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<TripPrintPreviewResponse> getPrintPreview(@PathVariable UUID id) {
+        return ResponseEntity.ok(tripService.getPrintPreview(id));
     }
 }
