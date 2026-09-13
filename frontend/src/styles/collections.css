@@ -13,13 +13,13 @@
 
 /* ===== Actions ===== */
 
-.collection-page-actions__create {
+.collection-page-actions__create,
+.collection-page-actions__import {
+  min-height: 48px;
   border-radius: 12px;
   font-weight: 600;
-}
-
-.collection-page-actions__import {
-  border-radius: 12px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.95rem;
 }
 
 @media (min-width: 768px) {
@@ -43,11 +43,11 @@
   letter-spacing: 0.02em;
 }
 
-/* Chip buttons use Bootstrap's size="sm", which crushes longer labels
-   (e.g. "Kredi Kartı — diğer") — give them a bit more room to breathe. */
 .collections-page .ui-filter-chip {
-  padding: 0.4rem 0.9rem;
-  font-size: 0.8rem;
+  min-height: 44px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .collection-search-input-wrapper__icon {
@@ -109,18 +109,20 @@
 }
 
 .collection-table__type-badge {
-  border: 1px solid #e5e7eb;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .collection-table-actions__btn {
-  min-width: 44px;
   min-height: 44px;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.9rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px !important;
+  gap: 0.25rem;
+  border-radius: 12px !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ===== Cards ===== */
@@ -135,11 +137,7 @@
 }
 
 .collection-card__payment-badge {
-  border: 1px solid #e5e7eb;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-size: 0.78rem;
   max-width: 42%;
   white-space: nowrap;
   overflow: hidden;
@@ -180,11 +178,120 @@ body.dark-mode .collection-table th {
   color: #9ca3af;
 }
 
-body.dark-mode .collection-card__payment-badge,
-body.dark-mode .collection-table__type-badge {
-  border-color: #374151;
-  background-color: #1f2937 !important;
-  color: #e5e7eb !important;
+/* ===== Payment type colors ===== */
+
+.payment-type-badge,
+.payment-type-chip {
+  --pt-bg: #f1f5f9;
+  --pt-fg: #334155;
+  --pt-bd: #cbd5e1;
+  --pt-solid: #475569;
+}
+
+.payment-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  background: var(--pt-bg);
+  color: var(--pt-fg);
+  border: 1px solid var(--pt-bd);
+}
+
+.payment-type-badge--cash,
+.payment-type-chip--cash {
+  --pt-bg: #dcfce7;
+  --pt-fg: #166534;
+  --pt-bd: #86efac;
+  --pt-solid: #16a34a;
+}
+
+.payment-type-badge--transfer,
+.payment-type-chip--transfer {
+  --pt-bg: #dbeafe;
+  --pt-fg: #1d4ed8;
+  --pt-bd: #93c5fd;
+  --pt-solid: #2563eb;
+}
+
+.payment-type-badge--card,
+.payment-type-chip--card {
+  --pt-bg: #e2e8f0;
+  --pt-fg: #334155;
+  --pt-bd: #cbd5e1;
+  --pt-solid: #475569;
+}
+
+.payment-type-badge--check,
+.payment-type-chip--check {
+  --pt-bg: #fef3c7;
+  --pt-fg: #92400e;
+  --pt-bd: #fcd34d;
+  --pt-solid: #d97706;
+}
+
+.payment-type-badge--note,
+.payment-type-chip--note {
+  --pt-bg: #ede9fe;
+  --pt-fg: #5b21b6;
+  --pt-bd: #c4b5fd;
+  --pt-solid: #7c3aed;
+}
+
+.payment-type-badge--karland,
+.payment-type-chip--karland {
+  --pt-bg: #ccfbf1;
+  --pt-fg: #0f766e;
+  --pt-bd: #5eead4;
+  --pt-solid: #0d9488;
+}
+
+.payment-type-badge--otokoc,
+.payment-type-chip--otokoc {
+  --pt-bg: #cffafe;
+  --pt-fg: #0e7490;
+  --pt-bd: #67e8f9;
+  --pt-solid: #0891b2;
+}
+
+.payment-type-badge--ykb,
+.payment-type-chip--ykb {
+  --pt-bg: #e0e7ff;
+  --pt-fg: #3730a3;
+  --pt-bd: #a5b4fc;
+  --pt-solid: #4f46e5;
+}
+
+.payment-type-badge--teb,
+.payment-type-chip--teb {
+  --pt-bg: #ffe4e6;
+  --pt-fg: #9f1239;
+  --pt-bd: #fda4af;
+  --pt-solid: #e11d48;
+}
+
+.payment-type-badge--unknown,
+.payment-type-chip--unknown {
+  --pt-bg: #f1f5f9;
+  --pt-fg: #475569;
+  --pt-bd: #cbd5e1;
+  --pt-solid: #64748b;
+}
+
+.collections-page .btn.payment-type-chip {
+  color: var(--pt-fg) !important;
+  background: var(--pt-bg) !important;
+  border-color: var(--pt-bd) !important;
+}
+
+.collections-page .btn.payment-type-chip:hover,
+.collections-page .btn.payment-type-chip.is-active {
+  color: #fff !important;
+  background: var(--pt-solid) !important;
+  border-color: var(--pt-solid) !important;
 }
 
 /* Legacy styles kept for backward compatibility */

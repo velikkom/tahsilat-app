@@ -56,38 +56,38 @@ function CollectionActions({
   }
 
   return (
-    <div className="collection-table-actions d-flex justify-content-end gap-1">
+    <div className="collection-table-actions d-flex justify-content-end gap-2 flex-wrap">
       <Button
         variant="outline-primary"
-        size="sm"
         className="collection-table-actions__btn touch-target"
         onClick={() => onView?.(row)}
         disabled={isDisabled}
         aria-label="Görüntüle"
       >
-        <FaEye aria-hidden="true" />
+        <FaEye className="me-1" aria-hidden="true" />
+        Görüntüle
       </Button>
 
       <Button
         variant="outline-warning"
-        size="sm"
         className="collection-table-actions__btn touch-target"
         onClick={() => onEdit?.(row)}
         disabled={isDisabled}
         aria-label="Düzenle"
       >
-        <FaEdit aria-hidden="true" />
+        <FaEdit className="me-1" aria-hidden="true" />
+        Düzenle
       </Button>
 
       <Button
         variant="outline-danger"
-        size="sm"
         className="collection-table-actions__btn touch-target"
         onClick={() => onDelete?.(row)}
         disabled={isDisabled}
         aria-label="Sil"
       >
-        <FaTrash aria-hidden="true" />
+        <FaTrash className="me-1" aria-hidden="true" />
+        Sil
       </Button>
     </div>
   );

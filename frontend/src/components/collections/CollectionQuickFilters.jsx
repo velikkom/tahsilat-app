@@ -11,7 +11,6 @@ function CollectionQuickFilters({ value, onChange, disabled = false }) {
         {QUICK_FILTER_OPTIONS.map((option) => (
           <Button
             key={option.value}
-            size="sm"
             variant={value === option.value ? "primary" : "outline-secondary"}
             className="ui-filter-chip flex-shrink-0 touch-target"
             onClick={() => onChange(option.value)}

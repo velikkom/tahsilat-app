@@ -3,12 +3,12 @@
 import { memo } from "react";
 import { Badge, Table } from "react-bootstrap";
 import CollectionActions from "./CollectionActions";
+import PaymentTypeBadge from "./PaymentTypeBadge";
 import {
   formatCurrency,
   formatDate,
   formatMaturityDays,
   getEffectiveStatus,
-  getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
 } from "@/utils/collectionUtils";
@@ -57,9 +57,10 @@ function CollectionTable({
                 <td className="fw-bold">{formatCurrency(collection.amount)}</td>
 
                 <td>
-                  <Badge bg="light" text="dark" className="collection-table__type-badge">
-                    {getPaymentTypeLabel(collection.paymentType)}
-                  </Badge>
+                  <PaymentTypeBadge
+                    paymentType={collection.paymentType}
+                    className="collection-table__type-badge"
+                  />
                 </td>
 
                 <td>

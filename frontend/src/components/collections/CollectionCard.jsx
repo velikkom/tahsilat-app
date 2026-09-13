@@ -3,11 +3,11 @@
 import { memo } from "react";
 import { Badge } from "react-bootstrap";
 import CollectionActions from "./CollectionActions";
+import PaymentTypeBadge from "./PaymentTypeBadge";
 import {
   formatCurrency,
   formatDate,
   getEffectiveStatus,
-  getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
 } from "@/utils/collectionUtils";
@@ -38,13 +38,10 @@ function CollectionCard({
             )}
           </div>
 
-          <Badge
-            bg="light"
-            text="dark"
+          <PaymentTypeBadge
+            paymentType={collection.paymentType}
             className="collection-card__payment-badge flex-shrink-0"
-          >
-            {getPaymentTypeLabel(collection.paymentType)}
-          </Badge>
+          />
         </div>
 
         <div className="collection-card__amount fw-bold">

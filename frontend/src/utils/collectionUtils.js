@@ -90,6 +90,22 @@ export function getPaymentTypeLabel(paymentType) {
   return PAYMENT_TYPE_LABELS[paymentType] || paymentType || "-";
 }
 
+export const PAYMENT_TYPE_TONES = {
+  CASH: "cash",
+  BANK_TRANSFER: "transfer",
+  CREDIT_CARD: "card",
+  CHECK: "check",
+  PROMISSORY_NOTE: "note",
+  MAIL_ORDER_KARLAND: "karland",
+  MAIL_ORDER_OTOKOC: "otokoc",
+  POS_YKB: "ykb",
+  POS_TEB: "teb",
+};
+
+export function getPaymentTypeTone(paymentType) {
+  return PAYMENT_TYPE_TONES[paymentType] || "unknown";
+}
+
 export function getStatusLabel(status) {
   return STATUS_LABELS[status] || status || "-";
 }
@@ -266,10 +282,21 @@ function isCollectionInCurrentMonth(collectionDate) {
   );
 }
 
+export function sortCollectionsByNewestDate(collections) {
+  return [...collections].sort((a, b) => {
+    const dateCompare = (b.collectionDate || "").localeCompare(a.collectionDate || "");
+    if (dateCompare !== 0) {
+      return dateCompare;
+    }
+
+    return (b.createdAt || "").localeCompare(a.createdAt || "");
+  });
+}
+
 export function filterCollections(collections, filters = EMPTY_COLLECTION_FILTERS) {
   const normalizedSearch = (filters.searchQuery || "").trim().toLocaleLowerCase("tr-TR");
 
-  return collections.filter((collection) => {
+  const filtered = collections.filter((collection) => {
     const effectiveStatus = getEffectiveStatus(collection);
 
     if (filters.paymentType !== "ALL" && collection.paymentType !== filters.paymentType) {
@@ -312,6 +339,8 @@ export function filterCollections(collections, filters = EMPTY_COLLECTION_FILTER
 
     return haystack.includes(normalizedSearch);
   });
+
+  return sortCollectionsByNewestDate(filtered);
 }
 
 export function buildPageCollectionStats(collections) {
