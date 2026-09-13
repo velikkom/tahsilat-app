@@ -78,6 +78,8 @@
   body.trip-print-active .app-sidebar,
   body.trip-print-active .app-navbar,
   body.trip-print-active .mobile-sidebar,
+  body.trip-print-active .mobile-tab-bar,
+  body.trip-print-active .ui-fab,
   body.trip-print-active .trip-print-page__toolbar {
     display: none !important;
   }

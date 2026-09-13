@@ -14,14 +14,14 @@ import { logout } from "@/services/authService";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const BASE_MENUS = [
-  { label: "Dashboard", href: "/dashboard", icon: <FaChartLine /> },
-  { label: "Customers", href: "/customers", icon: <FaUsers /> },
-  { label: "Collections", href: "/collections", icon: <FaMoneyCheckAlt /> },
+  { label: "Ana sayfa", href: "/dashboard", icon: <FaChartLine /> },
+  { label: "Müşteriler", href: "/customers", icon: <FaUsers /> },
+  { label: "Tahsilatlar", href: "/collections", icon: <FaMoneyCheckAlt /> },
   { label: "Turlar", href: "/trips", icon: <FaRoute /> },
 ];
 
 const ADMIN_MENU = {
-  label: "Users",
+  label: "Kullanıcılar",
   href: "/admin/users",
   icon: <FaUserCog />,
 };
@@ -44,7 +44,7 @@ export default function SidebarNav({ onNavigate }) {
   return (
     <div className="d-flex flex-column h-100 flex-grow-1">
       <div className="sidebar-brand mb-4 mb-lg-5">
-        <h3 className="fw-bold mb-0 sidebar-brand__title">Tahsilat ERP</h3>
+        <h3 className="fw-bold mb-0 sidebar-brand__title">Tahsilat</h3>
       </div>
 
       <nav className="d-flex flex-column gap-2 flex-grow-1">
@@ -53,7 +53,7 @@ export default function SidebarNav({ onNavigate }) {
             key={menu.href}
             href={menu.href}
             onClick={handleLinkClick}
-            className={`sidebar-nav-link d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none text-white ${
+            className={`sidebar-nav-link d-flex align-items-center gap-3 px-3 py-3 rounded text-decoration-none ${
               pathname === menu.href || pathname.startsWith(`${menu.href}/`)
                 ? "sidebar-nav-link--active"
                 : ""
@@ -72,7 +72,7 @@ export default function SidebarNav({ onNavigate }) {
           className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2 touch-target"
         >
           <FaSignOutAlt />
-          Logout
+          Çıkış
         </button>
       </div>
     </div>

@@ -9,7 +9,7 @@ import SidebarNav from "./SidebarNav";
  */
 export default function Sidebar() {
   return (
-    <aside className="app-sidebar bg-dark text-white p-3 min-vh-100">
+    <aside className="app-sidebar text-white p-3 min-vh-100">
       <SidebarNav />
     </aside>
   );

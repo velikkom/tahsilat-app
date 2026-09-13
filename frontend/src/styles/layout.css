@@ -6,3 +6,138 @@
 .main-content {
   min-height: 100vh;
 }
+
+/* ─── UI-1: global modern-SaaS overrides (tokens from shared-ui.css) ─── */
+
+.btn-primary {
+  --bs-btn-color: #fff !important;
+  --bs-btn-bg: var(--color-accent) !important;
+  --bs-btn-border-color: var(--color-accent) !important;
+  --bs-btn-hover-color: #fff !important;
+  --bs-btn-hover-bg: #0c5f58 !important;
+  --bs-btn-hover-border-color: #0c5f58 !important;
+  --bs-btn-active-color: #fff !important;
+  --bs-btn-active-bg: #0a4d47 !important;
+  --bs-btn-active-border-color: #0a4d47 !important;
+  --bs-btn-disabled-bg: var(--color-accent) !important;
+  --bs-btn-disabled-border-color: var(--color-accent) !important;
+  --bs-btn-focus-shadow-rgb: 15, 118, 110 !important;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--color-accent) !important;
+  --bs-btn-border-color: var(--color-accent) !important;
+  --bs-btn-hover-color: #fff !important;
+  --bs-btn-hover-bg: var(--color-accent) !important;
+  --bs-btn-hover-border-color: var(--color-accent) !important;
+  --bs-btn-active-bg: var(--color-accent) !important;
+  --bs-btn-active-border-color: var(--color-accent) !important;
+}
+
+.text-primary {
+  color: var(--color-accent) !important;
+}
+
+.border-primary {
+  border-color: var(--color-accent) !important;
+}
+
+/* Soften Bootstrap's default shadow/radius scale to the calm-SaaS look */
+.shadow-sm {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.card {
+  border-radius: var(--radius-card) !important;
+  border-color: var(--color-border);
+}
+
+/* ─── App shell surfaces ─── */
+
+.app-navbar {
+  background-color: var(--color-surface) !important;
+  border-bottom-color: var(--color-border) !important;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+
+.app-navbar__title {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.app-navbar__welcome {
+  color: var(--color-muted) !important;
+}
+
+.app-sidebar,
+.mobile-sidebar {
+  background-color: var(--color-ink) !important;
+}
+
+.sidebar-brand__title {
+  color: #fff;
+}
+
+.sidebar-nav-link {
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-weight: 500;
+}
+
+.sidebar-nav-link:hover {
+  color: #fff !important;
+}
+
+.sidebar-nav-link--active {
+  background-color: var(--color-accent) !important;
+  color: #fff !important;
+}
+
+/* ─── Mobile bottom tab bar (UI-1 / F-UI-1) ─── */
+
+.mobile-tab-bar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1030;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@media (max-width: 1023.98px) {
+  .mobile-tab-bar {
+    display: flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-tab-bar {
+    display: none !important;
+  }
+}
+
+.mobile-tab-bar__link {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: var(--tab-bar-height);
+  color: var(--color-muted);
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.mobile-tab-bar__link svg {
+  font-size: 1.15rem;
+}
+
+.mobile-tab-bar__link--active {
+  color: var(--color-accent);
+}

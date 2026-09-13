@@ -7,6 +7,7 @@ import SessionMonitor from "@/components/auth/SessionMonitor";
 import Sidebar from "./SideBar";
 import MobileSidebar from "./MobileSidebar";
 import Navbar from "./NavBar";
+import MobileTabBar from "./MobileTabBar";
 
 export default function DashboardShell({ children }) {
   const { isOpen, toggle, close } = useSidebar();
@@ -29,6 +30,8 @@ export default function DashboardShell({ children }) {
           {children}
         </main>
       </div>
+
+      <MobileTabBar />
     </div>
     </PendingUsersCountProvider>
     </CustomersProvider>

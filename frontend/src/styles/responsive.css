@@ -19,6 +19,15 @@
   width: 100%;
 }
 
+/* Reserve space above the fixed mobile tab bar so page content is never hidden behind it */
+@media (max-width: 1023.98px) {
+  .dashboard-shell__main {
+    padding-bottom: calc(
+      var(--tab-bar-height, 60px) + env(safe-area-inset-bottom, 0px) + 0.75rem
+    );
+  }
+}
+
 body.sidebar-drawer-open {
   overflow: hidden;
 }
@@ -30,7 +39,7 @@ body.sidebar-drawer-open {
 .app-sidebar {
   display: none !important;
   flex-shrink: 0;
-  width: 260px;
+  width: 240px;
   min-height: 100vh;
   flex-direction: column;
 }
@@ -60,7 +69,6 @@ body.sidebar-drawer-open {
 /* Mobile sidebar drawer — overlay, not in document flow */
 .mobile-sidebar {
   --bs-offcanvas-width: min(85vw, 280px);
-  background-color: #212529 !important;
   z-index: 1045;
 }
 
@@ -80,10 +88,6 @@ body.sidebar-drawer-open {
 
 .sidebar-nav-link:hover {
   background-color: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-nav-link--active {
-  background-color: #6c757d;
 }
 
 .sidebar-brand__title {
