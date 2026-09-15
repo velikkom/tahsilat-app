@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,9 +98,7 @@ public class TripServiceImpl implements TripService {
         validateDailyExpenses(request);
 
         applyTripFields(trip, request);
-
-        trip.getDailyExpenses().clear();
-        applyDailyExpenses(trip, request);
+        reconcileDailyExpenses(trip, request);
 
         return tripMapper.toResponse(tripRepository.save(trip));
     }
@@ -242,17 +241,57 @@ public class TripServiceImpl implements TripService {
             TripDailyExpense expense = new TripDailyExpense();
             expense.setTrip(trip);
             expense.setExpenseDate(expenseRequest.getExpenseDate());
-            expense.setMealAmount(expenseRequest.getMealAmount());
-            expense.setHotelAmount(expenseRequest.getHotelAmount());
-            expense.setHotelDetail(expenseRequest.getHotelDetail());
-            expense.setFuelInvoiceAmount(expenseRequest.getFuelInvoiceAmount());
-            expense.setFuelDetail(expenseRequest.getFuelDetail());
-            expense.setOtherAmount(expenseRequest.getOtherAmount());
-            expense.setOtherDetail(expenseRequest.getOtherDetail());
-            expense.setEveningHotelKm(expenseRequest.getEveningHotelKm());
+            applyDailyExpenseFields(expense, expenseRequest);
 
             trip.getDailyExpenses().add(expense);
         }
+    }
+
+    /**
+     * Updates an existing trip's daily expenses in place rather than
+     * clearing and recreating the whole collection. A clear()-then-add
+     * replace made Hibernate batch new INSERTs for every date ahead of
+     * the orphan-removal DELETEs for the rows they were replacing,
+     * tripping uq_trip_daily_expense_trip_date whenever a resubmitted
+     * date already had a row (i.e. on essentially every edit of an
+     * already-saved trip).
+     */
+    private void reconcileDailyExpenses(Trip trip, TripRequest request) {
+        Map<LocalDate, TripDailyExpense> existingByDate = new HashMap<>();
+
+        for (TripDailyExpense expense : trip.getDailyExpenses()) {
+            existingByDate.put(expense.getExpenseDate(), expense);
+        }
+
+        Set<LocalDate> requestedDates = new HashSet<>();
+
+        for (TripDailyExpenseRequest expenseRequest : request.getDailyExpenses()) {
+            requestedDates.add(expenseRequest.getExpenseDate());
+
+            TripDailyExpense expense = existingByDate.get(expenseRequest.getExpenseDate());
+
+            if (expense == null) {
+                expense = new TripDailyExpense();
+                expense.setTrip(trip);
+                expense.setExpenseDate(expenseRequest.getExpenseDate());
+                trip.getDailyExpenses().add(expense);
+            }
+
+            applyDailyExpenseFields(expense, expenseRequest);
+        }
+
+        trip.getDailyExpenses().removeIf(expense -> !requestedDates.contains(expense.getExpenseDate()));
+    }
+
+    private void applyDailyExpenseFields(TripDailyExpense expense, TripDailyExpenseRequest expenseRequest) {
+        expense.setMealAmount(expenseRequest.getMealAmount());
+        expense.setHotelAmount(expenseRequest.getHotelAmount());
+        expense.setHotelDetail(expenseRequest.getHotelDetail());
+        expense.setFuelInvoiceAmount(expenseRequest.getFuelInvoiceAmount());
+        expense.setFuelDetail(expenseRequest.getFuelDetail());
+        expense.setOtherAmount(expenseRequest.getOtherAmount());
+        expense.setOtherDetail(expenseRequest.getOtherDetail());
+        expense.setEveningHotelKm(expenseRequest.getEveningHotelKm());
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
