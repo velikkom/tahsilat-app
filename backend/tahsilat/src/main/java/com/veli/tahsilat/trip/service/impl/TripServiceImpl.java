@@ -238,8 +238,11 @@ public class TripServiceImpl implements TripService {
             expense.setExpenseDate(expenseRequest.getExpenseDate());
             expense.setMealAmount(expenseRequest.getMealAmount());
             expense.setHotelAmount(expenseRequest.getHotelAmount());
+            expense.setHotelDetail(expenseRequest.getHotelDetail());
             expense.setFuelInvoiceAmount(expenseRequest.getFuelInvoiceAmount());
+            expense.setFuelDetail(expenseRequest.getFuelDetail());
             expense.setOtherAmount(expenseRequest.getOtherAmount());
+            expense.setOtherDetail(expenseRequest.getOtherDetail());
             expense.setEveningHotelKm(expenseRequest.getEveningHotelKm());
 
             trip.getDailyExpenses().add(expense);

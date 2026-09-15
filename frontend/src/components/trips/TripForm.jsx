@@ -130,8 +130,11 @@ export default function TripForm({ mode = "create", trip = null }) {
         expenseDate: row.expenseDate,
         mealAmount: toNumberOrNull(row.mealAmount),
         hotelAmount: toNumberOrNull(row.hotelAmount),
+        hotelDetail: row.hotelDetail || null,
         fuelInvoiceAmount: toNumberOrNull(row.fuelInvoiceAmount),
+        fuelDetail: row.fuelDetail || null,
         otherAmount: toNumberOrNull(row.otherAmount),
+        otherDetail: row.otherDetail || null,
         eveningHotelKm: toNumberOrNull(row.eveningHotelKm),
       })),
     };
@@ -405,9 +408,9 @@ export default function TripForm({ mode = "create", trip = null }) {
                       {form.dailyExpenses.map((row) => (
                         <td key={row.expenseDate}>
                           <Form.Control
-                            type="number"
-                            min="0"
-                            step={field.step}
+                            type={field.inputType ?? "number"}
+                            min={field.inputType ? undefined : "0"}
+                            step={field.inputType ? undefined : field.step}
                             value={row[field.key]}
                             onChange={(e) =>
                               handleDailyExpenseChange(

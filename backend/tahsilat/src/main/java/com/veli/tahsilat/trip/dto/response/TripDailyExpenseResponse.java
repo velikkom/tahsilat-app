@@ -19,9 +19,15 @@ public class TripDailyExpenseResponse {
 
     private BigDecimal hotelAmount;
 
+    private String hotelDetail;
+
     private BigDecimal fuelInvoiceAmount;
 
+    private String fuelDetail;
+
     private BigDecimal otherAmount;
+
+    private String otherDetail;
 
     private Integer eveningHotelKm;
 }
