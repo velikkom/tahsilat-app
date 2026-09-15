@@ -64,11 +64,17 @@ public class TripServiceImpl implements TripService {
     @Override
     @Transactional
     public TripResponse createTrip(TripRequest request) {
+        return createTripForSalesman(request, getCurrentUser());
+    }
+
+    @Override
+    @Transactional
+    public TripResponse createTripForSalesman(TripRequest request, User salesman) {
         validateDateRange(request.getStartDate(), request.getEndDate());
         validateDailyExpenses(request);
 
         Trip trip = new Trip();
-        trip.setSalesman(getCurrentUser());
+        trip.setSalesman(salesman);
 
         applyTripFields(trip, request);
         applyDailyExpenses(trip, request);

@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 
 import TripTable from "@/components/trips/TripTable";
 import TripCardGrid from "@/components/trips/TripCardGrid";
+import ImportTripModal from "@/components/trips/ImportTripModal";
 import FloatingAddButton from "@/components/ui/FloatingAddButton";
 
 import useTrips from "@/hooks/useTrips";
@@ -31,6 +32,7 @@ export default function TripsView() {
   const [deletingId, setDeletingId] = useState(null);
   const [downloadingExpenseId, setDownloadingExpenseId] = useState(null);
   const [downloadingCollectionId, setDownloadingCollectionId] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   const isRangeInvalid = useMemo(() => {
     return Boolean(
@@ -172,12 +174,20 @@ export default function TripsView() {
           </p>
         </div>
 
-        <Link
-          href="/trips/new"
-          className="btn btn-primary d-none d-lg-inline-flex align-items-center gap-2"
-        >
-          Yeni Tur
-        </Link>
+        <div className="d-none d-lg-flex align-items-center gap-2">
+          <Button
+            variant="outline-primary"
+            onClick={() => setShowImportModal(true)}
+          >
+            Excel'den İçe Aktar
+          </Button>
+          <Link
+            href="/trips/new"
+            className="btn btn-primary d-inline-flex align-items-center gap-2"
+          >
+            Yeni Tur
+          </Link>
+        </div>
       </div>
 
       <div className="card border-0 shadow-sm ui-panel-card mb-3">
@@ -278,6 +288,16 @@ export default function TripsView() {
       <FloatingAddButton
         onClick={() => router.push("/trips/new")}
         ariaLabel="Yeni tur ekle"
+      />
+
+      <ImportTripModal
+        show={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImported={async (result) => {
+          if (result?.importedRows > 0) {
+            await refresh();
+          }
+        }}
       />
     </div>
   );
