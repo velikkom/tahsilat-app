@@ -11,15 +11,15 @@ class CollectionExcelParseSupportTest {
     private final CollectionExcelParseSupport support = new CollectionExcelParseSupport();
 
     @Test
-    void karlandMapsToMailOrderKarlandNotCreditCard() {
-        assertEquals(PaymentType.MAIL_ORDER_KARLAND, support.mapPaymentType("Karland"));
+    void karlandMapsToMailOrderNotCreditCard() {
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("Karland"));
         assertNotEquals(PaymentType.CREDIT_CARD, support.mapPaymentType("karland"));
     }
 
     @Test
-    void otokocMapsToMailOrderOtokoc() {
-        assertEquals(PaymentType.MAIL_ORDER_OTOKOC, support.mapPaymentType("Otokoç"));
-        assertEquals(PaymentType.MAIL_ORDER_OTOKOC, support.mapPaymentType("otokoc"));
+    void otokocMapsToMailOrder() {
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("Otokoç"));
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("otokoc"));
     }
 
     @Test

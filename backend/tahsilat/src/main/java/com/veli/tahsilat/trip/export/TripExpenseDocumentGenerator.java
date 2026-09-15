@@ -177,8 +177,7 @@ public class TripExpenseDocumentGenerator {
         BigDecimal promissoryNote = sumFor(collectionSumsByType, PaymentType.PROMISSORY_NOTE);
         BigDecimal check = sumFor(collectionSumsByType, PaymentType.CHECK);
         BigDecimal bankTransfer = sumFor(collectionSumsByType, PaymentType.BANK_TRANSFER);
-        BigDecimal mailorderKarland = sumFor(collectionSumsByType, PaymentType.MAIL_ORDER_KARLAND);
-        BigDecimal mailorderOtokoc = sumFor(collectionSumsByType, PaymentType.MAIL_ORDER_OTOKOC);
+        BigDecimal mailOrder = sumFor(collectionSumsByType, PaymentType.MAIL_ORDER);
         BigDecimal posYkb = sumFor(collectionSumsByType, PaymentType.POS_YKB);
         BigDecimal posTeb = sumFor(collectionSumsByType, PaymentType.POS_TEB);
 
@@ -186,8 +185,7 @@ public class TripExpenseDocumentGenerator {
                 .add(promissoryNote)
                 .add(check)
                 .add(bankTransfer)
-                .add(mailorderKarland)
-                .add(mailorderOtokoc)
+                .add(mailOrder)
                 .add(posYkb)
                 .add(posTeb);
 
@@ -196,8 +194,7 @@ public class TripExpenseDocumentGenerator {
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "SENET", promissoryNote);
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "ÇEK", check);
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "HAVALE", bankTransfer);
-        row = writeLabelValueRow(sheet, labelStyle, row, 0, "MAILORDER KARLAND", mailorderKarland);
-        row = writeLabelValueRow(sheet, labelStyle, row, 0, "MAILORDER OTOKOÇ", mailorderOtokoc);
+        row = writeLabelValueRow(sheet, labelStyle, row, 0, "MAİLORDER", mailOrder);
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "POS YKB", posYkb);
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "POS TEB", posTeb);
         row = writeLabelValueRow(sheet, labelStyle, row, 0, "GENEL TOPLAM", genelToplam);

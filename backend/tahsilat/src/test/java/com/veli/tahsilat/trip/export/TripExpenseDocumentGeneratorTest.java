@@ -68,8 +68,7 @@ class TripExpenseDocumentGeneratorTest {
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            assertEquals(0.0, findValueAfterLabel(sheet, "MAILORDER KARLAND"), 0.001);
-            assertEquals(0.0, findValueAfterLabel(sheet, "MAILORDER OTOKOÇ"), 0.001);
+            assertEquals(0.0, findValueAfterLabel(sheet, "MAİLORDER"), 0.001);
             assertEquals(0.0, findValueAfterLabel(sheet, "POS YKB"), 0.001);
             assertEquals(0.0, findValueAfterLabel(sheet, "POS TEB"), 0.001);
 
@@ -81,12 +80,12 @@ class TripExpenseDocumentGeneratorTest {
     }
 
     @Test
-    void mailOrderKarlandTotalIsWrittenToItsOwnRowAndIncludedInGenelToplam() throws IOException {
+    void mailOrderTotalIsWrittenToItsOwnRowAndIncludedInGenelToplam() throws IOException {
         Trip trip = baseTrip();
 
         Map<PaymentType, BigDecimal> collectionSumsByType = new EnumMap<>(PaymentType.class);
         collectionSumsByType.put(PaymentType.CASH, new BigDecimal("300"));
-        collectionSumsByType.put(PaymentType.MAIL_ORDER_KARLAND, new BigDecimal("400"));
+        collectionSumsByType.put(PaymentType.MAIL_ORDER, new BigDecimal("400"));
         collectionSumsByType.put(PaymentType.CREDIT_CARD, new BigDecimal("500"));
 
         byte[] bytes = generator.generate(trip, collectionSumsByType);
@@ -94,16 +93,15 @@ class TripExpenseDocumentGeneratorTest {
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            assertEquals(400.0, findValueAfterLabel(sheet, "MAILORDER KARLAND"), 0.001);
-            assertEquals(0.0, findValueAfterLabel(sheet, "MAILORDER OTOKOÇ"), 0.001);
+            assertEquals(400.0, findValueAfterLabel(sheet, "MAİLORDER"), 0.001);
             assertEquals(0.0, findValueAfterLabel(sheet, "POS YKB"), 0.001);
             assertEquals(0.0, findValueAfterLabel(sheet, "POS TEB"), 0.001);
 
-            // GENEL TOPLAM must equal CASH + MAIL_ORDER_KARLAND (700) - the
+            // GENEL TOPLAM must equal CASH + MAIL_ORDER (700) - the
             // 500 credit card amount must not leak into any Form 2 row.
             assertEquals(700.0, findValueAfterLabel(sheet, "GENEL TOPLAM"), 0.001);
 
-            // Kalan nakit formulası yalnizca CASH'e bakar, MAIL_ORDER_KARLAND dahil olmaz.
+            // Kalan nakit formulası yalnizca CASH'e bakar, MAIL_ORDER dahil olmaz.
             assertEquals(300.0, findValueAfterLabel(sheet, "NAKİT TAHSİLAT"), 0.001);
         }
     }

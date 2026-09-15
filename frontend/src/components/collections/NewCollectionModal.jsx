@@ -16,6 +16,7 @@ const createInitialForm = (defaultCustomerId = "") => ({
   mikroSr: "",
   mikroNo: "",
   bankName: "",
+  mailOrderCompany: "",
 });
 
 const mapCollectionToForm = (collection) => ({
@@ -29,6 +30,7 @@ const mapCollectionToForm = (collection) => ({
   mikroSr: collection?.mikroSr || "",
   mikroNo: collection?.mikroNo || "",
   bankName: collection?.bankName || "",
+  mailOrderCompany: collection?.mailOrderCompany || "",
 });
 
 export default function NewCollectionModal({
@@ -93,6 +95,7 @@ export default function NewCollectionModal({
         value === "CHECK" || value === "PROMISSORY_NOTE"
           ? prev.maturityDate
           : "",
+      mailOrderCompany: value === "MAIL_ORDER" ? prev.mailOrderCompany : "",
     }));
   };
 
@@ -136,6 +139,7 @@ export default function NewCollectionModal({
       mikroSr: form.mikroSr || null,
       mikroNo: form.mikroNo || null,
       bankName: form.bankName || null,
+      mailOrderCompany: form.mailOrderCompany || null,
     });
   };
 

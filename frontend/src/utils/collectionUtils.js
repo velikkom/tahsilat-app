@@ -29,8 +29,7 @@ export const PAYMENT_TYPE_LABELS = {
   CREDIT_CARD: "Kredi Kartı — diğer",
   CHECK: "Çek",
   PROMISSORY_NOTE: "Müşteri Senedi",
-  MAIL_ORDER_KARLAND: "Mailorder Karland",
-  MAIL_ORDER_OTOKOC: "Mailorder Otokoç",
+  MAIL_ORDER: "Mailorder",
   POS_YKB: "POS YKB",
   POS_TEB: "POS TEB",
 };
@@ -96,8 +95,7 @@ export const PAYMENT_TYPE_TONES = {
   CREDIT_CARD: "card",
   CHECK: "check",
   PROMISSORY_NOTE: "note",
-  MAIL_ORDER_KARLAND: "karland",
-  MAIL_ORDER_OTOKOC: "otokoc",
+  MAIL_ORDER: "mailorder",
   POS_YKB: "ykb",
   POS_TEB: "teb",
 };
@@ -243,8 +241,7 @@ const PAYMENT_TYPE_FILTER_OPTIONS = [
   { value: "CHECK", label: "Çek" },
   { value: "PROMISSORY_NOTE", label: "Müşteri Senedi" },
   { value: "BANK_TRANSFER", label: "Havale" },
-  { value: "MAIL_ORDER_KARLAND", label: "Mailorder Karland" },
-  { value: "MAIL_ORDER_OTOKOC", label: "Mailorder Otokoç" },
+  { value: "MAIL_ORDER", label: "Mailorder" },
   { value: "POS_YKB", label: "POS YKB" },
   { value: "POS_TEB", label: "POS TEB" },
 ];

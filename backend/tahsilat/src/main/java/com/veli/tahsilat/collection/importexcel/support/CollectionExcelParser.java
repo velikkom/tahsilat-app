@@ -1,5 +1,6 @@
 package com.veli.tahsilat.collection.importexcel.support;
 
+import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.importexcel.dto.ParsedCollectionImportRow;
 import com.veli.tahsilat.common.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,9 @@ public class CollectionExcelParser {
                     continue;
                 }
 
+                String paymentTypeText = parseSupport.getCellString(row.getCell(3));
+                PaymentType paymentType = parseSupport.mapPaymentType(paymentTypeText);
+
                 rows.add(
                         ParsedCollectionImportRow.builder()
                                 .rowNumber(row.getRowNum() + 1)
@@ -66,14 +70,13 @@ public class CollectionExcelParser {
                                 .customerName(
                                         parseSupport.getCellString(row.getCell(2))
                                 )
-                                .paymentType(
-                                        parseSupport.mapPaymentType(
-                                                parseSupport.getCellString(row.getCell(3))
-                                        )
-                                )
+                                .paymentType(paymentType)
                                 .amount(parseSupport.parseAmount(row.getCell(4)))
                                 .maturityDate(
                                         parseSupport.parseDate(row.getCell(5))
+                                )
+                                .mailOrderCompany(
+                                        paymentType == PaymentType.MAIL_ORDER ? paymentTypeText : null
                                 )
                                 .build()
                 );

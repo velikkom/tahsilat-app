@@ -79,6 +79,7 @@ public class CollectionServiceImpl
         collection.setMikroSr(request.getMikroSr());
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
+        collection.setMailOrderCompany(request.getMailOrderCompany());
 
         // Bu versiyonda tum odeme turleri olusturuldugu anda PAID kabul edilir.
         // TODO: Cek/senet icin vade gunu odeme hesaba gectiginde PAID'e cekilecek
@@ -138,6 +139,7 @@ public class CollectionServiceImpl
         collection.setMikroSr(request.getMikroSr());
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
+        collection.setMailOrderCompany(request.getMailOrderCompany());
 
         Collection savedCollection =
                 collectionRepository.save(collection);

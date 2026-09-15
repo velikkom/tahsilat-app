@@ -266,6 +266,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         collection.setCollectionDate(row.getCollectionDate());
         collection.setMaturityDate(row.getMaturityDate());
         collection.setPaymentType(row.getPaymentType());
+        collection.setMailOrderCompany(row.getMailOrderCompany());
         collection.setStatus(CollectionStatus.PAID);
         collection.setDescription("Excel import");
         collection.setCollectedBy(collectedBy);

@@ -132,7 +132,7 @@ class TripPrintPreviewTest {
     private void assertAllAmountFieldsNull(JsonNode row) {
         for (String field : new String[] {
                 "nakitTutari", "senetTutar", "cekTutar",
-                "mailorderKarland", "mailorderOtokoc", "havaleTutar", "posYkb", "posTeb"
+                "mailorder", "havaleTutar", "posYkb", "posTeb"
         }) {
             if (!row.get(field).isNull()) {
                 throw new AssertionError("Expected " + field + " to be null for CREDIT_CARD row but was " + row.get(field));

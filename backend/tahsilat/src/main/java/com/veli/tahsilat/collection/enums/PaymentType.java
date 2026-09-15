@@ -12,9 +12,7 @@ public enum PaymentType {
 
     PROMISSORY_NOTE,
 
-    MAIL_ORDER_KARLAND,
-
-    MAIL_ORDER_OTOKOC,
+    MAIL_ORDER,
 
     POS_YKB,
 

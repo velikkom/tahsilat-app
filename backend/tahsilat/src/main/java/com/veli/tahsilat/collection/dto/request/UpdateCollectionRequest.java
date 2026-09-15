@@ -40,4 +40,6 @@ public class UpdateCollectionRequest {
     private String mikroNo;
 
     private String bankName;
+
+    private String mailOrderCompany;
 }

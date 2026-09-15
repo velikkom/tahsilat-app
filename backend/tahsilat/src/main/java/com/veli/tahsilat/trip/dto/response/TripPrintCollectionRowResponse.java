@@ -41,9 +41,9 @@ public class TripPrintCollectionRowResponse {
 
     private BigDecimal cekTutar;
 
-    private BigDecimal mailorderKarland;
+    private String mailorderFirma;
 
-    private BigDecimal mailorderOtokoc;
+    private BigDecimal mailorder;
 
     private String havaleBanka;
 

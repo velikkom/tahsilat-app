@@ -43,6 +43,8 @@ public class CollectionResponse {
 
     private String bankName;
 
+    private String mailOrderCompany;
+
     private Boolean active;
 
     private LocalDateTime createdAt;

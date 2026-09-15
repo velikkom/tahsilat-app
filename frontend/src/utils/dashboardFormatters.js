@@ -4,8 +4,7 @@ export const PAYMENT_TYPE_LABELS = {
   CREDIT_CARD: "Kredi Kartı — diğer",
   BANK_TRANSFER: "Havale / EFT",
   PROMISSORY_NOTE: "Senet",
-  MAIL_ORDER_KARLAND: "Mailorder Karland",
-  MAIL_ORDER_OTOKOC: "Mailorder Otokoç",
+  MAIL_ORDER: "Mailorder",
   POS_YKB: "POS YKB",
   POS_TEB: "POS TEB",
 };

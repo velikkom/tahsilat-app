@@ -7,8 +7,7 @@ const COLLECTION_TYPES = [
   { value: "BANK_TRANSFER", label: "Havale / EFT" },
   { value: "CHECK", label: "Çek" },
   { value: "PROMISSORY_NOTE", label: "Senet" },
-  { value: "MAIL_ORDER_KARLAND", label: "Mailorder Karland" },
-  { value: "MAIL_ORDER_OTOKOC", label: "Mailorder Otokoç" },
+  { value: "MAIL_ORDER", label: "Mailorder" },
   { value: "POS_YKB", label: "POS YKB" },
   { value: "POS_TEB", label: "POS TEB" },
   { value: "CREDIT_CARD", label: "Kredi Kartı — diğer" },
@@ -169,6 +168,21 @@ export default function CollectionFormFields({
           />
         </Form.Group>
       </Col>
+
+      {form.paymentType === "MAIL_ORDER" && (
+        <Col xs={12} md={6} lg={3}>
+          <Form.Group>
+            <Form.Label>Mailorder Firma</Form.Label>
+            <Form.Control
+              type="text"
+              name="mailOrderCompany"
+              value={form.mailOrderCompany}
+              onChange={onChange}
+              disabled={isFormDisabled}
+            />
+          </Form.Group>
+        </Col>
+      )}
 
       <Col xs={12}>
         <Form.Group>

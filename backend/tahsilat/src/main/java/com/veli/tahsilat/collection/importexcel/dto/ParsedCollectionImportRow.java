@@ -25,4 +25,6 @@ public class ParsedCollectionImportRow {
     private LocalDate maturityDate;
 
     private UUID customerId;
+
+    private String mailOrderCompany;
 }

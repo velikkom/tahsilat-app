@@ -47,8 +47,8 @@ public class TripCollectionDocumentGenerator {
     private static final int COL_BANKA_ADI = 9;
     private static final int COL_CEK_VADE = 10;
     private static final int COL_CEK_TUTAR = 11;
-    private static final int COL_MAILORDER_KARLAND = 12;
-    private static final int COL_MAILORDER_OTOKOC = 13;
+    private static final int COL_MAILORDER_FIRMA = 12;
+    private static final int COL_MAILORDER_TUTAR = 13;
     private static final int COL_HAVALE_BANKA = 14;
     private static final int COL_HAVALE_TUTAR = 15;
     private static final int COL_POS_YKB = 16;
@@ -151,8 +151,7 @@ public class TripCollectionDocumentGenerator {
 
         setGroupHeader(sheet, groupRow, subRow, COL_CEK_VADE, COL_CEK_TUTAR, "ÇEK", "VADE", "TUTAR", headerStyle);
 
-        setSingleColumnHeader(sheet, groupRow, subRow, COL_MAILORDER_KARLAND, "MAILORDER KARLAND", headerStyle);
-        setSingleColumnHeader(sheet, groupRow, subRow, COL_MAILORDER_OTOKOC, "MAILORDER OTOKOÇ", headerStyle);
+        setGroupHeader(sheet, groupRow, subRow, COL_MAILORDER_FIRMA, COL_MAILORDER_TUTAR, "MAIL ORDER", "GEÇİLEN FİRMA", "TUTAR", headerStyle);
 
         setGroupHeader(sheet, groupRow, subRow, COL_HAVALE_BANKA, COL_HAVALE_TUTAR, "HAVALE", "BANKA", "TUTAR", headerStyle);
 
@@ -189,10 +188,9 @@ public class TripCollectionDocumentGenerator {
         } else if (paymentType == PaymentType.BANK_TRANSFER) {
             setCell(sheet, rowIndex, COL_HAVALE_BANKA, collection.getBankName());
             setCell(sheet, rowIndex, COL_HAVALE_TUTAR, collection.getAmount());
-        } else if (paymentType == PaymentType.MAIL_ORDER_KARLAND) {
-            setCell(sheet, rowIndex, COL_MAILORDER_KARLAND, collection.getAmount());
-        } else if (paymentType == PaymentType.MAIL_ORDER_OTOKOC) {
-            setCell(sheet, rowIndex, COL_MAILORDER_OTOKOC, collection.getAmount());
+        } else if (paymentType == PaymentType.MAIL_ORDER) {
+            setCell(sheet, rowIndex, COL_MAILORDER_FIRMA, collection.getMailOrderCompany());
+            setCell(sheet, rowIndex, COL_MAILORDER_TUTAR, collection.getAmount());
         } else if (paymentType == PaymentType.POS_YKB) {
             setCell(sheet, rowIndex, COL_POS_YKB, collection.getAmount());
         } else if (paymentType == PaymentType.POS_TEB) {
@@ -208,8 +206,7 @@ public class TripCollectionDocumentGenerator {
         BigDecimal promissoryNoteTotal = BigDecimal.ZERO;
         BigDecimal checkTotal = BigDecimal.ZERO;
         BigDecimal bankTransferTotal = BigDecimal.ZERO;
-        BigDecimal mailOrderKarlandTotal = BigDecimal.ZERO;
-        BigDecimal mailOrderOtokocTotal = BigDecimal.ZERO;
+        BigDecimal mailOrderTotal = BigDecimal.ZERO;
         BigDecimal posYkbTotal = BigDecimal.ZERO;
         BigDecimal posTebTotal = BigDecimal.ZERO;
 
@@ -225,10 +222,8 @@ public class TripCollectionDocumentGenerator {
                 checkTotal = checkTotal.add(amount);
             } else if (paymentType == PaymentType.BANK_TRANSFER) {
                 bankTransferTotal = bankTransferTotal.add(amount);
-            } else if (paymentType == PaymentType.MAIL_ORDER_KARLAND) {
-                mailOrderKarlandTotal = mailOrderKarlandTotal.add(amount);
-            } else if (paymentType == PaymentType.MAIL_ORDER_OTOKOC) {
-                mailOrderOtokocTotal = mailOrderOtokocTotal.add(amount);
+            } else if (paymentType == PaymentType.MAIL_ORDER) {
+                mailOrderTotal = mailOrderTotal.add(amount);
             } else if (paymentType == PaymentType.POS_YKB) {
                 posYkbTotal = posYkbTotal.add(amount);
             } else if (paymentType == PaymentType.POS_TEB) {
@@ -245,8 +240,7 @@ public class TripCollectionDocumentGenerator {
         setCell(sheet, rowIndex, COL_SENET_TUTAR, promissoryNoteTotal);
         setCell(sheet, rowIndex, COL_CEK_TUTAR, checkTotal);
         setCell(sheet, rowIndex, COL_HAVALE_TUTAR, bankTransferTotal);
-        setCell(sheet, rowIndex, COL_MAILORDER_KARLAND, mailOrderKarlandTotal);
-        setCell(sheet, rowIndex, COL_MAILORDER_OTOKOC, mailOrderOtokocTotal);
+        setCell(sheet, rowIndex, COL_MAILORDER_TUTAR, mailOrderTotal);
         setCell(sheet, rowIndex, COL_POS_YKB, posYkbTotal);
         setCell(sheet, rowIndex, COL_POS_TEB, posTebTotal);
     }

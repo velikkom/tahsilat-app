@@ -155,10 +155,7 @@ export default function TripPrintPage() {
             <strong>Havale:</strong> {formatCurrency(totals.bankTransfer)}
           </div>
           <div>
-            <strong>Mailorder Karland:</strong> {formatCurrency(totals.mailOrderKarland)}
-          </div>
-          <div>
-            <strong>Mailorder Otokoç:</strong> {formatCurrency(totals.mailOrderOtokoc)}
+            <strong>Mailorder:</strong> {formatCurrency(totals.mailOrder)}
           </div>
           <div>
             <strong>POS YKB:</strong> {formatCurrency(totals.posYkb)}
@@ -234,8 +231,8 @@ export default function TripPrintPage() {
                 <th>Banka Adı</th>
                 <th>Çek Vade</th>
                 <th>Çek Tutar</th>
-                <th>Mailorder Karland</th>
-                <th>Mailorder Otokoç</th>
+                <th>Mailorder Firma</th>
+                <th>Mailorder Tutar</th>
                 <th>Havale Banka</th>
                 <th>Havale Tutar</th>
                 <th>POS YKB</th>
@@ -257,8 +254,8 @@ export default function TripPrintPage() {
                   <td>{row.bankName || ""}</td>
                   <td>{row.cekVade ? formatDate(row.cekVade) : ""}</td>
                   <td>{amountCell(row.cekTutar)}</td>
-                  <td>{amountCell(row.mailorderKarland)}</td>
-                  <td>{amountCell(row.mailorderOtokoc)}</td>
+                  <td>{row.mailorderFirma || ""}</td>
+                  <td>{amountCell(row.mailorder)}</td>
                   <td>{row.havaleBanka || ""}</td>
                   <td>{amountCell(row.havaleTutar)}</td>
                   <td>{amountCell(row.posYkb)}</td>
@@ -277,8 +274,8 @@ export default function TripPrintPage() {
                 <td />
                 <td />
                 <td>{formatCurrency(totals.check)}</td>
-                <td>{formatCurrency(totals.mailOrderKarland)}</td>
-                <td>{formatCurrency(totals.mailOrderOtokoc)}</td>
+                <td />
+                <td>{formatCurrency(totals.mailOrder)}</td>
                 <td />
                 <td>{formatCurrency(totals.bankTransfer)}</td>
                 <td>{formatCurrency(totals.posYkb)}</td>

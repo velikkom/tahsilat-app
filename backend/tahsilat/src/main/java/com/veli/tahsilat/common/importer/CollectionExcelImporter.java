@@ -187,6 +187,10 @@ public class CollectionExcelImporter
                         )
                 );
 
+                if (collection.getPaymentType() == PaymentType.MAIL_ORDER) {
+                    collection.setMailOrderCompany(paymentTypeText);
+                }
+
                 collection.setStatus(
                         CollectionStatus.PAID
                 );
@@ -399,11 +403,8 @@ public class CollectionExcelImporter
             case "havale" ->
                     PaymentType.BANK_TRANSFER;
 
-            case "karland", "mailorder karland" ->
-                    PaymentType.MAIL_ORDER_KARLAND;
-
-            case "otokoc" ->
-                    PaymentType.MAIL_ORDER_OTOKOC;
+            case "karland", "mailorder karland", "otokoc" ->
+                    PaymentType.MAIL_ORDER;
 
             case "ykb", "yapi kredi", "pos ykb" ->
                     PaymentType.POS_YKB;

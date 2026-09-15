@@ -17,9 +17,7 @@ public class TripPrintTotalsResponse {
 
     private BigDecimal bankTransfer;
 
-    private BigDecimal mailOrderKarland;
-
-    private BigDecimal mailOrderOtokoc;
+    private BigDecimal mailOrder;
 
     private BigDecimal posYkb;
 

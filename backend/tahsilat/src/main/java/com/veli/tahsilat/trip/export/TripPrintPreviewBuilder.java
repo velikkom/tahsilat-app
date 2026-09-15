@@ -75,8 +75,7 @@ public class TripPrintPreviewBuilder {
                 .promissoryNote(breakdown.promissoryNote())
                 .check(breakdown.check())
                 .bankTransfer(breakdown.bankTransfer())
-                .mailOrderKarland(breakdown.mailOrderKarland())
-                .mailOrderOtokoc(breakdown.mailOrderOtokoc())
+                .mailOrder(breakdown.mailOrder())
                 .posYkb(breakdown.posYkb())
                 .posTeb(breakdown.posTeb())
                 .genelToplam(breakdown.genelToplam())
@@ -116,10 +115,8 @@ public class TripPrintPreviewBuilder {
             row.cekVade(collection.getMaturityDate()).cekTutar(amount);
         } else if (paymentType == PaymentType.BANK_TRANSFER) {
             row.havaleBanka(collection.getBankName()).havaleTutar(amount);
-        } else if (paymentType == PaymentType.MAIL_ORDER_KARLAND) {
-            row.mailorderKarland(amount);
-        } else if (paymentType == PaymentType.MAIL_ORDER_OTOKOC) {
-            row.mailorderOtokoc(amount);
+        } else if (paymentType == PaymentType.MAIL_ORDER) {
+            row.mailorderFirma(collection.getMailOrderCompany()).mailorder(amount);
         } else if (paymentType == PaymentType.POS_YKB) {
             row.posYkb(amount);
         } else if (paymentType == PaymentType.POS_TEB) {

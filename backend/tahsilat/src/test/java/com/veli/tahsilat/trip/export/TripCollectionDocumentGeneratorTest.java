@@ -43,7 +43,7 @@ class TripCollectionDocumentGeneratorTest {
             int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
             int senetColumn = findColumnIndex(sheet, "TUTAR", 0);
             int cekColumn = findColumnIndex(sheet, "TUTAR", 1);
-            int havaleColumn = findColumnIndex(sheet, "TUTAR", 2);
+            int havaleColumn = findColumnIndex(sheet, "TUTAR", 3);
 
             assertEquals(500.0, numericValue(sheet, rowIndex, nakitColumn), 0.001);
             assertNull(numericValue(sheet, rowIndex, senetColumn));
@@ -67,16 +67,16 @@ class TripCollectionDocumentGeneratorTest {
             int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
             int senetColumn = findColumnIndex(sheet, "TUTAR", 0);
             int cekColumn = findColumnIndex(sheet, "TUTAR", 1);
-            int havaleColumn = findColumnIndex(sheet, "TUTAR", 2);
-            int karlandColumn = findColumnIndex(sheet, "MAILORDER KARLAND");
-            int otokocColumn = findColumnIndex(sheet, "MAILORDER OTOKOÇ");
+            int mailorderTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
+            int havaleColumn = findColumnIndex(sheet, "TUTAR", 3);
+            int mailorderFirmaColumn = findColumnIndex(sheet, "GEÇİLEN FİRMA");
 
             assertNull(numericValue(sheet, rowIndex, nakitColumn));
             assertNull(numericValue(sheet, rowIndex, senetColumn));
             assertNull(numericValue(sheet, rowIndex, cekColumn));
             assertNull(numericValue(sheet, rowIndex, havaleColumn));
-            assertNull(numericValue(sheet, rowIndex, karlandColumn));
-            assertNull(numericValue(sheet, rowIndex, otokocColumn));
+            assertNull(numericValue(sheet, rowIndex, mailorderTutarColumn));
+            assertNull(stringValue(sheet, rowIndex, mailorderFirmaColumn));
 
             int totalRowIndex = findRowByUnvani(sheet, "GENEL TOPLAM");
             assertEquals(0.0, numericValueOrZero(sheet, totalRowIndex, nakitColumn), 0.001);
@@ -84,25 +84,28 @@ class TripCollectionDocumentGeneratorTest {
     }
 
     @Test
-    void mailOrderKarlandAmountIsWrittenToKarlandColumnOnly() throws IOException {
+    void mailOrderAmountAndFirmaAreWrittenToMailOrderColumnsOnly() throws IOException {
         Trip trip = baseTrip();
-        Collection karlandCollection =
-                collection("Karland Musteri", PaymentType.MAIL_ORDER_KARLAND, new BigDecimal("300"), null);
+        Collection mailOrderCollection =
+                collection("Mailorder Musteri", PaymentType.MAIL_ORDER, new BigDecimal("300"), null);
+        mailOrderCollection.setMailOrderCompany("Karland");
 
-        byte[] bytes = generator.generate(trip, List.of(karlandCollection));
+        byte[] bytes = generator.generate(trip, List.of(mailOrderCollection));
 
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            int rowIndex = findRowByUnvani(sheet, "Karland Musteri");
+            int rowIndex = findRowByUnvani(sheet, "Mailorder Musteri");
             int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
-            int karlandColumn = findColumnIndex(sheet, "MAILORDER KARLAND");
+            int mailorderFirmaColumn = findColumnIndex(sheet, "GEÇİLEN FİRMA");
+            int mailorderTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
 
-            assertEquals(300.0, numericValue(sheet, rowIndex, karlandColumn), 0.001);
+            assertEquals(300.0, numericValue(sheet, rowIndex, mailorderTutarColumn), 0.001);
+            assertEquals("Karland", stringValue(sheet, rowIndex, mailorderFirmaColumn));
             assertNull(numericValue(sheet, rowIndex, nakitColumn));
 
             int totalRowIndex = findRowByUnvani(sheet, "GENEL TOPLAM");
-            assertEquals(300.0, numericValue(sheet, totalRowIndex, karlandColumn), 0.001);
+            assertEquals(300.0, numericValue(sheet, totalRowIndex, mailorderTutarColumn), 0.001);
         }
     }
 
@@ -135,7 +138,7 @@ class TripCollectionDocumentGeneratorTest {
             // BANK_TRANSFER also copies the bank name into the HAVALE group's
             // own BANKA sub-column, alongside the amount.
             int havaleBankaColumn = findColumnIndex(sheet, "BANKA");
-            int havaleTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
+            int havaleTutarColumn = findColumnIndex(sheet, "TUTAR", 3);
 
             assertEquals("Ziraat Bankası", stringValue(sheet, rowIndex, havaleBankaColumn));
             assertEquals(200.0, numericValue(sheet, rowIndex, havaleTutarColumn), 0.001);

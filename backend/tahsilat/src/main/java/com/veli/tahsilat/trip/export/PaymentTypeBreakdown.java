@@ -16,8 +16,7 @@ public record PaymentTypeBreakdown(
         BigDecimal promissoryNote,
         BigDecimal check,
         BigDecimal bankTransfer,
-        BigDecimal mailOrderKarland,
-        BigDecimal mailOrderOtokoc,
+        BigDecimal mailOrder,
         BigDecimal posYkb,
         BigDecimal posTeb
 ) {
@@ -27,8 +26,7 @@ public record PaymentTypeBreakdown(
                 .add(promissoryNote)
                 .add(check)
                 .add(bankTransfer)
-                .add(mailOrderKarland)
-                .add(mailOrderOtokoc)
+                .add(mailOrder)
                 .add(posYkb)
                 .add(posTeb);
     }
@@ -38,8 +36,7 @@ public record PaymentTypeBreakdown(
         BigDecimal promissoryNote = BigDecimal.ZERO;
         BigDecimal check = BigDecimal.ZERO;
         BigDecimal bankTransfer = BigDecimal.ZERO;
-        BigDecimal mailOrderKarland = BigDecimal.ZERO;
-        BigDecimal mailOrderOtokoc = BigDecimal.ZERO;
+        BigDecimal mailOrder = BigDecimal.ZERO;
         BigDecimal posYkb = BigDecimal.ZERO;
         BigDecimal posTeb = BigDecimal.ZERO;
 
@@ -51,8 +48,7 @@ public record PaymentTypeBreakdown(
                 case PROMISSORY_NOTE -> promissoryNote = promissoryNote.add(amount);
                 case CHECK -> check = check.add(amount);
                 case BANK_TRANSFER -> bankTransfer = bankTransfer.add(amount);
-                case MAIL_ORDER_KARLAND -> mailOrderKarland = mailOrderKarland.add(amount);
-                case MAIL_ORDER_OTOKOC -> mailOrderOtokoc = mailOrderOtokoc.add(amount);
+                case MAIL_ORDER -> mailOrder = mailOrder.add(amount);
                 case POS_YKB -> posYkb = posYkb.add(amount);
                 case POS_TEB -> posTeb = posTeb.add(amount);
                 default -> {
@@ -63,7 +59,7 @@ public record PaymentTypeBreakdown(
 
         return new PaymentTypeBreakdown(
                 cash, promissoryNote, check, bankTransfer,
-                mailOrderKarland, mailOrderOtokoc, posYkb, posTeb
+                mailOrder, posYkb, posTeb
         );
     }
 }

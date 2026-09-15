@@ -42,4 +42,6 @@ public class CreateCollectionRequest {
     private String mikroNo;
 
     private String bankName;
+
+    private String mailOrderCompany;
 }

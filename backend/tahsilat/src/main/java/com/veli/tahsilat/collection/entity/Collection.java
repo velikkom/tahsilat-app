@@ -63,4 +63,6 @@ public class Collection
     private String mikroNo;
 
     private String bankName;
+
+    private String mailOrderCompany;
 }
