@@ -40,6 +40,9 @@ public class TripRequest {
     private BigDecimal weeklyAllowance;
 
     @PositiveOrZero
+    private BigDecimal commissionExcludedAmount;
+
+    @PositiveOrZero
     private BigDecimal commissionReceived;
 
     @PositiveOrZero

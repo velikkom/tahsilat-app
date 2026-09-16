@@ -167,6 +167,10 @@ export default function TripPrintPage() {
             <strong>Genel Toplam:</strong> {formatCurrency(totals.genelToplam)}
           </div>
           <div>
+            <strong>Primden Düşülecek Tahsilat:</strong>{" "}
+            {formatCurrency(preview.commissionExcludedAmount)}
+          </div>
+          <div>
             <strong>%1 Aldığı Prim:</strong> {formatCurrency(preview.commissionReceived)}
           </div>
         </div>

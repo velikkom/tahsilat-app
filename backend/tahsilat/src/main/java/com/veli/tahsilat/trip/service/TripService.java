@@ -35,5 +35,7 @@ public interface TripService {
 
     byte[] generateCollectionDocument(UUID id);
 
+    byte[] generateTahsilatDokumu(UUID id);
+
     TripPrintPreviewResponse getPrintPreview(UUID id);
 }

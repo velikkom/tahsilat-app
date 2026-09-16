@@ -42,6 +42,8 @@ public class TripPrintPreviewResponse {
 
     private BigDecimal weeklyAllowance;
 
+    private BigDecimal commissionExcludedAmount;
+
     private BigDecimal commissionReceived;
 
     private BigDecimal extraReceived;

@@ -83,6 +83,14 @@ async function downloadTripDocument(path, filename, errorMessage) {
   triggerBlobDownload(blob, filename);
 }
 
+export function downloadTripTahsilatDokumu(id) {
+  return downloadTripDocument(
+    `/trips/${id}/tahsilat-dokumu.xlsx`,
+    `tahsilat-dokumu-${id}.xlsx`,
+    "Tahsilat dökümü indirilemedi"
+  );
+}
+
 export function downloadTripExpenseDocument(id) {
   return downloadTripDocument(
     `/trips/${id}/expense-document.xlsx`,

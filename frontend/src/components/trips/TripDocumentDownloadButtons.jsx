@@ -2,41 +2,19 @@
 
 import { useState } from "react";
 import { Button } from "react-bootstrap";
-import { FaDownload, FaFileInvoice } from "react-icons/fa";
+import { FaDownload } from "react-icons/fa";
 import Swal from "sweetalert2";
 
-import {
-  downloadTripCollectionDocument,
-  downloadTripExpenseDocument,
-} from "@/services/tripService";
+import { downloadTripTahsilatDokumu } from "@/services/tripService";
 
 export default function TripDocumentDownloadButtons({ tripId }) {
-  const [downloadingExpense, setDownloadingExpense] = useState(false);
-  const [downloadingCollection, setDownloadingCollection] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
-  async function handleDownloadExpense() {
-    setDownloadingExpense(true);
-
-    try {
-      await downloadTripExpenseDocument(tripId);
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text: error.message || "Harcama dokümanı indirilemedi.",
-      });
-    } finally {
-      setDownloadingExpense(false);
-    }
-  }
-
-  async function handleDownloadCollection() {
-    setDownloadingCollection(true);
+  async function handleDownload() {
+    setDownloading(true);
 
     try {
-      await downloadTripCollectionDocument(tripId);
+      await downloadTripTahsilatDokumu(tripId);
     } catch (error) {
       console.error(error);
 
@@ -46,29 +24,18 @@ export default function TripDocumentDownloadButtons({ tripId }) {
         text: error.message || "Tahsilat dökümü indirilemedi.",
       });
     } finally {
-      setDownloadingCollection(false);
+      setDownloading(false);
     }
   }
 
   return (
-    <div className="d-flex flex-wrap gap-2">
-      <Button
-        variant="outline-success"
-        onClick={handleDownloadExpense}
-        disabled={downloadingExpense}
-      >
-        <FaDownload className="me-2" aria-hidden="true" />
-        Harcama Dökümü (Form 2)
-      </Button>
-
-      <Button
-        variant="outline-info"
-        onClick={handleDownloadCollection}
-        disabled={downloadingCollection}
-      >
-        <FaFileInvoice className="me-2" aria-hidden="true" />
-        Tahsilat Dökümü (Form 1)
-      </Button>
-    </div>
+    <Button
+      variant="outline-success"
+      onClick={handleDownload}
+      disabled={downloading}
+    >
+      <FaDownload className="me-2" aria-hidden="true" />
+      Tahsilat Dökümü İndir
+    </Button>
   );
 }

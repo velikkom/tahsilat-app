@@ -4,19 +4,17 @@ import { memo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Table } from "react-bootstrap";
-import { FaDownload, FaEdit, FaFileInvoice, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
 
 function TripTable({
   trips = [],
   onDelete,
-  onDownloadExpense,
-  onDownloadCollection,
+  onDownload,
   disabled = false,
   deletingId = null,
-  downloadingExpenseId = null,
-  downloadingCollectionId = null,
+  downloadingId = null,
 }) {
   const router = useRouter();
 
@@ -35,8 +33,7 @@ function TripTable({
         <tbody>
           {trips.map((trip) => {
             const isDeleting = deletingId === trip.id;
-            const isDownloadingExpense = downloadingExpenseId === trip.id;
-            const isDownloadingCollection = downloadingCollectionId === trip.id;
+            const isDownloading = downloadingId === trip.id;
             const isDisabled = disabled || isDeleting;
 
             return (
@@ -60,31 +57,15 @@ function TripTable({
                       className="touch-target d-inline-flex align-items-center gap-2"
                       onClick={(event) => {
                         event.stopPropagation();
-                        onDownloadExpense?.(trip);
+                        onDownload?.(trip);
                       }}
                       onDoubleClick={(event) => event.stopPropagation()}
-                      disabled={disabled || isDownloadingExpense}
-                      aria-label="Harcama dökümü indir"
-                      title="Harcama dökümü (Form 2)"
+                      disabled={disabled || isDownloading}
+                      aria-label="Tahsilat dökümü indir"
+                      title="Tahsilat dökümü (Ön + Arka)"
                     >
                       <FaDownload aria-hidden="true" />
-                      Harcama
-                    </Button>
-
-                    <Button
-                      variant="outline-info"
-                      className="touch-target d-inline-flex align-items-center gap-2"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onDownloadCollection?.(trip);
-                      }}
-                      onDoubleClick={(event) => event.stopPropagation()}
-                      disabled={disabled || isDownloadingCollection}
-                      aria-label="Tahsilat dökümü indir"
-                      title="Tahsilat dökümü (Form 1)"
-                    >
-                      <FaFileInvoice aria-hidden="true" />
-                      Tahsilat
+                      Döküm
                     </Button>
 
                     <Link

@@ -115,6 +115,21 @@ public class TripController {
                 .body(document);
     }
 
+    @Operation(summary = "Download accounting Tahsilat Dökümü (Ön + Arka) as xlsx")
+    @GetMapping("/{id}/tahsilat-dokumu.xlsx")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<byte[]> downloadTahsilatDokumu(@PathVariable UUID id) {
+        byte[] document = tripService.generateTahsilatDokumu(id);
+
+        return ResponseEntity.ok()
+                .contentType(XLSX_MEDIA_TYPE)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"tahsilat-dokumu-" + id + ".xlsx\""
+                )
+                .body(document);
+    }
+
     @Operation(summary = "Get Form 1 + Form 2 print preview data")
     @GetMapping("/{id}/print-preview")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")

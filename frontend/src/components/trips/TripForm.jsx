@@ -32,6 +32,7 @@ function toFormState(trip) {
     exitFuelAmount: trip?.exitFuelAmount ?? "",
     tripFuelAmount: trip?.tripFuelAmount ?? "",
     weeklyAllowance: trip?.weeklyAllowance ?? "",
+    commissionExcludedAmount: trip?.commissionExcludedAmount ?? "",
     commissionReceived: trip?.commissionReceived ?? "",
     extraReceived: trip?.extraReceived ?? "",
     agiReceived: trip?.agiReceived ?? "",
@@ -122,6 +123,7 @@ export default function TripForm({ mode = "create", trip = null }) {
       exitFuelAmount: toNumberOrNull(form.exitFuelAmount),
       tripFuelAmount: toNumberOrNull(form.tripFuelAmount),
       weeklyAllowance: toNumberOrNull(form.weeklyAllowance),
+      commissionExcludedAmount: toNumberOrNull(form.commissionExcludedAmount),
       commissionReceived: toNumberOrNull(form.commissionReceived),
       extraReceived: toNumberOrNull(form.extraReceived),
       agiReceived: toNumberOrNull(form.agiReceived),
@@ -316,6 +318,21 @@ export default function TripForm({ mode = "create", trip = null }) {
                   step="0.01"
                   name="weeklyAllowance"
                   value={form.weeklyAllowance}
+                  onChange={handleFieldChange}
+                  disabled={submitting}
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={6} md={3}>
+              <Form.Group>
+                <Form.Label>Primden Düşülecek Tahsilat</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  name="commissionExcludedAmount"
+                  value={form.commissionExcludedAmount}
                   onChange={handleFieldChange}
                   disabled={submitting}
                 />

@@ -4,19 +4,17 @@ import { memo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "react-bootstrap";
-import { FaDownload, FaEdit, FaFileInvoice, FaTrash } from "react-icons/fa";
+import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
 
 function TripCardGrid({
   trips = [],
   onDelete,
-  onDownloadExpense,
-  onDownloadCollection,
+  onDownload,
   disabled = false,
   deletingId = null,
-  downloadingExpenseId = null,
-  downloadingCollectionId = null,
+  downloadingId = null,
 }) {
   const router = useRouter();
 
@@ -24,8 +22,7 @@ function TripCardGrid({
     <div className="d-flex flex-column gap-3">
       {trips.map((trip) => {
         const isDeleting = deletingId === trip.id;
-        const isDownloadingExpense = downloadingExpenseId === trip.id;
-        const isDownloadingCollection = downloadingCollectionId === trip.id;
+        const isDownloading = downloadingId === trip.id;
         const isDisabled = disabled || isDeleting;
 
         return (
@@ -51,29 +48,14 @@ function TripCardGrid({
                   className="trip-card-actions__btn touch-target"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onDownloadExpense?.(trip);
+                    onDownload?.(trip);
                   }}
                   onDoubleClick={(event) => event.stopPropagation()}
-                  disabled={disabled || isDownloadingExpense}
-                  aria-label="Harcama dökümü indir"
-                >
-                  <FaDownload size={16} className="trip-card-actions__icon" aria-hidden="true" />
-                  Harcama
-                </Button>
-
-                <Button
-                  variant="outline-info"
-                  className="trip-card-actions__btn touch-target"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDownloadCollection?.(trip);
-                  }}
-                  onDoubleClick={(event) => event.stopPropagation()}
-                  disabled={disabled || isDownloadingCollection}
+                  disabled={disabled || isDownloading}
                   aria-label="Tahsilat dökümü indir"
                 >
-                  <FaFileInvoice size={16} className="trip-card-actions__icon" aria-hidden="true" />
-                  Tahsilat
+                  <FaDownload size={16} className="trip-card-actions__icon" aria-hidden="true" />
+                  Döküm
                 </Button>
 
                 <Link

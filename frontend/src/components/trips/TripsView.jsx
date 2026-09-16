@@ -14,8 +14,7 @@ import FloatingAddButton from "@/components/ui/FloatingAddButton";
 import useTrips from "@/hooks/useTrips";
 import {
   deleteTrip,
-  downloadTripCollectionDocument,
-  downloadTripExpenseDocument,
+  downloadTripTahsilatDokumu,
 } from "@/services/tripService";
 
 const EMPTY_DATE_FILTERS = { fromDate: "", toDate: "" };
@@ -30,8 +29,7 @@ export default function TripsView() {
 
   const [isBusy, setIsBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [downloadingExpenseId, setDownloadingExpenseId] = useState(null);
-  const [downloadingCollectionId, setDownloadingCollectionId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
   const [showImportModal, setShowImportModal] = useState(false);
 
   const isRangeInvalid = useMemo(() => {
@@ -118,37 +116,15 @@ export default function TripsView() {
     [isBusy, refresh]
   );
 
-  const handleDownloadExpense = useCallback(async (trip) => {
+  const handleDownload = useCallback(async (trip) => {
     if (!trip?.id) {
       return;
     }
 
-    setDownloadingExpenseId(trip.id);
+    setDownloadingId(trip.id);
 
     try {
-      await downloadTripExpenseDocument(trip.id);
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text: error.message || "Harcama dokümanı indirilemedi.",
-      });
-    } finally {
-      setDownloadingExpenseId(null);
-    }
-  }, []);
-
-  const handleDownloadCollection = useCallback(async (trip) => {
-    if (!trip?.id) {
-      return;
-    }
-
-    setDownloadingCollectionId(trip.id);
-
-    try {
-      await downloadTripCollectionDocument(trip.id);
+      await downloadTripTahsilatDokumu(trip.id);
     } catch (error) {
       console.error(error);
 
@@ -158,7 +134,7 @@ export default function TripsView() {
         text: error.message || "Tahsilat dökümü indirilemedi.",
       });
     } finally {
-      setDownloadingCollectionId(null);
+      setDownloadingId(null);
     }
   }, []);
 
@@ -259,12 +235,10 @@ export default function TripsView() {
                 <TripTable
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownloadExpense={handleDownloadExpense}
-                  onDownloadCollection={handleDownloadCollection}
+                  onDownload={handleDownload}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingExpenseId={downloadingExpenseId}
-                  downloadingCollectionId={downloadingCollectionId}
+                  downloadingId={downloadingId}
                 />
               </div>
 
@@ -272,12 +246,10 @@ export default function TripsView() {
                 <TripCardGrid
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownloadExpense={handleDownloadExpense}
-                  onDownloadCollection={handleDownloadCollection}
+                  onDownload={handleDownload}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingExpenseId={downloadingExpenseId}
-                  downloadingCollectionId={downloadingCollectionId}
+                  downloadingId={downloadingId}
                 />
               </div>
             </>

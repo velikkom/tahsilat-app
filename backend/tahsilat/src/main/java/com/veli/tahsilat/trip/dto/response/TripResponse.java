@@ -35,6 +35,8 @@ public class TripResponse {
 
     private BigDecimal weeklyAllowance;
 
+    private BigDecimal commissionExcludedAmount;
+
     private BigDecimal commissionReceived;
 
     private BigDecimal extraReceived;

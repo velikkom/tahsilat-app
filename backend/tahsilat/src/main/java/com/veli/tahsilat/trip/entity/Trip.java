@@ -50,6 +50,13 @@ public class Trip
 
     private BigDecimal weeklyAllowance;
 
+    /**
+     * Amount subtracted from genel toplam when computing the prim hakediş
+     * matrahı on the ÖN sheet ({@code B26 = B25 - SUM(C17:C24)}). Written to
+     * C17, the nakit row of the "PİRİMDEN DÜŞÜLECEK TAHSİLAT" column.
+     */
+    private BigDecimal commissionExcludedAmount;
+
     private BigDecimal commissionReceived;
 
     private BigDecimal extraReceived;

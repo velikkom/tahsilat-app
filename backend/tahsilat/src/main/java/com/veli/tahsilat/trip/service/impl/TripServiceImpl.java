@@ -12,6 +12,7 @@ import com.veli.tahsilat.trip.dto.response.TripResponse;
 import com.veli.tahsilat.trip.entity.Trip;
 import com.veli.tahsilat.trip.entity.TripDailyExpense;
 import com.veli.tahsilat.trip.export.TripCollectionDocumentGenerator;
+import com.veli.tahsilat.trip.export.TripDocumentGenerator;
 import com.veli.tahsilat.trip.export.TripExpenseDocumentGenerator;
 import com.veli.tahsilat.trip.export.TripPrintPreviewBuilder;
 import com.veli.tahsilat.trip.mapper.TripMapper;
@@ -59,6 +60,8 @@ public class TripServiceImpl implements TripService {
     private final TripExpenseDocumentGenerator tripExpenseDocumentGenerator;
 
     private final TripCollectionDocumentGenerator tripCollectionDocumentGenerator;
+
+    private final TripDocumentGenerator tripDocumentGenerator;
 
     private final TripPrintPreviewBuilder tripPrintPreviewBuilder;
 
@@ -186,6 +189,21 @@ public class TripServiceImpl implements TripService {
 
     @Override
     @Transactional(readOnly = true)
+    public byte[] generateTahsilatDokumu(UUID id) {
+        Trip trip = findAccessibleTrip(id);
+
+        List<Collection> collections =
+                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
+                        trip.getSalesman().getId(),
+                        trip.getStartDate(),
+                        trip.getEndDate()
+                );
+
+        return tripDocumentGenerator.generate(trip, collections);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public TripPrintPreviewResponse getPrintPreview(UUID id) {
         Trip trip = findAccessibleTrip(id);
 
@@ -230,6 +248,7 @@ public class TripServiceImpl implements TripService {
         trip.setExitFuelAmount(request.getExitFuelAmount());
         trip.setTripFuelAmount(request.getTripFuelAmount());
         trip.setWeeklyAllowance(request.getWeeklyAllowance());
+        trip.setCommissionExcludedAmount(request.getCommissionExcludedAmount());
         trip.setCommissionReceived(request.getCommissionReceived());
         trip.setExtraReceived(request.getExtraReceived());
         trip.setAgiReceived(request.getAgiReceived());
