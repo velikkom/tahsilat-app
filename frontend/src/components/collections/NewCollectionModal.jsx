@@ -2,8 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
+import Swal from "sweetalert2";
 import CollectionFormFields from "@/components/forms/CollectionFormFields";
 import useCustomers from "@/hooks/useCustomers";
+import { getMailOrderCompanies } from "@/services/collectionService";
+import {
+  isKnownMailOrderCompany,
+  toTurkishUpperCase,
+} from "@/utils/collectionUtils";
 
 const createInitialForm = (defaultCustomerId = "") => ({
   customerId: defaultCustomerId,
@@ -48,13 +54,32 @@ export default function NewCollectionModal({
   const { refreshCustomers } = useCustomers();
   const [validated, setValidated] = useState(false);
   const [form, setForm] = useState(createInitialForm());
+  const [mailOrderCompanies, setMailOrderCompanies] = useState([]);
   const submitLockRef = useRef(false);
   const isEditMode = mode === "edit";
 
   useEffect(() => {
-    if (show) {
-      refreshCustomers({ silent: true });
+    if (!show) {
+      return;
     }
+
+    refreshCustomers({ silent: true });
+
+    let cancelled = false;
+
+    getMailOrderCompanies()
+      .then((names) => {
+        if (!cancelled && Array.isArray(names)) {
+          setMailOrderCompanies(names);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [show, refreshCustomers]);
 
   useEffect(() => {
@@ -126,6 +151,35 @@ export default function NewCollectionModal({
       return;
     }
 
+    const mailOrderCompany = toTurkishUpperCase(form.mailOrderCompany).trim();
+
+    if (form.paymentType === "MAIL_ORDER" && mailOrderCompany) {
+      const known = isKnownMailOrderCompany(
+        mailOrderCompany,
+        mailOrderCompanies
+      );
+
+      if (!known) {
+        const confirmation = await Swal.fire({
+          icon: "question",
+          title:
+            mailOrderCompanies.length === 0
+              ? "İlk mailorder firması"
+              : "Firma kayıtlı değil",
+          text: `"${mailOrderCompany}" kayıtlı değil. Kaydedeyim mi?`,
+          showCancelButton: true,
+          confirmButtonText: "Evet, kaydet",
+          cancelButtonText: "Vazgeç",
+          reverseButtons: true,
+          focusCancel: true,
+        });
+
+        if (!confirmation.isConfirmed) {
+          return;
+        }
+      }
+    }
+
     submitLockRef.current = true;
 
     await onSubmit({
@@ -139,7 +193,7 @@ export default function NewCollectionModal({
       mikroSr: form.mikroSr || null,
       mikroNo: form.mikroNo || null,
       bankName: form.bankName || null,
-      mailOrderCompany: form.mailOrderCompany || null,
+      mailOrderCompany: mailOrderCompany || null,
     });
   };
 
@@ -172,6 +226,7 @@ export default function NewCollectionModal({
             customers={customers}
             loadingCustomers={loadingCustomers}
             lockCustomerSelection={lockCustomerSelection}
+            mailOrderCompanies={mailOrderCompanies}
           />
         </Modal.Body>
 

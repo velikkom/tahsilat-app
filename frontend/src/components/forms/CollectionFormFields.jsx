@@ -1,6 +1,7 @@
 "use client";
 
 import { Form, Row, Col } from "react-bootstrap";
+import MailOrderCompanyField from "@/components/forms/MailOrderCompanyField";
 
 const COLLECTION_TYPES = [
   { value: "CASH", label: "Nakit" },
@@ -23,6 +24,7 @@ export default function CollectionFormFields({
   customers,
   loadingCustomers,
   lockCustomerSelection = false,
+  mailOrderCompanies = [],
 }) {
   return (
     <Row className="g-3">
@@ -171,16 +173,16 @@ export default function CollectionFormFields({
 
       {form.paymentType === "MAIL_ORDER" && (
         <Col xs={12} md={6} lg={3}>
-          <Form.Group>
-            <Form.Label>Mailorder Firma</Form.Label>
-            <Form.Control
-              type="text"
-              name="mailOrderCompany"
-              value={form.mailOrderCompany}
-              onChange={onChange}
-              disabled={isFormDisabled}
-            />
-          </Form.Group>
+          <MailOrderCompanyField
+            value={form.mailOrderCompany}
+            companies={mailOrderCompanies}
+            disabled={isFormDisabled}
+            onChange={(nextValue) =>
+              onChange({
+                target: { name: "mailOrderCompany", value: nextValue },
+              })
+            }
+          />
         </Col>
       )}
 

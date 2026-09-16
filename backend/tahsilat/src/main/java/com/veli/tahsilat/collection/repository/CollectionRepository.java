@@ -321,4 +321,12 @@ public interface CollectionRepository
             LocalDate endDate
     );
 
+    @Query("""
+            SELECT DISTINCT c.mailOrderCompany
+            FROM Collection c
+            WHERE c.active = true
+            AND c.mailOrderCompany IS NOT NULL
+            AND c.mailOrderCompany <> ''
+            """)
+    List<String> findDistinctMailOrderCompanies();
 }

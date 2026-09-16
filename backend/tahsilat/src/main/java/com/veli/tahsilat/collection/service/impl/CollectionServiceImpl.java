@@ -24,14 +24,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CollectionServiceImpl
         implements CollectionService {
+
+    private static final Locale TURKISH = Locale.forLanguageTag("tr-TR");
 
     private final CollectionRepository collectionRepository;
 
@@ -44,6 +51,7 @@ public class CollectionServiceImpl
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public CollectionResponse createCollection(
             CreateCollectionRequest request
     ) {
@@ -79,7 +87,7 @@ public class CollectionServiceImpl
         collection.setMikroSr(request.getMikroSr());
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
-        collection.setMailOrderCompany(request.getMailOrderCompany());
+        collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
 
         // Bu versiyonda tum odeme turleri olusturuldugu anda PAID kabul edilir.
         // TODO: Cek/senet icin vade gunu odeme hesaba gectiginde PAID'e cekilecek
@@ -103,6 +111,7 @@ public class CollectionServiceImpl
     }
 
     @Override
+    @Transactional
     public CollectionResponse updateCollection(
             UUID id,
             UpdateCollectionRequest request
@@ -139,7 +148,7 @@ public class CollectionServiceImpl
         collection.setMikroSr(request.getMikroSr());
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
-        collection.setMailOrderCompany(request.getMailOrderCompany());
+        collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
 
         Collection savedCollection =
                 collectionRepository.save(collection);
@@ -304,6 +313,43 @@ public class CollectionServiceImpl
                     "Maturity date is not allowed"
             );
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> listMailOrderCompanies() {
+        Map<String, String> uniqueNames = new java.util.LinkedHashMap<>();
+
+        for (String name : collectionRepository.findDistinctMailOrderCompanies()) {
+            String display = normalizeMailOrderCompany(name);
+
+            if (display == null) {
+                continue;
+            }
+
+            uniqueNames.merge(
+                    catalogKey(display),
+                    display,
+                    (existing, incoming) -> incoming.indexOf('\u0130') >= 0 ? incoming : existing
+            );
+        }
+
+        return uniqueNames.values().stream()
+                .sorted(Comparator.comparing(this::catalogKey))
+                .toList();
+    }
+
+    private String normalizeMailOrderCompany(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        return value.trim().toUpperCase(TURKISH);
+    }
+
+    /** İ/I fold so "DeniOto" and "DENIOTO" are the same catalog entry. */
+    private String catalogKey(String value) {
+        return value.replace('İ', 'I');
     }
 
     private void applyCollectionFields(

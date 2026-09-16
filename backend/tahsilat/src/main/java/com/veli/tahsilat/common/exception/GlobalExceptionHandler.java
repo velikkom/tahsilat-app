@@ -191,6 +191,36 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnreadableRequest(
+            org.springframework.http.converter.HttpMessageNotReadableException ex
+    ) {
+        log.warn("Unreadable request body", ex);
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .success(false)
+                .message("İstek okunamadı. Ödeme türü veya tarih formatını kontrol edin.")
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDataIntegrity(
+            org.springframework.dao.DataIntegrityViolationException ex
+    ) {
+        log.error("Data integrity violation", ex);
+
+        ApiErrorResponse response = ApiErrorResponse.builder()
+                .success(false)
+                .message("Kayıt veritabanı kısıtına takıldı. Aynı tahsilat daha önce eklenmiş olabilir.")
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleUnhandledException(Exception ex) {
         log.error("Unhandled exception", ex);

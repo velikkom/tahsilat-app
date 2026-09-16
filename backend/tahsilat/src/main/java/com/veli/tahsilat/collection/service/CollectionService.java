@@ -6,6 +6,7 @@ import com.veli.tahsilat.collection.dto.response.CollectionResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CollectionService {
@@ -33,4 +34,6 @@ public interface CollectionService {
     Page<CollectionResponse> getOverdueCollections(
             Pageable pageable
     );
+
+    List<String> listMailOrderCompanies();
 }

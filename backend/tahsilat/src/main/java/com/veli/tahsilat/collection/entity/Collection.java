@@ -8,6 +8,7 @@ import com.veli.tahsilat.common.entity.BaseEntity;
 import com.veli.tahsilat.customer.entity.Customer;
 import com.veli.tahsilat.user.entity.User;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -64,5 +65,6 @@ public class Collection
 
     private String bankName;
 
+    @Column(length = 100)
     private String mailOrderCompany;
 }

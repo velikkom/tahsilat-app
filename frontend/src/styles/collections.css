@@ -313,6 +313,46 @@ body.dark-mode .collection-table th {
   min-width: 160px;
 }
 
+.mail-order-company-field {
+  position: relative;
+}
+
+.mail-order-company-field__list {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.mail-order-company-field__option {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+}
+
+.mail-order-company-field__option:hover,
+.mail-order-company-field__option:focus {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 @media (max-width: 767px) {
   .collections-actions-column {
     width: 140px;

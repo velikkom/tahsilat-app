@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,6 +45,13 @@ public class CollectionController {
     public ResponseEntity<Page<CollectionResponse>> getAllCollections(Pageable pageable) {
 
         return ResponseEntity.ok(collectionService.getAllCollections(pageable));
+    }
+
+    @Operation(summary = "List known mail-order company names")
+    @GetMapping("/mail-order-companies")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<List<String>> listMailOrderCompanies() {
+        return ResponseEntity.ok(collectionService.listMailOrderCompanies());
     }
 
     @Operation(

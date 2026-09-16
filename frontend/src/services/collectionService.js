@@ -6,6 +6,12 @@ export function getCollections({ page = 0, size = 100 } = {}) {
   });
 }
 
+export function getMailOrderCompanies() {
+  return apiFetchJson("/collections/mail-order-companies", {
+    errorMessage: "Mailorder firmaları getirilemedi",
+  });
+}
+
 export function createCollection(payload) {
   return apiFetchJson("/collections", {
     method: "POST",
