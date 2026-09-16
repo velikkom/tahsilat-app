@@ -193,7 +193,8 @@ export default function NewCollectionModal({
       mikroSr: form.mikroSr || null,
       mikroNo: form.mikroNo || null,
       bankName: form.bankName || null,
-      mailOrderCompany: mailOrderCompany || null,
+      mailOrderCompany:
+        form.paymentType === "MAIL_ORDER" ? mailOrderCompany || null : null,
     });
   };
 

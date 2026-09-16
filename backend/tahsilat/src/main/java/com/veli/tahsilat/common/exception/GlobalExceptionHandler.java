@@ -212,9 +212,20 @@ public class GlobalExceptionHandler {
     ) {
         log.error("Data integrity violation", ex);
 
+        String sqlState = null;
+        Throwable cause = ex.getMostSpecificCause();
+        if (cause instanceof java.sql.SQLException sqlException) {
+            sqlState = sqlException.getSQLState();
+        }
+
+        // 23514 = check_violation (stale payment_type CHECK / enum leftover)
+        String message = "23514".equals(sqlState)
+                ? "Seçilen ödeme türü kaydedilemedi. Sayfayı yenileyip tekrar deneyin."
+                : "Kayıt veritabanı kısıtına takıldı. Aynı tahsilat daha önce eklenmiş olabilir.";
+
         ApiErrorResponse response = ApiErrorResponse.builder()
                 .success(false)
-                .message("Kayıt veritabanı kısıtına takıldı. Aynı tahsilat daha önce eklenmiş olabilir.")
+                .message(message)
                 .timestamp(LocalDateTime.now())
                 .build();
 

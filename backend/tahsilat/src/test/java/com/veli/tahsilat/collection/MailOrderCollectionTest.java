@@ -27,6 +27,7 @@ import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -100,6 +101,36 @@ class MailOrderCollectionTest {
                 .andExpect(jsonPath("$.paymentType").value("MAIL_ORDER"))
                 .andExpect(jsonPath("$.mailOrderCompany").value("DEN\u0130OTO"))
                 .andExpect(jsonPath("$.amount").value(30000.0));
+    }
+
+    @Test
+    void updateCreditCardCollectionToMailOrder() throws Exception {
+        Collection collection = new Collection();
+        collection.setCustomer(customer);
+        collection.setAmount(new BigDecimal("30000.00"));
+        collection.setCollectionDate(LocalDate.of(2026, 9, 14));
+        collection.setPaymentType(PaymentType.CREDIT_CARD);
+        collection.setStatus(CollectionStatus.PAID);
+        collection.setCollectedBy(salesman);
+        collection = collectionRepository.saveAndFlush(collection);
+
+        String token = login();
+
+        mockMvc.perform(put("/api/v1/collections/{id}", collection.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "customerId": "%s",
+                                  "amount": 30000,
+                                  "collectionDate": "2026-09-14",
+                                  "paymentType": "MAIL_ORDER",
+                                  "mailOrderCompany": "DENOTO"
+                                }
+                                """.formatted(customer.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paymentType").value("MAIL_ORDER"))
+                .andExpect(jsonPath("$.mailOrderCompany").value("DENOTO"));
     }
 
     @Test
