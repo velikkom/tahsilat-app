@@ -23,7 +23,8 @@
 @media (max-width: 1023.98px) {
   .dashboard-shell__main {
     padding-bottom: calc(
-      var(--tab-bar-height, 60px) + env(safe-area-inset-bottom, 0px) + 0.75rem
+      var(--tab-bar-height, 68px) + var(--tab-bar-inset, 10px) +
+        env(safe-area-inset-bottom, 0px) + 0.75rem
     );
   }
 }

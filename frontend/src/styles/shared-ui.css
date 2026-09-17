@@ -15,7 +15,8 @@
 
   --radius-card: 16px;
   --radius-chip: 999px;
-  --tab-bar-height: 60px;
+  --tab-bar-height: 68px;
+  --tab-bar-inset: 10px;
 
   --ui-radius-sm: 12px;
   --ui-radius-md: 14px;
@@ -122,7 +123,8 @@
 @media (max-width: 1023.98px) {
   .ui-fab {
     bottom: calc(
-      var(--tab-bar-height, 60px) + env(safe-area-inset-bottom, 0px) + 1rem
+      var(--tab-bar-height, 68px) + var(--tab-bar-inset, 10px) +
+        env(safe-area-inset-bottom, 0px) + 1rem
     );
   }
 }

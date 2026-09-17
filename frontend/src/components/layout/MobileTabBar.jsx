@@ -29,8 +29,10 @@ export default function MobileTabBar() {
             }`}
             aria-current={isActive ? "page" : undefined}
           >
-            {item.icon}
-            <span>{item.label}</span>
+            <span className="mobile-tab-bar__icon" aria-hidden="true">
+              {item.icon}
+            </span>
+            <span className="mobile-tab-bar__label">{item.label}</span>
           </Link>
         );
       })}
