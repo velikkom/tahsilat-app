@@ -4,17 +4,19 @@ import { memo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Table } from "react-bootstrap";
-import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaFileAlt, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
+
+function tripDokumuHref(tripId) {
+  return `/trips/${tripId}/print`;
+}
 
 function TripTable({
   trips = [],
   onDelete,
-  onDownload,
   disabled = false,
   deletingId = null,
-  downloadingId = null,
 }) {
   const router = useRouter();
 
@@ -33,14 +35,14 @@ function TripTable({
         <tbody>
           {trips.map((trip) => {
             const isDeleting = deletingId === trip.id;
-            const isDownloading = downloadingId === trip.id;
             const isDisabled = disabled || isDeleting;
+            const dokumuHref = tripDokumuHref(trip.id);
 
             return (
               <tr
                 key={trip.id}
-                style={{ cursor: "pointer" }}
-                onDoubleClick={() => router.push(`/trips/${trip.id}/print`)}
+                className="trip-table__row"
+                onClick={() => router.push(dokumuHref)}
               >
                 <td>
                   {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
@@ -52,21 +54,16 @@ function TripTable({
 
                 <td className="text-end">
                   <div className="d-flex justify-content-end gap-2">
-                    <Button
-                      variant="outline-success"
-                      className="touch-target d-inline-flex align-items-center gap-2"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onDownload?.(trip);
-                      }}
-                      onDoubleClick={(event) => event.stopPropagation()}
-                      disabled={disabled || isDownloading}
-                      aria-label="Tahsilat dökümü indir"
-                      title="Tahsilat dökümü (Ön + Arka)"
+                    <Link
+                      href={dokumuHref}
+                      className="btn btn-outline-success touch-target d-inline-flex align-items-center gap-2"
+                      aria-label="Tahsilat dökümünü aç"
+                      title="Dökümü aç"
+                      onClick={(event) => event.stopPropagation()}
                     >
-                      <FaDownload aria-hidden="true" />
+                      <FaFileAlt aria-hidden="true" />
                       Döküm
-                    </Button>
+                    </Link>
 
                     <Link
                       href={`/trips/${trip.id}`}
@@ -74,7 +71,6 @@ function TripTable({
                       aria-label="Düzenle"
                       title="Düzenle"
                       onClick={(event) => event.stopPropagation()}
-                      onDoubleClick={(event) => event.stopPropagation()}
                     >
                       <FaEdit aria-hidden="true" />
                       Düzenle
@@ -87,7 +83,6 @@ function TripTable({
                         event.stopPropagation();
                         onDelete?.(trip);
                       }}
-                      onDoubleClick={(event) => event.stopPropagation()}
                       disabled={isDisabled}
                       aria-label="Sil"
                       title="Sil"

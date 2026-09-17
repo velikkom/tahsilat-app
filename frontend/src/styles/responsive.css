@@ -437,6 +437,14 @@ body.sidebar-drawer-open {
   }
 }
 
+.trip-card {
+  cursor: pointer;
+}
+
+.trip-table__row {
+  cursor: pointer;
+}
+
 /* --- Trip card actions (narrow phones <424px) --- */
 
 .trip-card-actions {

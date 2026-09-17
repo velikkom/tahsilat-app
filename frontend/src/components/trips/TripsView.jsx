@@ -12,10 +12,7 @@ import ImportTripModal from "@/components/trips/ImportTripModal";
 import FloatingAddButton from "@/components/ui/FloatingAddButton";
 
 import useTrips from "@/hooks/useTrips";
-import {
-  deleteTrip,
-  downloadTripTahsilatDokumu,
-} from "@/services/tripService";
+import { deleteTrip } from "@/services/tripService";
 
 const EMPTY_DATE_FILTERS = { fromDate: "", toDate: "" };
 
@@ -29,7 +26,6 @@ export default function TripsView() {
 
   const [isBusy, setIsBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [downloadingId, setDownloadingId] = useState(null);
   const [showImportModal, setShowImportModal] = useState(false);
 
   const isRangeInvalid = useMemo(() => {
@@ -116,28 +112,6 @@ export default function TripsView() {
     [isBusy, refresh]
   );
 
-  const handleDownload = useCallback(async (trip) => {
-    if (!trip?.id) {
-      return;
-    }
-
-    setDownloadingId(trip.id);
-
-    try {
-      await downloadTripTahsilatDokumu(trip.id);
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text: error.message || "Tahsilat dökümü indirilemedi.",
-      });
-    } finally {
-      setDownloadingId(null);
-    }
-  }, []);
-
   const hasTrips = trips.length > 0;
 
   return (
@@ -155,7 +129,7 @@ export default function TripsView() {
             variant="outline-primary"
             onClick={() => setShowImportModal(true)}
           >
-            Excel'den İçe Aktar
+            Excel&apos;den İçe Aktar
           </Button>
           <Link
             href="/trips/new"
@@ -235,10 +209,8 @@ export default function TripsView() {
                 <TripTable
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownload={handleDownload}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingId={downloadingId}
                 />
               </div>
 
@@ -246,10 +218,8 @@ export default function TripsView() {
                 <TripCardGrid
                   trips={trips}
                   onDelete={handleDelete}
-                  onDownload={handleDownload}
                   disabled={isBusy}
                   deletingId={deletingId}
-                  downloadingId={downloadingId}
                 />
               </div>
             </>

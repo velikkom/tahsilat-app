@@ -4,17 +4,19 @@ import { memo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "react-bootstrap";
-import { FaDownload, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaFileAlt, FaTrash } from "react-icons/fa";
 
 import { formatDate } from "@/utils/collectionUtils";
+
+function tripDokumuHref(tripId) {
+  return `/trips/${tripId}/print`;
+}
 
 function TripCardGrid({
   trips = [],
   onDelete,
-  onDownload,
   disabled = false,
   deletingId = null,
-  downloadingId = null,
 }) {
   const router = useRouter();
 
@@ -22,14 +24,22 @@ function TripCardGrid({
     <div className="d-flex flex-column gap-3">
       {trips.map((trip) => {
         const isDeleting = deletingId === trip.id;
-        const isDownloading = downloadingId === trip.id;
         const isDisabled = disabled || isDeleting;
+        const dokumuHref = tripDokumuHref(trip.id);
 
         return (
           <div
             key={trip.id}
             className="card border-0 shadow-sm trip-card"
-            onDoubleClick={() => router.push(`/trips/${trip.id}/print`)}
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(dokumuHref)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                router.push(dokumuHref);
+              }
+            }}
           >
             <div className="card-body">
               <div className="mb-3">
@@ -43,27 +53,21 @@ function TripCardGrid({
               </div>
 
               <div className="trip-card-actions">
-                <Button
-                  variant="outline-success"
-                  className="trip-card-actions__btn touch-target"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onDownload?.(trip);
-                  }}
-                  onDoubleClick={(event) => event.stopPropagation()}
-                  disabled={disabled || isDownloading}
-                  aria-label="Tahsilat dökümü indir"
+                <Link
+                  href={dokumuHref}
+                  className="btn btn-outline-success trip-card-actions__btn touch-target"
+                  aria-label="Tahsilat dökümünü aç"
+                  onClick={(event) => event.stopPropagation()}
                 >
-                  <FaDownload size={16} className="trip-card-actions__icon" aria-hidden="true" />
+                  <FaFileAlt size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Döküm
-                </Button>
+                </Link>
 
                 <Link
                   href={`/trips/${trip.id}`}
                   className="btn btn-outline-warning trip-card-actions__btn touch-target"
                   aria-label="Düzenle"
                   onClick={(event) => event.stopPropagation()}
-                  onDoubleClick={(event) => event.stopPropagation()}
                 >
                   <FaEdit size={16} className="trip-card-actions__icon" aria-hidden="true" />
                   Düzenle
@@ -76,7 +80,6 @@ function TripCardGrid({
                     event.stopPropagation();
                     onDelete?.(trip);
                   }}
-                  onDoubleClick={(event) => event.stopPropagation()}
                   disabled={isDisabled}
                   aria-label="Sil"
                 >
