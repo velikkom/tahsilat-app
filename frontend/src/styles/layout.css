@@ -71,6 +71,39 @@
   color: var(--color-muted) !important;
 }
 
+.app-breadcrumb-bar {
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-breadcrumb {
+  padding: 0.55rem 0 0.65rem;
+  font-size: 0.85rem;
+}
+
+.app-breadcrumb .breadcrumb {
+  margin-bottom: 0;
+}
+
+.app-breadcrumb .breadcrumb-item a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.app-breadcrumb .breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.app-breadcrumb .breadcrumb-item.active {
+  color: var(--color-muted);
+}
+
+@media print {
+  .app-breadcrumb-bar {
+    display: none !important;
+  }
+}
+
 .app-sidebar,
 .mobile-sidebar {
   background-color: var(--color-ink) !important;

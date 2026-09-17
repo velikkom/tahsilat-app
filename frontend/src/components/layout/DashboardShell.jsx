@@ -7,6 +7,7 @@ import SessionMonitor from "@/components/auth/SessionMonitor";
 import Sidebar from "./SideBar";
 import MobileSidebar from "./MobileSidebar";
 import Navbar from "./NavBar";
+import AppBreadcrumb from "./AppBreadcrumb";
 import MobileTabBar from "./MobileTabBar";
 
 export default function DashboardShell({ children }) {
@@ -25,6 +26,7 @@ export default function DashboardShell({ children }) {
 
       <div className="dashboard-shell__content d-flex flex-column min-v-0">
         <Navbar onMenuToggle={toggle} />
+        <AppBreadcrumb />
 
         <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">
           {children}

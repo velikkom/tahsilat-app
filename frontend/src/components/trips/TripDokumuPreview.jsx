@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button, Spinner } from "react-bootstrap";
-import { FaDownload, FaEdit } from "react-icons/fa";
+import { FaArrowLeft, FaDownload, FaEdit, FaPrint } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 import TripDokumuArkaSheet from "@/components/trips/TripDokumuArkaSheet";
@@ -99,6 +99,13 @@ export default function TripDokumuPreview() {
       <div className="trip-print-page">
         <div className="trip-print-page__toolbar">
           <Link
+            href="/trips"
+            className="btn btn-outline-secondary touch-target d-inline-flex align-items-center gap-2"
+          >
+            <FaArrowLeft aria-hidden="true" />
+            Geri
+          </Link>
+          <Link
             href={`/trips/${tripId}`}
             className="btn btn-outline-warning touch-target d-inline-flex align-items-center gap-2"
           >
@@ -115,6 +122,13 @@ export default function TripDokumuPreview() {
     <div className="trip-print-page">
       <div className="trip-print-page__toolbar">
         <div className="trip-print-page__toolbar-group">
+          <Link
+            href="/trips"
+            className="btn btn-outline-secondary touch-target d-inline-flex align-items-center gap-2"
+          >
+            <FaArrowLeft aria-hidden="true" />
+            Geri
+          </Link>
           <Button
             variant={side === "on" ? "dark" : "outline-dark"}
             className="touch-target"
@@ -145,6 +159,14 @@ export default function TripDokumuPreview() {
         </div>
 
         <div className="trip-print-page__toolbar-group">
+          <Button
+            variant="outline-primary"
+            className="touch-target d-inline-flex align-items-center gap-2"
+            onClick={() => window.print()}
+          >
+            <FaPrint aria-hidden="true" />
+            Yazdır
+          </Button>
           <Button
             variant="outline-success"
             className="touch-target d-inline-flex align-items-center gap-2"

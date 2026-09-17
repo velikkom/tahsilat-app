@@ -156,6 +156,7 @@
 @media print {
   body.trip-print-active .app-sidebar,
   body.trip-print-active .app-navbar,
+  body.trip-print-active .app-breadcrumb-bar,
   body.trip-print-active .mobile-sidebar,
   body.trip-print-active .mobile-tab-bar,
   body.trip-print-active .ui-fab,
