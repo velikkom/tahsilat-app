@@ -122,7 +122,7 @@ public class TripDocumentTemplate {
         /**
          * Column C of the tahsilat özeti: "PİRİMDEN DÜŞÜLECEK TAHSİLAT".
          * A single trip-level amount is written on the nakit row (C17);
-         * {@code B26 = B25 - SUM(C17:C24)} then subtracts it from genel toplam.
+         * {@code B26 = (B25 - SUM(C17:C24)) / 1.2} then takes 1% in B27.
          */
         public static final int COL_COMMISSION_EXCLUDED = 2;
         public static final int ROW_COMMISSION_EXCLUDED = 16;

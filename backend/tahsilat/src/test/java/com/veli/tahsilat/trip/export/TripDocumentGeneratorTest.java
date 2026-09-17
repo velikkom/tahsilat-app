@@ -66,6 +66,20 @@ class TripDocumentGeneratorTest {
     }
 
     @Test
+    void primMatrahFormulaStripsVat() throws IOException {
+        Trip trip = baseTrip();
+
+        byte[] bytes = generator.generate(trip, List.of());
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
+            Sheet on = workbook.getSheet(TripDocumentTemplate.SHEET_ON);
+
+            assertEquals("(B25-SUM(C17:C24))/1.2", on.getRow(25).getCell(1).getCellFormula());
+            assertEquals("B26*1%", on.getRow(26).getCell(1).getCellFormula());
+        }
+    }
+
+    @Test
     void thirtyFirstCollectionOpensASecondArkaSheet() throws IOException {
         Trip trip = baseTrip();
         List<Collection> collections = new ArrayList<>();

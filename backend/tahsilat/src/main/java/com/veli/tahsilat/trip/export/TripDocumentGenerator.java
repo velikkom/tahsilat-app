@@ -312,6 +312,10 @@ public class TripDocumentGenerator {
                 On.COL_COMMISSION_EXCLUDED,
                 trip.getCommissionExcludedAmount()
         );
+
+        // Prim matrahı is KDV-exclusive: (genel toplam - primden düşülecek) / 1.2
+        setFormula(sheet, 25, 1, "(B25-SUM(C17:C24))/1.2");
+        setFormula(sheet, 26, 1, "B26*1%");
     }
 
     private void writeVehicleRow(Sheet sheet, Trip trip) {

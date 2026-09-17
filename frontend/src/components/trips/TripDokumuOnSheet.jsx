@@ -44,8 +44,8 @@ export default function TripDokumuOnSheet({ preview, pageIndex = 0 }) {
   const havale = toNumber(totals.bankTransfer);
   const genelToplam = cash + senet + cek + mailOrder + posYkb + posTeb + havale;
   const excluded = toNumber(preview.commissionExcludedAmount);
-  const primMatrah = genelToplam - excluded;
-  const prim = (primMatrah / 1.2) * 0.01;
+  const primMatrah = Math.round(((genelToplam - excluded) / 1.2) * 100) / 100;
+  const prim = Math.round(primMatrah * 0.01 * 100) / 100;
   const masraf = toNumber(preview.expenseTotal);
   const haftalik = toNumber(preview.weeklyAllowance);
   const extra = toNumber(preview.extraReceived);
@@ -254,16 +254,18 @@ export default function TripDokumuOnSheet({ preview, pageIndex = 0 }) {
           </tr>
           <tr>
             <td>MAİLORDER</td>
-            <td />
+            <td className="dokumu-strong">
+              {formatFormAmount(mailOrder, { zero: true })}
+            </td>
             <td />
             <td>FAZLADAN ALDIĞI</td>
             <td>{formatFormAmount(preview.extraReceived)}</td>
             <td colSpan={3} />
           </tr>
           <tr>
-            <td>MAİLORDER</td>
+            <td>KREDİ KARTI / YKB TAHS.TOP.</td>
             <td className="dokumu-strong">
-              {formatFormAmount(mailOrder, { zero: true })}
+              {formatFormAmount(posYkb, { zero: true })}
             </td>
             <td />
             <td>ALDIĞI AGİ</td>
@@ -271,9 +273,9 @@ export default function TripDokumuOnSheet({ preview, pageIndex = 0 }) {
             <td colSpan={3} />
           </tr>
           <tr>
-            <td>KREDİ KARTI / YKB TAHS.TOP.</td>
+            <td>KREDİ KARTI / TEB TAHS.TOP.</td>
             <td className="dokumu-strong">
-              {formatFormAmount(posYkb, { zero: true })}
+              {formatFormAmount(posTeb, { zero: true })}
             </td>
             <td />
             <td>KALAN NAKİT</td>
@@ -283,22 +285,12 @@ export default function TripDokumuOnSheet({ preview, pageIndex = 0 }) {
             <td colSpan={3} />
           </tr>
           <tr>
-            <td>KREDİ KARTI / TEB TAHS.TOP.</td>
-            <td className="dokumu-strong">
-              {formatFormAmount(posTeb, { zero: true })}
-            </td>
-            <td />
-            <td rowSpan={2} className="dokumu-head">
-              İMZASI
-            </td>
-            <td rowSpan={2} />
-            <td colSpan={3} />
-          </tr>
-          <tr>
             <td>HAVALE TAHSİLAT TOPLAMI</td>
             <td className="dokumu-strong">
               {formatFormAmount(havale, { zero: true })}
             </td>
+            <td />
+            <td className="dokumu-head">İMZASI</td>
             <td />
             <td colSpan={3} />
           </tr>
