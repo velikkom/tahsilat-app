@@ -55,6 +55,10 @@ export async function deleteTrip(id) {
   return true;
 }
 
+export function downloadTripFile(file) {
+  triggerBlobDownload(file, file.name);
+}
+
 function triggerBlobDownload(blob, filename) {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");

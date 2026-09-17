@@ -12,6 +12,7 @@ import TripDokumuOnSheet from "@/components/trips/TripDokumuOnSheet";
 import useTripPrintPreview from "@/hooks/useTripPrintPreview";
 import { formatDate } from "@/utils/collectionUtils";
 import {
+  downloadTripFile,
   downloadTripTahsilatDokumu,
   getTripTahsilatDokumuFile,
 } from "@/services/tripService";
@@ -21,6 +22,41 @@ import {
   tripDayCount,
 } from "@/utils/tripDokumuFormat";
 
+function canShareData(data) {
+  try {
+    return typeof navigator.canShare === "function" && navigator.canShare(data);
+  } catch {
+    return false;
+  }
+}
+
+function isShareCanceled(error) {
+  return error?.name === "AbortError";
+}
+
+async function shareFiles(file, title, text) {
+  if (!file || typeof navigator.share !== "function") {
+    return false;
+  }
+
+  const payload = { title, text, files: [file] };
+
+  if (typeof navigator.canShare === "function" && !canShareData(payload)) {
+    return false;
+  }
+
+  try {
+    await navigator.share(payload);
+    return true;
+  } catch (error) {
+    if (isShareCanceled(error)) {
+      return true;
+    }
+
+    return false;
+  }
+}
+
 export default function TripDokumuPreview() {
   const params = useParams();
   const tripId = params.id;
@@ -29,6 +65,7 @@ export default function TripDokumuPreview() {
   const [pageIndex, setPageIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [shareFile, setShareFile] = useState(null);
 
   const onPageCount = useMemo(() => {
     if (!preview) {
@@ -69,6 +106,28 @@ export default function TripDokumuPreview() {
     return () => document.body.classList.remove("trip-print-arka");
   }, [side]);
 
+  useEffect(() => {
+    if (!tripId || !preview) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    getTripTahsilatDokumuFile(tripId)
+      .then((file) => {
+        if (!cancelled) {
+          setShareFile(file);
+        }
+      })
+      .catch((prefetchError) => {
+        console.error(prefetchError);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tripId, preview]);
+
   async function handleDownload() {
     if (!tripId || downloading) {
       return;
@@ -108,35 +167,24 @@ export default function TripDokumuPreview() {
       .join(" · ");
 
     try {
-      const file = await getTripTahsilatDokumuFile(tripId);
-      const canShareFile = (() => {
-        try {
-          return Boolean(navigator.canShare?.({ files: [file] }));
-        } catch {
-          return false;
-        }
-      })();
-
-      if (canShareFile) {
-        await navigator.share({ title, text, files: [file] });
+      if (await shareFiles(shareFile, title, text)) {
         return;
       }
 
-      if (typeof navigator.share === "function") {
-        await navigator.share({ title, text, url: window.location.href });
-        return;
+      if (shareFile) {
+        downloadTripFile(shareFile);
+      } else {
+        await downloadTripTahsilatDokumu(tripId);
       }
-
-      await navigator.clipboard.writeText(window.location.href);
 
       await Swal.fire({
         icon: "success",
-        title: "Bağlantı kopyalandı",
-        text: "Bu tarayıcı paylaşımı desteklemiyor. Döküm sayfasının bağlantısı panoya alındı.",
+        title: "Excel indirildi",
+        text: "Bu tarayıcı doğrudan paylaşım penceresini açamadı. İndirilen dosyayı WhatsApp veya e-posta ile gönderebilirsiniz.",
         confirmButtonText: "Tamam",
       });
     } catch (shareError) {
-      if (shareError?.name === "AbortError") {
+      if (isShareCanceled(shareError)) {
         return;
       }
 
