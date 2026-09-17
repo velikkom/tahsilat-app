@@ -83,6 +83,21 @@ async function downloadTripDocument(path, filename, errorMessage) {
   triggerBlobDownload(blob, filename);
 }
 
+export async function getTripTahsilatDokumuFile(id) {
+  const filename = `tahsilat-dokumu-${id}.xlsx`;
+  const response = await apiFetch(`/trips/${id}/tahsilat-dokumu.xlsx`);
+
+  if (!response.ok) {
+    throw new Error("Tahsilat dökümü alınamadı");
+  }
+
+  const blob = await response.blob();
+
+  return new File([blob], filename, {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
 export function downloadTripTahsilatDokumu(id) {
   return downloadTripDocument(
     `/trips/${id}/tahsilat-dokumu.xlsx`,

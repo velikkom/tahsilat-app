@@ -4,13 +4,17 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Button, Spinner } from "react-bootstrap";
-import { FaArrowLeft, FaDownload, FaEdit, FaPrint } from "react-icons/fa";
+import { FaArrowLeft, FaDownload, FaEdit, FaPrint, FaShareAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 import TripDokumuArkaSheet from "@/components/trips/TripDokumuArkaSheet";
 import TripDokumuOnSheet from "@/components/trips/TripDokumuOnSheet";
 import useTripPrintPreview from "@/hooks/useTripPrintPreview";
-import { downloadTripTahsilatDokumu } from "@/services/tripService";
+import { formatDate } from "@/utils/collectionUtils";
+import {
+  downloadTripTahsilatDokumu,
+  getTripTahsilatDokumuFile,
+} from "@/services/tripService";
 import {
   ARKA_ROW_CAPACITY,
   ON_DAY_CAPACITY,
@@ -24,6 +28,7 @@ export default function TripDokumuPreview() {
   const [side, setSide] = useState("on");
   const [pageIndex, setPageIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const onPageCount = useMemo(() => {
     if (!preview) {
@@ -83,6 +88,67 @@ export default function TripDokumuPreview() {
       });
     } finally {
       setDownloading(false);
+    }
+  }
+
+  async function handleShare() {
+    if (!tripId || sharing) {
+      return;
+    }
+
+    setSharing(true);
+
+    const title = `Tahsilat Dökümü — ${preview.salesmanName || ""}`.trim();
+    const text = [
+      formatDate(preview.startDate),
+      formatDate(preview.endDate),
+      preview.vehiclePlate,
+    ]
+      .filter((part) => part && part !== "-")
+      .join(" · ");
+
+    try {
+      const file = await getTripTahsilatDokumuFile(tripId);
+      const canShareFile = (() => {
+        try {
+          return Boolean(navigator.canShare?.({ files: [file] }));
+        } catch {
+          return false;
+        }
+      })();
+
+      if (canShareFile) {
+        await navigator.share({ title, text, files: [file] });
+        return;
+      }
+
+      if (typeof navigator.share === "function") {
+        await navigator.share({ title, text, url: window.location.href });
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Bağlantı kopyalandı",
+        text: "Bu tarayıcı paylaşımı desteklemiyor. Döküm sayfasının bağlantısı panoya alındı.",
+        confirmButtonText: "Tamam",
+      });
+    } catch (shareError) {
+      if (shareError?.name === "AbortError") {
+        return;
+      }
+
+      console.error(shareError);
+
+      await Swal.fire({
+        icon: "error",
+        title: "Hata",
+        text: shareError.message || "Döküm paylaşılamadı.",
+      });
+    } finally {
+      setSharing(false);
     }
   }
 
@@ -166,6 +232,15 @@ export default function TripDokumuPreview() {
           >
             <FaPrint aria-hidden="true" />
             Yazdır
+          </Button>
+          <Button
+            variant="outline-info"
+            className="touch-target d-inline-flex align-items-center gap-2"
+            onClick={handleShare}
+            disabled={sharing}
+          >
+            <FaShareAlt aria-hidden="true" />
+            {sharing ? "Paylaşılıyor..." : "Paylaş"}
           </Button>
           <Button
             variant="outline-success"
