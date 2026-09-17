@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getTripPrintPreview } from "@/services/tripService";
 
@@ -11,11 +11,7 @@ export default function useTripPrintPreview() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchPreview();
-  }, []);
-
-  async function fetchPreview() {
+  const fetchPreview = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -29,7 +25,13 @@ export default function useTripPrintPreview() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [params.id]);
+
+  useEffect(() => {
+    // Fetching on mount / trip change is the purpose of this hook.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async preview load
+    void fetchPreview();
+  }, [fetchPreview]);
 
   return {
     preview,

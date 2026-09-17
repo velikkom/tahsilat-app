@@ -1,77 +1,156 @@
-/* --- Trip print preview (Form 1 + Form 2 A4 pages) --- */
+/* Excel-like Tahsilat Dökümü preview (ÖN + ARKA) */
 
 .trip-print-page {
-  background: #e9ecef;
+  background: #d9d9d9;
   min-height: 100vh;
-  padding: 1.5rem 0 3rem;
+  padding: 1rem 0 3rem;
 }
 
 .trip-print-page__toolbar {
-  max-width: 900px;
-  margin: 0 auto 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto 1rem;
   padding: 0 1rem;
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
   gap: 0.75rem;
 }
 
-.trip-print-page__sheet {
-  width: 900px;
-  max-width: calc(100% - 2rem);
-  min-height: 620px;
-  margin: 0 auto 2rem;
+.trip-print-page__toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dokumu-paper {
   background: #fff;
-  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
-  padding: 2rem;
+  margin: 0 auto;
+  padding: 12px 14px 18px;
+  box-shadow: 0 0.35rem 1.1rem rgba(0, 0, 0, 0.18);
   overflow-x: auto;
 }
 
-.trip-print-page__title {
-  font-weight: 700;
-  font-size: 1.05rem;
-  text-align: center;
-  margin-bottom: 1rem;
+.dokumu-paper--on {
+  max-width: 1100px;
+  width: calc(100% - 1.5rem);
 }
 
-.trip-print-page__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+.dokumu-paper--arka {
+  max-width: 1480px;
+  width: calc(100% - 1.5rem);
 }
 
-.trip-print-page__meta strong {
-  margin-right: 0.35rem;
-}
-
-.trip-print-table {
+.dokumu-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.75rem;
+  table-layout: fixed;
+  font-family: Arial, Calibri, sans-serif;
+  color: #111;
 }
 
-.trip-print-table th,
-.trip-print-table td {
-  border: 1px solid #adb5bd;
-  padding: 0.25rem 0.4rem;
+.dokumu-table td {
+  border: 1px solid #111;
+  padding: 3px 4px;
+  vertical-align: middle;
   text-align: center;
+  font-size: 10px;
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+.dokumu-table--on td {
+  height: 22px;
+}
+
+.dokumu-table--on .dokumu-col-label {
+  width: 18%;
+}
+
+.dokumu-table--on .dokumu-col-total {
+  width: 11%;
+}
+
+.dokumu-table--arka {
+  table-layout: auto;
+  min-width: 1280px;
+}
+
+.dokumu-table--arka td {
+  height: 18px;
+  font-size: 9px;
+  padding: 2px 3px;
   white-space: nowrap;
 }
 
-.trip-print-table th {
-  background: #f1f3f5;
-  font-weight: 600;
+.dokumu-table--arka td.dokumu-left {
+  white-space: normal;
 }
 
-.trip-print-table tfoot td {
+.dokumu-title {
+  font-size: 13px !important;
   font-weight: 700;
-  background: #f8f9fa;
+  letter-spacing: 0.02em;
+  border: none !important;
+  padding: 6px 4px 8px !important;
 }
 
-.trip-print-page__section-title {
+.dokumu-title--arka {
+  font-size: 18px !important;
+}
+
+.dokumu-note,
+.dokumu-meta-row td {
+  border: none !important;
+}
+
+.dokumu-note {
+  font-size: 9px !important;
+  text-align: left !important;
+  padding-bottom: 8px !important;
+}
+
+.dokumu-head,
+.dokumu-section {
   font-weight: 700;
-  font-size: 0.85rem;
-  margin: 1.25rem 0 0.5rem;
+  background: #f3f3f3;
+}
+
+.dokumu-label {
+  font-weight: 700;
+  text-align: left !important;
+}
+
+.dokumu-split-label {
+  text-align: right !important;
+}
+
+.dokumu-split-label span {
+  display: block;
+}
+
+.dokumu-fill {
+  background: #ffff66;
+}
+
+.dokumu-strong {
+  font-weight: 700;
+}
+
+.dokumu-date {
+  font-weight: 700;
+  font-size: 11px !important;
+}
+
+.dokumu-detail {
+  font-size: 9px !important;
+}
+
+.dokumu-left {
+  text-align: left !important;
+}
+
+.dokumu-right {
+  text-align: right !important;
 }
 
 @media print {
@@ -93,21 +172,16 @@
     padding: 0;
   }
 
-  body.trip-print-active .trip-print-page__sheet {
+  body.trip-print-active .dokumu-paper {
     box-shadow: none;
     width: auto;
     max-width: none;
-    min-height: auto;
     margin: 0;
-    page-break-after: always;
-  }
-
-  body.trip-print-active .trip-print-page__sheet:last-child {
-    page-break-after: auto;
+    padding: 0;
   }
 
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 landscape;
+    margin: 8mm;
   }
 }
