@@ -89,10 +89,7 @@ public class CollectionServiceImpl
         collection.setBankName(request.getBankName());
         collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
 
-        // Bu versiyonda tum odeme turleri olusturuldugu anda PAID kabul edilir.
-        // TODO: Cek/senet icin vade gunu odeme hesaba gectiginde PAID'e cekilecek
-        // ayri bir odeme takip akisi tasarlanacak.
-        collection.setStatus(CollectionStatus.PAID);
+        collection.setStatus(resolveInitialStatus(request.getPaymentType()));
         collection.setCollectedBy(getCurrentUser());
 
         Collection savedCollection =
@@ -149,11 +146,29 @@ public class CollectionServiceImpl
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
         collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
+        collection.setStatus(resolveInitialStatus(request.getPaymentType()));
 
         Collection savedCollection =
                 collectionRepository.save(collection);
 
         return collectionMapper.toResponse(savedCollection);
+    }
+
+    /**
+     * CHECK/PROMISSORY_NOTE settle on their maturity date, not at creation, so they
+     * start PENDING until a future reconciliation flow (not yet designed) marks them
+     * PAID; every other payment type is settled immediately. There is currently no
+     * manual "mark as paid" action, so update() re-derives status from paymentType
+     * the same way create() does.
+     */
+    private CollectionStatus resolveInitialStatus(PaymentType paymentType) {
+        boolean settlesOnMaturity =
+                paymentType == PaymentType.CHECK
+                        || paymentType == PaymentType.PROMISSORY_NOTE;
+
+        return settlesOnMaturity
+                ? CollectionStatus.PENDING
+                : CollectionStatus.PAID;
     }
 
     @Override
