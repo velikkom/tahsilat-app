@@ -320,7 +320,7 @@ export default function CustomersView() {
         {hasCustomers && (
           <div className="card border-0 shadow-sm ui-panel-card customer-filters-panel">
             <div className="card-body d-flex flex-column gap-3">
-              <div className="customer-filters-panel__toolbar">
+              <div className="d-flex flex-column flex-md-row gap-2 align-items-stretch">
                 <CustomerSearchBar
                   value={searchQuery}
                   onChange={setSearchQuery}
@@ -337,10 +337,12 @@ export default function CustomersView() {
                     Temizle
                   </Button>
                 )}
+              </div>
 
+              <div className="customers-toolbar__actions d-flex flex-column flex-md-row gap-2">
                 <Button
                   variant="outline-secondary"
-                  className="customers-toolbar__filter-btn touch-target flex-shrink-0"
+                  className="customers-toolbar__filter-btn touch-target"
                   onClick={() => setShowFilters(true)}
                   disabled={isBusy}
                 >
@@ -351,7 +353,7 @@ export default function CustomersView() {
                 {isAdmin && (
                   <Button
                     variant="primary"
-                    className="customers-toolbar__create-btn touch-target d-none d-lg-inline-flex flex-shrink-0"
+                    className="customers-toolbar__create-btn touch-target d-none d-lg-inline-flex"
                     onClick={openCreateModal}
                     disabled={isBusy}
                   >
