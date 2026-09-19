@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useSearchParams } from "next/navigation";
-import Swal from "sweetalert2";
 
 import CollectionHeader from "@/components/collections/CollectionHeader";
 import CollectionStats from "@/components/collections/CollectionStats";
@@ -20,6 +19,7 @@ import ImportCollectionsModal from "@/components/collections/ImportCollectionsMo
 import CustomerCollectionDrawer from "@/components/customers/detail/collections/CustomerCollectionDrawer";
 
 import useCollections from "@/hooks/useCollections";
+import useConfirmedMutation from "@/hooks/useConfirmedMutation";
 import useCustomers from "@/hooks/useCustomers";
 import useDueMaturitySummary from "@/context/DueMaturityContext";
 import {
@@ -59,15 +59,13 @@ export default function CollectionsView() {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [modalMode, setModalMode] = useState("create");
   const [editingCollection, setEditingCollection] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [queryFilterApplied, setQueryFilterApplied] = useState(queryFilter);
 
-  const submittingRef = useRef(false);
-  const deletingRef = useRef(false);
+  const submitMutation = useConfirmedMutation();
+  const deleteMutation = useConfirmedMutation();
 
-  const isBusy = isSubmitting || isDeleting;
+  const isBusy = submitMutation.isRunning || deleteMutation.isRunning;
 
   if (queryFilter !== "ALL" && queryFilterApplied !== queryFilter) {
     setQueryFilterApplied(queryFilter);
@@ -121,130 +119,72 @@ export default function CollectionsView() {
     clearLastCreatedCustomerId();
   }, [clearLastCreatedCustomerId]);
 
-  const executeSubmission = useCallback(
-    async (action, successText) => {
-      if (submittingRef.current || deletingRef.current) {
-        return;
-      }
-
-      submittingRef.current = true;
-      setIsSubmitting(true);
-
-      try {
-        await action();
-        resetModalState();
-
-        await Swal.fire({
-          icon: "success",
-          title: "Başarılı",
-          text: successText,
-          confirmButtonText: "Tamam",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        });
-
-        await refreshAll();
-      } catch (error) {
-        console.error(error);
-
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Tahsilat kaydedilirken hata oluştu.",
-        });
-      } finally {
-        submittingRef.current = false;
-        setIsSubmitting(false);
-      }
-    },
-    [refreshAll, resetModalState]
-  );
-
   const handleModalSubmit = useCallback(
     async (payload) => {
-      if (modalMode === "edit" && editingCollection?.id) {
-        await executeSubmission(
-          () => updateCollection(editingCollection.id, payload),
-          "Tahsilat başarıyla güncellendi."
-        );
+      if (isBusy) {
         return;
       }
 
-      await executeSubmission(
-        () => createCollection(payload),
-        "Tahsilat başarıyla oluşturuldu."
-      );
+      if (modalMode === "edit" && editingCollection?.id) {
+        await submitMutation.run({
+          action: () => updateCollection(editingCollection.id, payload),
+          successText: "Tahsilat başarıyla güncellendi.",
+          errorText: "Tahsilat kaydedilirken hata oluştu.",
+          onSuccess: async () => {
+            resetModalState();
+            await refreshAll();
+          },
+        });
+        return;
+      }
+
+      await submitMutation.run({
+        action: () => createCollection(payload),
+        successText: "Tahsilat başarıyla oluşturuldu.",
+        errorText: "Tahsilat kaydedilirken hata oluştu.",
+        onSuccess: async () => {
+          resetModalState();
+          await refreshAll();
+        },
+      });
     },
-    [modalMode, editingCollection, executeSubmission]
+    [isBusy, modalMode, editingCollection, submitMutation, resetModalState, refreshAll]
   );
 
   const handleDeleteCollection = useCallback(
     async (collection) => {
-      if (!collection?.id || isBusy || deletingRef.current) {
+      if (!collection?.id || isBusy) {
         return;
       }
 
-      const confirmation = await Swal.fire({
-        title: "Emin misiniz?",
-        text: "Bu tahsilatı silmek istediğinize emin misiniz?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Evet, sil",
-        cancelButtonText: "İptal",
-        reverseButtons: true,
-        focusCancel: true,
+      await deleteMutation.run({
+        confirm: {
+          title: "Emin misiniz?",
+          text: "Bu tahsilatı silmek istediğinize emin misiniz?",
+          confirmButtonText: "Evet, sil",
+        },
+        onConfirmed: () => setDeletingId(collection.id),
+        action: () => deleteCollection(collection.id),
+        successText: "Tahsilat başarıyla silindi.",
+        errorText: "Tahsilat silinirken hata oluştu.",
+        onSuccess: async () => {
+          setShowDrawer(false);
+          await refreshAll();
+        },
       });
 
-      if (!confirmation.isConfirmed) {
-        return;
-      }
-
-      if (deletingRef.current) {
-        return;
-      }
-
-      deletingRef.current = true;
-      setIsDeleting(true);
-      setDeletingId(collection.id);
-
-      try {
-        await deleteCollection(collection.id);
-        setShowDrawer(false);
-
-        await Swal.fire({
-          icon: "success",
-          title: "Başarılı",
-          text: "Tahsilat başarıyla silindi.",
-          confirmButtonText: "Tamam",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-        });
-
-        await refreshAll();
-      } catch (error) {
-        console.error(error);
-
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Tahsilat silinirken hata oluştu.",
-        });
-      } finally {
-        deletingRef.current = false;
-        setIsDeleting(false);
-        setDeletingId(null);
-      }
+      setDeletingId(null);
     },
-    [isBusy, refreshAll]
+    [isBusy, refreshAll, deleteMutation]
   );
 
   const handleCloseModal = useCallback(() => {
-    if (isSubmitting) {
+    if (submitMutation.isRunning) {
       return;
     }
 
     resetModalState();
-  }, [isSubmitting, resetModalState]);
+  }, [submitMutation.isRunning, resetModalState]);
 
   const handleOpenCreateModal = useCallback(() => {
     if (isBusy) {
@@ -307,66 +247,32 @@ export default function CollectionsView() {
     setFilters((prev) => ({ ...prev, quickFilter }));
   }, []);
 
-  const handleMarkAsPaid = useCallback(async (collection) => {
-    if (
-      !collection?.id ||
-      isBusy ||
-      submittingRef.current ||
-      deletingRef.current ||
-      !canMarkCollectionAsPaid(collection)
-    ) {
-      return;
-    }
+  const handleMarkAsPaid = useCallback(
+    async (collection) => {
+      if (!collection?.id || isBusy || !canMarkCollectionAsPaid(collection)) {
+        return;
+      }
 
-    const confirmation = await Swal.fire({
-      title: "Emin misiniz?",
-      text: `"${formatCurrency(
-        collection.amount
-      )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Evet, işaretle",
-      cancelButtonText: "İptal",
-      reverseButtons: true,
-      focusCancel: true,
-    });
-
-    if (!confirmation.isConfirmed) {
-      return;
-    }
-
-    submittingRef.current = true;
-    setIsSubmitting(true);
-
-    try {
-      await markCollectionAsPaid(collection.id);
-
-      setShowDrawer(false);
-      setSelectedCollection(null);
-
-      await Swal.fire({
-        icon: "success",
-        title: "Başarılı",
-        text: "Tahsilat tahsil edildi olarak işaretlendi.",
-        confirmButtonText: "Tamam",
+      await submitMutation.run({
+        confirm: {
+          title: "Emin misiniz?",
+          text: `"${formatCurrency(
+            collection.amount
+          )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
+          confirmButtonText: "Evet, işaretle",
+        },
+        action: () => markCollectionAsPaid(collection.id),
+        successText: "Tahsilat tahsil edildi olarak işaretlendi.",
+        errorText: "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
+        onSuccess: async () => {
+          setShowDrawer(false);
+          setSelectedCollection(null);
+          await refreshAll();
+        },
       });
-
-      await refreshAll();
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text:
-          error.message ||
-          "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
-      });
-    } finally {
-      submittingRef.current = false;
-      setIsSubmitting(false);
-    }
-  }, [isBusy, refreshAll]);
+    },
+    [isBusy, submitMutation, refreshAll]
+  );
 
   const selectedCustomerName =
     selectedCollection?.customerName ||
@@ -485,7 +391,7 @@ export default function CollectionsView() {
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
         customers={customers}
-        submitting={isSubmitting}
+        submitting={submitMutation.isRunning}
         loadingCustomers={loadingCustomers}
         mode={modalMode}
         initialCollection={editingCollection}

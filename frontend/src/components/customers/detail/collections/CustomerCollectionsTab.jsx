@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Button, ButtonGroup, Spinner } from "react-bootstrap";
-import Swal from "sweetalert2";
 
 import useBreakpoint from "@/hooks/useBreakpoint";
+import useConfirmedMutation from "@/hooks/useConfirmedMutation";
 import useCustomerCollections from "@/hooks/useCustomerCollections";
 import useDueMaturitySummary from "@/context/DueMaturityContext";
 import {
@@ -49,11 +49,11 @@ export default function CustomerCollectionsTab({ customer }) {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [editingCollection, setEditingCollection] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMutating, setIsMutating] = useState(false);
-  const mutationLockRef = useRef(false);
 
-  const busy = isSubmitting || isMutating;
+  const submitMutation = useConfirmedMutation();
+  const rowActionMutation = useConfirmedMutation();
+
+  const busy = submitMutation.isRunning || rowActionMutation.isRunning;
 
   const refreshAll = useCallback(async () => {
     await refresh();
@@ -151,166 +151,91 @@ export default function CustomerCollectionsTab({ customer }) {
   );
 
   const handleCloseModal = useCallback(() => {
-    if (isSubmitting) {
+    if (submitMutation.isRunning) {
       return;
     }
     setShowModal(false);
     setModalMode("create");
     setEditingCollection(null);
-  }, [isSubmitting]);
+  }, [submitMutation.isRunning]);
 
   const handleModalSubmit = useCallback(
     async (payload) => {
-      setIsSubmitting(true);
-
-      try {
-        if (modalMode === "edit" && editingCollection?.id) {
-          await updateCollection(editingCollection.id, payload);
-        } else {
-          await createCollection(payload);
-        }
-
-        setShowModal(false);
-        setModalMode("create");
-        setEditingCollection(null);
-
-        await Swal.fire({
-          icon: "success",
-          title: "Başarılı",
-          text:
-            modalMode === "edit"
-              ? "Tahsilat başarıyla güncellendi."
-              : "Tahsilat başarıyla oluşturuldu.",
-          confirmButtonText: "Tamam",
-        });
-
-        await refreshAll();
-      } catch (error) {
-        console.error(error);
-
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Tahsilat kaydedilirken hata oluştu.",
-        });
-      } finally {
-        setIsSubmitting(false);
+      if (busy) {
+        return;
       }
+
+      const isEdit = modalMode === "edit" && Boolean(editingCollection?.id);
+
+      await submitMutation.run({
+        action: () =>
+          isEdit
+            ? updateCollection(editingCollection.id, payload)
+            : createCollection(payload),
+        successText: isEdit
+          ? "Tahsilat başarıyla güncellendi."
+          : "Tahsilat başarıyla oluşturuldu.",
+        errorText: "Tahsilat kaydedilirken hata oluştu.",
+        onSuccess: async () => {
+          setShowModal(false);
+          setModalMode("create");
+          setEditingCollection(null);
+          await refreshAll();
+        },
+      });
     },
-    [modalMode, editingCollection, refreshAll]
+    [busy, modalMode, editingCollection, submitMutation, refreshAll]
   );
 
   const handleDeleteCollection = useCallback(
     async (collection) => {
-      if (!collection?.id || busy || mutationLockRef.current) {
+      if (!collection?.id || busy) {
         return;
       }
 
-      const confirmation = await Swal.fire({
-        title: "Emin misiniz?",
-        text: "Bu tahsilatı silmek istediğinize emin misiniz?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Evet, sil",
-        cancelButtonText: "İptal",
-        reverseButtons: true,
-        focusCancel: true,
+      await rowActionMutation.run({
+        confirm: {
+          title: "Emin misiniz?",
+          text: "Bu tahsilatı silmek istediğinize emin misiniz?",
+          confirmButtonText: "Evet, sil",
+        },
+        action: () => deleteCollection(collection.id),
+        successText: "Tahsilat başarıyla silindi.",
+        errorText: "Tahsilat silinirken hata oluştu.",
+        onSuccess: async () => {
+          setShowDrawer(false);
+          await refreshAll();
+        },
       });
-
-      if (!confirmation.isConfirmed) {
-        return;
-      }
-
-      mutationLockRef.current = true;
-      setIsMutating(true);
-
-      try {
-        await deleteCollection(collection.id);
-
-        setShowDrawer(false);
-
-        await Swal.fire({
-          icon: "success",
-          title: "Başarılı",
-          text: "Tahsilat başarıyla silindi.",
-          confirmButtonText: "Tamam",
-        });
-
-        await refreshAll();
-      } catch (error) {
-        console.error(error);
-
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Tahsilat silinirken hata oluştu.",
-        });
-      } finally {
-        mutationLockRef.current = false;
-        setIsMutating(false);
-      }
     },
-    [busy, refreshAll]
+    [busy, rowActionMutation, refreshAll]
   );
 
-  const handleMarkAsPaid = useCallback(async (collection) => {
-    if (
-      !collection?.id ||
-      busy ||
-      mutationLockRef.current ||
-      !canMarkCollectionAsPaid(collection)
-    ) {
-      return;
-    }
+  const handleMarkAsPaid = useCallback(
+    async (collection) => {
+      if (!collection?.id || busy || !canMarkCollectionAsPaid(collection)) {
+        return;
+      }
 
-    const confirmation = await Swal.fire({
-      title: "Emin misiniz?",
-      text: `"${formatCurrency(
-        collection.amount
-      )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Evet, işaretle",
-      cancelButtonText: "İptal",
-      reverseButtons: true,
-      focusCancel: true,
-    });
-
-    if (!confirmation.isConfirmed) {
-      return;
-    }
-
-    mutationLockRef.current = true;
-    setIsMutating(true);
-
-    try {
-      await markCollectionAsPaid(collection.id);
-
-      setShowDrawer(false);
-
-      await Swal.fire({
-        icon: "success",
-        title: "Başarılı",
-        text: "Tahsilat tahsil edildi olarak işaretlendi.",
-        confirmButtonText: "Tamam",
+      await rowActionMutation.run({
+        confirm: {
+          title: "Emin misiniz?",
+          text: `"${formatCurrency(
+            collection.amount
+          )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
+          confirmButtonText: "Evet, işaretle",
+        },
+        action: () => markCollectionAsPaid(collection.id),
+        successText: "Tahsilat tahsil edildi olarak işaretlendi.",
+        errorText: "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
+        onSuccess: async () => {
+          setShowDrawer(false);
+          await refreshAll();
+        },
       });
-
-      await refreshAll();
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text:
-          error.message ||
-          "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
-      });
-    } finally {
-      mutationLockRef.current = false;
-      setIsMutating(false);
-    }
-  }, [busy, refreshAll]);
+    },
+    [busy, rowActionMutation, refreshAll]
+  );
 
   if (loading) {
     return (
@@ -437,7 +362,7 @@ export default function CustomerCollectionsTab({ customer }) {
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
         customers={[customer]}
-        submitting={isSubmitting}
+        submitting={submitMutation.isRunning}
         loadingCustomers={false}
         mode={modalMode}
         initialCollection={editingCollection}
