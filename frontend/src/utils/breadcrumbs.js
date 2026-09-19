@@ -9,7 +9,7 @@ const SECTION_LABELS = {
   users: "Kullanıcılar",
 };
 
-export function breadcrumbsFor(pathname) {
+export function breadcrumbsFor(pathname, extraLabels = {}) {
   const parts = String(pathname || "")
     .split("/")
     .filter(Boolean);
@@ -42,7 +42,7 @@ export function breadcrumbsFor(pathname) {
 
     if (UUID.test(part)) {
       if (previous === "customers") {
-        crumbs.push({ href, label: "Detay" });
+        crumbs.push({ href, label: extraLabels[href] || "Detay" });
       } else if (previous === "trips") {
         crumbs.push({ href, label: "Düzenle" });
       }

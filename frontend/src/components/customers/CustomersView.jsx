@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Spinner } from "react-bootstrap";
 import { FaFilter, FaPlus } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -12,7 +13,6 @@ import CustomerQuickFilters from "@/components/customers/CustomerQuickFilters";
 import CustomerCardGrid from "@/components/customers/CustomerCardGrid";
 import CustomerPagination from "@/components/customers/CustomerPagination";
 import CustomersDesktopTable from "@/components/customers/CustomersDesktopTable";
-import CustomerDetailDrawer from "@/components/customers/CustomerDetailDrawer";
 import CustomerFiltersDrawer from "@/components/customers/CustomerFiltersDrawer";
 import CustomerCreateModal from "@/components/customers/CustomerCreateModal";
 import CustomerEmptyState from "@/components/customers/CustomerEmptyState";
@@ -47,6 +47,7 @@ export default function CustomersView() {
     clearLastCreatedCustomerId,
   } = useCustomers();
   const { isAdmin } = useCurrentUser();
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState(EMPTY_CUSTOMER_FILTERS);
@@ -54,10 +55,8 @@ export default function CustomersView() {
   const [mobilePage, setMobilePage] = useState(1);
 
   const [showFilters, setShowFilters] = useState(false);
-  const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [modalMode, setModalMode] = useState("create");
   const [editingCustomer, setEditingCustomer] = useState(null);
 
@@ -108,13 +107,12 @@ export default function CustomersView() {
   }, [mobilePage, mobilePagination.totalPages]);
 
   const openDetail = useCallback((customer) => {
-    setSelectedCustomer(customer);
-    setShowDetailDrawer(true);
-  }, []);
+    if (!customer?.id) {
+      return;
+    }
 
-  const closeDetail = useCallback(() => {
-    setShowDetailDrawer(false);
-  }, []);
+    router.push(`/customers/${customer.id}`);
+  }, [router]);
 
   const openCreateModal = useCallback(() => {
     if (isBusy) {
@@ -132,7 +130,6 @@ export default function CustomersView() {
         return;
       }
 
-      setShowDetailDrawer(false);
       setModalMode("edit");
       setEditingCustomer(customer);
       setShowCustomerModal(true);
@@ -146,7 +143,6 @@ export default function CustomersView() {
         return;
       }
 
-      setShowDetailDrawer(false);
       setCollectionCustomerId(customer.id);
       setShowCollectionModal(true);
     },
@@ -281,11 +277,6 @@ export default function CustomersView() {
           confirmButtonText: "Tamam",
         });
 
-        if (selectedCustomer?.id === customer.id) {
-          closeDetail();
-          setSelectedCustomer(null);
-        }
-
         await refresh();
       } catch (error) {
         await Swal.fire({
@@ -298,7 +289,7 @@ export default function CustomersView() {
         setDeletingId(null);
       }
     },
-    [isBusy, selectedCustomer, closeDetail, refresh]
+    [isBusy, refresh]
   );
 
   const hasCustomers = customers.length > 0;
@@ -452,18 +443,6 @@ export default function CustomersView() {
           ariaLabel="Yeni müşteri ekle"
         />
       )}
-
-      <CustomerDetailDrawer
-        show={showDetailDrawer}
-        customer={selectedCustomer}
-        onHide={closeDetail}
-        onEdit={openEditModal}
-        onDelete={handleDeleteCustomer}
-        onNewCollection={openCollectionModal}
-        showEdit={isAdmin}
-        showDelete={isAdmin}
-        busy={isBusy}
-      />
 
       <CustomerFiltersDrawer
         show={showFilters}

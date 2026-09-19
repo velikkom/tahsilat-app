@@ -1,3 +1,5 @@
+"use client";
+
 import { TabView, TabPanel } from "primereact/tabview";
 import CustomerOverview from "./CustomerOverview";
 import CustomerCollectionsTab from "./collections/CustomerCollectionsTab";
@@ -5,16 +7,12 @@ import CustomerCollectionsTab from "./collections/CustomerCollectionsTab";
 export default function CustomerTabs({ customer }) {
   return (
     <TabView className="customer-tabs">
-      <TabPanel header="Overview">
+      <TabPanel header="Özet">
         <CustomerOverview customer={customer} />
       </TabPanel>
 
-      <TabPanel header="Collections">
+      <TabPanel header="Tahsilatlar">
         <CustomerCollectionsTab customer={customer} />
-      </TabPanel>
-
-      <TabPanel header="Notes">
-        <div className="card p-4">Customer notes section</div>
       </TabPanel>
     </TabView>
   );

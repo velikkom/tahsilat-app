@@ -32,19 +32,24 @@ export default function CustomersDesktopTable({
 }) {
   function actionBodyTemplate(rowData) {
     return (
-      <CustomerActionButtons
-        onView={() => onView?.(rowData)}
-        onEdit={() => onEdit?.(rowData)}
-        onDelete={() => onDelete?.(rowData)}
-        onNewCollection={
-          onNewCollection ? () => onNewCollection(rowData) : undefined
-        }
-        showEdit={showEdit}
-        showDelete={showDelete}
-        disabled={busy}
-        deleting={deletingId === rowData.id}
-        compact
-      />
+      <div
+        onClick={(event) => event.stopPropagation()}
+        onDoubleClick={(event) => event.stopPropagation()}
+      >
+        <CustomerActionButtons
+          onView={() => onView?.(rowData)}
+          onEdit={() => onEdit?.(rowData)}
+          onDelete={() => onDelete?.(rowData)}
+          onNewCollection={
+            onNewCollection ? () => onNewCollection(rowData) : undefined
+          }
+          showEdit={showEdit}
+          showDelete={showDelete}
+          disabled={busy}
+          deleting={deletingId === rowData.id}
+          compact
+        />
+      </div>
     );
   }
 
@@ -59,8 +64,14 @@ export default function CustomersDesktopTable({
             removableSort
             loading={loading}
             responsiveLayout="scroll"
-            className="p-datatable-lg"
+            className="p-datatable-lg customers-desktop-table"
             emptyMessage="Müşteri bulunamadı."
+            rowClassName={() => "customers-desktop-table__row"}
+            onRowDoubleClick={(event) => {
+              if (event.data) {
+                onView?.(event.data);
+              }
+            }}
           >
             <Column field="companyName" header="Şirket Adı" sortable />
             <Column

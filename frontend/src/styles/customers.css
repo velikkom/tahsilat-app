@@ -82,10 +82,21 @@
   min-width: 0;
 }
 
+.customers-desktop-table__row {
+  cursor: pointer;
+}
+
+.customer-detail-header__actions .btn {
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
 /* ─── Customer cards ─── */
 
 .customer-card {
   overflow: hidden;
+  cursor: pointer;
 }
 
 .customer-card__title {

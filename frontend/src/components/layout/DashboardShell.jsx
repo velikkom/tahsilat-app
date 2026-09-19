@@ -9,33 +9,36 @@ import MobileSidebar from "./MobileSidebar";
 import Navbar from "./NavBar";
 import AppBreadcrumb from "./AppBreadcrumb";
 import MobileTabBar from "./MobileTabBar";
+import { BreadcrumbLabelsProvider } from "@/context/BreadcrumbLabelsContext";
 
 export default function DashboardShell({ children }) {
   const { isOpen, toggle, close } = useSidebar();
 
   return (
     <CustomersProvider>
-    <PendingUsersCountProvider>
-      <SessionMonitor />
-      <div className="dashboard-shell d-flex min-vh-100">
-      {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
-      <Sidebar />
+      <PendingUsersCountProvider>
+        <BreadcrumbLabelsProvider>
+          <SessionMonitor />
+          <div className="dashboard-shell d-flex min-vh-100">
+            {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
+            <Sidebar />
 
-      {/* Drawer: only visible when hamburger toggles isOpen */}
-      <MobileSidebar show={isOpen} onHide={close} />
+            {/* Drawer: only visible when hamburger toggles isOpen */}
+            <MobileSidebar show={isOpen} onHide={close} />
 
-      <div className="dashboard-shell__content d-flex flex-column min-v-0">
-        <Navbar onMenuToggle={toggle} />
-        <AppBreadcrumb />
+            <div className="dashboard-shell__content d-flex flex-column min-v-0">
+              <Navbar onMenuToggle={toggle} />
+              <AppBreadcrumb />
 
-        <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">
-          {children}
-        </main>
-      </div>
+              <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">
+                {children}
+              </main>
+            </div>
 
-      <MobileTabBar />
-    </div>
-    </PendingUsersCountProvider>
+            <MobileTabBar />
+          </div>
+        </BreadcrumbLabelsProvider>
+      </PendingUsersCountProvider>
     </CustomersProvider>
   );
 }

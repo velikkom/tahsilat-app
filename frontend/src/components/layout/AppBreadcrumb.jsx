@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { Breadcrumb } from "react-bootstrap";
 
 import { breadcrumbsFor } from "@/utils/breadcrumbs";
+import { useBreadcrumbLabels } from "@/context/BreadcrumbLabelsContext";
 
 export default function AppBreadcrumb() {
   const pathname = usePathname();
-  const crumbs = breadcrumbsFor(pathname);
+  const { labels } = useBreadcrumbLabels();
+  const crumbs = breadcrumbsFor(pathname, labels);
 
   return (
     <nav className="app-breadcrumb-bar px-3 px-md-4" aria-label="Sayfa yolu">

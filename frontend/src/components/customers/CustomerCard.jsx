@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Badge, Button } from "react-bootstrap";
+import { Badge } from "react-bootstrap";
 import CustomerActionButtons from "./CustomerActionButtons";
 import {
   formatCustomerField,
@@ -32,6 +32,25 @@ function CustomerCard({
           ? "ui-entity-card--accent-success"
           : "ui-entity-card--accent-secondary"
       }`}
+      role="button"
+      tabIndex={0}
+      onClick={() => {
+        if (disabled || deleting) {
+          return;
+        }
+
+        onView?.(customer);
+      }}
+      onKeyDown={(event) => {
+        if (disabled || deleting) {
+          return;
+        }
+
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onView?.(customer);
+        }
+      }}
     >
       <div className="card-body d-flex flex-column gap-3 p-3 p-md-4 min-width-0">
         <div className="customer-card__header d-flex justify-content-between align-items-start gap-2">
@@ -62,7 +81,11 @@ function CustomerCard({
           </li>
         </ul>
 
-        <div className="customer-card__actions mt-auto pt-3 border-top min-width-0">
+        <div
+          className="customer-card__actions mt-auto pt-3 border-top min-width-0"
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+        >
           <CustomerActionButtons
             onView={() => onView?.(customer)}
             onEdit={() => onEdit?.(customer)}
