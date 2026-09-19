@@ -306,15 +306,21 @@ export default function CustomersView() {
 
   return (
     <>
-      <div className="customers-page ui-page-with-fab d-flex flex-column gap-3 gap-md-4">
+      <div
+        className={`customers-page ui-page-with-fab d-flex flex-column gap-3${
+          hasActiveFilters ? " customers-page--filtering" : ""
+        }`}
+      >
         <CustomersHeader />
 
-        {!loading && hasCustomers && <CustomerStats stats={stats} />}
+        {!loading && hasCustomers && !hasActiveFilters && (
+          <CustomerStats stats={stats} />
+        )}
 
         {hasCustomers && (
           <div className="card border-0 shadow-sm ui-panel-card customer-filters-panel">
             <div className="card-body d-flex flex-column gap-3">
-              <div className="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+              <div className="customer-filters-panel__toolbar">
                 <CustomerSearchBar
                   value={searchQuery}
                   onChange={setSearchQuery}
@@ -331,12 +337,10 @@ export default function CustomersView() {
                     Temizle
                   </Button>
                 )}
-              </div>
 
-              <div className="customers-toolbar__actions d-flex flex-column flex-md-row gap-2">
                 <Button
                   variant="outline-secondary"
-                  className="customers-toolbar__filter-btn touch-target"
+                  className="customers-toolbar__filter-btn touch-target flex-shrink-0"
                   onClick={() => setShowFilters(true)}
                   disabled={isBusy}
                 >
@@ -347,7 +351,7 @@ export default function CustomersView() {
                 {isAdmin && (
                   <Button
                     variant="primary"
-                    className="customers-toolbar__create-btn touch-target d-none d-lg-inline-flex"
+                    className="customers-toolbar__create-btn touch-target d-none d-lg-inline-flex flex-shrink-0"
                     onClick={openCreateModal}
                     disabled={isBusy}
                   >
@@ -384,6 +388,11 @@ export default function CustomersView() {
               />
             ) : (
               <>
+                <div className="customer-results-meta text-muted small mb-3">
+                  {filteredCustomers.length} / {customers.length} kayıt
+                  gösteriliyor
+                </div>
+
                 <div className="d-none d-lg-block">
                   <CustomersDesktopTable
                     customers={filteredCustomers}
@@ -427,11 +436,6 @@ export default function CustomersView() {
                       disabled={isBusy}
                     />
                   )}
-                </div>
-
-                <div className="text-muted small mt-3">
-                  {filteredCustomers.length} / {customers.length} kayıt
-                  gösteriliyor
                 </div>
               </>
             )}

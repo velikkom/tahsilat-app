@@ -31,7 +31,7 @@ const STAT_CARDS = [
 
 function CustomerStats({ stats }) {
   return (
-    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-2 g-md-3 mb-3 mb-md-4">
+    <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-2 g-md-3">
       {STAT_CARDS.map((card) => (
         <div className="col" key={card.key}>
           <div
