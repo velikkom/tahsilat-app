@@ -353,9 +353,74 @@ body.dark-mode .collection-table th {
   color: #1d4ed8;
 }
 
+.customer-select-field {
+  position: relative;
+}
+
+.customer-select-field__list {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.customer-select-field__option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.55rem 0.85rem;
+  color: #0f172a;
+}
+
+.customer-select-field__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.customer-select-field__meta {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.customer-select-field__empty {
+  padding: 0.7rem 0.85rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.customer-select-field__option:hover,
+.customer-select-field__option:focus,
+.customer-select-field__option[aria-selected="true"] {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 @media (max-width: 767px) {
   .collections-actions-column {
     width: 140px;
     min-width: 140px;
+  }
+
+  .customer-select-field__list {
+    position: static;
+    max-height: min(40dvh, 280px);
+    margin-top: 0.4rem;
+    box-shadow: none;
   }
 }

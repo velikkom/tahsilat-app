@@ -1,6 +1,7 @@
 "use client";
 
 import { Form, Row, Col } from "react-bootstrap";
+import CustomerSelectField from "@/components/forms/CustomerSelectField";
 import MailOrderCompanyField from "@/components/forms/MailOrderCompanyField";
 
 const COLLECTION_TYPES = [
@@ -29,28 +30,14 @@ export default function CollectionFormFields({
   return (
     <Row className="g-3">
       <Col xs={12}>
-        <Form.Group>
-          <Form.Label>Müşteri</Form.Label>
-          <Form.Select
-            required
-            name="customerId"
-            value={form.customerId}
-            onChange={onChange}
-            disabled={isFormDisabled || lockCustomerSelection}
-          >
-            <option value="">
-              {loadingCustomers ? "Müşteriler yükleniyor..." : "Müşteri Seçiniz"}
-            </option>
-            {customers.map((customer) => (
-              <option key={customer.id} value={customer.id}>
-                {customer.name || customer.companyName}
-              </option>
-            ))}
-          </Form.Select>
-          <Form.Control.Feedback type="invalid">
-            Müşteri seçiniz.
-          </Form.Control.Feedback>
-        </Form.Group>
+        <CustomerSelectField
+          value={form.customerId}
+          onChange={onChange}
+          customers={customers}
+          loading={loadingCustomers}
+          disabled={isFormDisabled || lockCustomerSelection}
+          validated={validated}
+        />
       </Col>
 
       <Col xs={12} md={6} lg={4}>
