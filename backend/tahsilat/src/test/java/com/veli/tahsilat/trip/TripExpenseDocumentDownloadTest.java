@@ -2,6 +2,7 @@ package com.veli.tahsilat.trip;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.trip.repository.TripRepository;
 import com.veli.tahsilat.user.entity.User;
 import com.veli.tahsilat.user.enums.Role;
@@ -44,10 +45,14 @@ class TripExpenseDocumentDownloadTest {
     private TripRepository tripRepository;
 
     @Autowired
+    private CollectionRepository collectionRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
+        collectionRepository.deleteAll();
         tripRepository.deleteAll();
         userRepository.deleteAll();
     }
