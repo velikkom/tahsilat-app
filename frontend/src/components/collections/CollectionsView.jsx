@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Spinner } from "react-bootstrap";
+import { useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 
 import CollectionHeader from "@/components/collections/CollectionHeader";
@@ -12,6 +13,7 @@ import CollectionQuickFilters from "@/components/collections/CollectionQuickFilt
 import CollectionTable from "@/components/collections/CollectionTable";
 import CollectionCardGrid from "@/components/collections/CollectionCardGrid";
 import CollectionEmptyState from "@/components/collections/CollectionEmptyState";
+import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
 import FloatingAddButton from "@/components/ui/FloatingAddButton";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
 import ImportCollectionsModal from "@/components/collections/ImportCollectionsModal";
@@ -19,6 +21,7 @@ import CustomerCollectionDrawer from "@/components/customers/detail/collections/
 
 import useCollections from "@/hooks/useCollections";
 import useCustomers from "@/hooks/useCustomers";
+import useDueMaturitySummary from "@/context/DueMaturityContext";
 import {
   createCollection,
   deleteCollection,
@@ -28,12 +31,16 @@ import {
 import {
   EMPTY_COLLECTION_FILTERS,
   buildPageCollectionStats,
+  canMarkCollectionAsPaid,
   filterCollections,
   formatCurrency,
 } from "@/utils/collectionUtils";
 
 export default function CollectionsView() {
+  const searchParams = useSearchParams();
+  const dueFromQuery = searchParams.get("due") === "1";
   const { collections, loading, refresh } = useCollections();
+  const { refresh: refreshDueMaturity } = useDueMaturitySummary();
   const {
     customers,
     loading: loadingCustomers,
@@ -41,7 +48,10 @@ export default function CollectionsView() {
     clearLastCreatedCustomerId,
   } = useCustomers();
 
-  const [filters, setFilters] = useState(EMPTY_COLLECTION_FILTERS);
+  const [filters, setFilters] = useState(() => ({
+    ...EMPTY_COLLECTION_FILTERS,
+    quickFilter: dueFromQuery ? "DUE_MATURITY" : "ALL",
+  }));
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -51,11 +61,26 @@ export default function CollectionsView() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [dueQueryApplied, setDueQueryApplied] = useState(dueFromQuery);
 
   const submittingRef = useRef(false);
   const deletingRef = useRef(false);
 
   const isBusy = isSubmitting || isDeleting;
+
+  if (dueFromQuery && !dueQueryApplied) {
+    setDueQueryApplied(true);
+    setFilters((prev) => ({ ...prev, quickFilter: "DUE_MATURITY" }));
+  }
+
+  if (!dueFromQuery && dueQueryApplied) {
+    setDueQueryApplied(false);
+  }
+
+  const refreshAll = useCallback(async () => {
+    await refresh();
+    await refreshDueMaturity({ silent: true });
+  }, [refresh, refreshDueMaturity]);
 
   const customerMap = useMemo(() => {
     const map = {};
@@ -117,7 +142,7 @@ export default function CollectionsView() {
           allowEscapeKey: false,
         });
 
-        await refresh();
+        await refreshAll();
       } catch (error) {
         console.error(error);
 
@@ -131,7 +156,7 @@ export default function CollectionsView() {
         setIsSubmitting(false);
       }
     },
-    [refresh, resetModalState]
+    [refreshAll, resetModalState]
   );
 
   const handleModalSubmit = useCallback(
@@ -194,7 +219,7 @@ export default function CollectionsView() {
           allowEscapeKey: false,
         });
 
-        await refresh();
+        await refreshAll();
       } catch (error) {
         console.error(error);
 
@@ -209,7 +234,7 @@ export default function CollectionsView() {
         setDeletingId(null);
       }
     },
-    [isBusy, refresh]
+    [isBusy, refreshAll]
   );
 
   const handleCloseModal = useCallback(() => {
@@ -258,8 +283,8 @@ export default function CollectionsView() {
   }, [isBusy]);
 
   const handleImportCompleted = useCallback(async () => {
-    await refresh();
-  }, [refresh]);
+    await refreshAll();
+  }, [refreshAll]);
 
   const handleClearFilters = useCallback(() => {
     setFilters(EMPTY_COLLECTION_FILTERS);
@@ -282,7 +307,13 @@ export default function CollectionsView() {
   }, []);
 
   const handleMarkAsPaid = useCallback(async (collection) => {
-    if (!collection?.id || isBusy || submittingRef.current || deletingRef.current) {
+    if (
+      !collection?.id ||
+      isBusy ||
+      submittingRef.current ||
+      deletingRef.current ||
+      !canMarkCollectionAsPaid(collection)
+    ) {
       return;
     }
 
@@ -319,7 +350,7 @@ export default function CollectionsView() {
         confirmButtonText: "Tamam",
       });
 
-      await refresh();
+      await refreshAll();
     } catch (error) {
       console.error(error);
 
@@ -334,7 +365,7 @@ export default function CollectionsView() {
       submittingRef.current = false;
       setIsSubmitting(false);
     }
-  }, [isBusy, refresh]);
+  }, [isBusy, refreshAll]);
 
   const selectedCustomerName =
     selectedCollection?.customerName ||
@@ -347,6 +378,8 @@ export default function CollectionsView() {
   return (
     <div className="collections-page ui-page-with-fab">
       <CollectionHeader />
+
+      <DueMaturityBanner />
 
       {!loading && hasCollections && <CollectionStats stats={stats} />}
 
@@ -401,6 +434,7 @@ export default function CollectionsView() {
                   onView={handleViewCollection}
                   onEdit={handleEditCollection}
                   onDelete={handleDeleteCollection}
+                  onMarkAsPaid={handleMarkAsPaid}
                   disabled={isBusy}
                   deletingId={deletingId}
                 />
@@ -413,6 +447,7 @@ export default function CollectionsView() {
                   onView={handleViewCollection}
                   onEdit={handleEditCollection}
                   onDelete={handleDeleteCollection}
+                  onMarkAsPaid={handleMarkAsPaid}
                   disabled={isBusy}
                   deletingId={deletingId}
                 />

@@ -18,6 +18,7 @@ function CollectionCard({
   onView,
   onEdit,
   onDelete,
+  onMarkAsPaid,
   disabled = false,
   deletingId = null,
 }) {
@@ -77,6 +78,7 @@ function CollectionCard({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          onMarkAsPaid={onMarkAsPaid}
           disabled={disabled}
           deletingId={deletingId}
           variant="card"

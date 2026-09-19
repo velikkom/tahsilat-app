@@ -9,6 +9,7 @@ function CollectionCardGrid({
   onView,
   onEdit,
   onDelete,
+  onMarkAsPaid,
   disabled = false,
   deletingId = null,
 }) {
@@ -25,6 +26,7 @@ function CollectionCardGrid({
               onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
+              onMarkAsPaid={onMarkAsPaid}
               disabled={disabled}
               deletingId={deletingId}
             />

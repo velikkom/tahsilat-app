@@ -2,13 +2,16 @@
 
 import { Table, Badge, Button } from "react-bootstrap";
 import {
+  canMarkCollectionAsPaid,
   formatCurrency,
   formatDate,
   formatMaturityDays,
   getEffectiveStatus,
+  getMarkAsPaidButtonTitle,
   getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
+  showsMarkAsPaidAction,
 } from "@/utils/collectionUtils";
 
 function MaturityDaysCell({ collection }) {
@@ -43,8 +46,8 @@ export default function CustomerCollectionsTable({
         <tbody>
           {collections.map((collection) => {
             const status = getEffectiveStatus(collection);
-            const canMarkAsPaid =
-              status === "PENDING" || status === "OVERDUE";
+            const showMarkAsPaid = showsMarkAsPaidAction(collection);
+            const markEnabled = canMarkCollectionAsPaid(collection);
 
             return (
               <tr
@@ -83,13 +86,13 @@ export default function CustomerCollectionsTable({
 
                 <td className="text-end" onClick={(e) => e.stopPropagation()}>
                   <div className="d-inline-flex gap-1">
-                    {canMarkAsPaid && (
+                    {showMarkAsPaid && (
                       <Button
                         size="sm"
                         variant="outline-success"
-                        disabled={busy}
+                        disabled={busy || !markEnabled}
                         onClick={() => onMarkAsPaid(collection)}
-                        title="Tahsil Edildi olarak işaretle"
+                        title={getMarkAsPaidButtonTitle(collection)}
                       >
                         <i className="pi pi-check" aria-hidden="true" />
                       </Button>

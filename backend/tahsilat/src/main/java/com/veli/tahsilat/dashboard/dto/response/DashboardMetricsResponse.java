@@ -25,4 +25,10 @@ public class DashboardMetricsResponse {
     private PaymentType mostUsedPaymentType;
 
     private Long mostUsedPaymentTypeCount;
+
+    private BigDecimal pendingMaturityAmount;
+
+    private Long dueMaturityCount;
+
+    private BigDecimal dueMaturityAmount;
 }

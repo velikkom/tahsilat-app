@@ -41,6 +41,12 @@ export function markCollectionAsPaid(id) {
   });
 }
 
+export function getDueMaturitySummary() {
+  return apiFetchJson("/collections/due-summary", {
+    errorMessage: "Vadesi gelen çek/senet özeti alınamadı",
+  });
+}
+
 export async function deleteCollection(id) {
   await apiFetchJson(`/collections/${id}`, {
     method: "DELETE",

@@ -1,6 +1,7 @@
 package com.veli.tahsilat.dashboard.service.impl;
 
 import com.veli.tahsilat.collection.entity.Collection;
+import com.veli.tahsilat.collection.enums.CollectionStatus;
 import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.mapper.CollectionMapper;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
@@ -42,6 +43,11 @@ public class DashboardServiceImpl implements DashboardService {
             "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran",
             "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"
     };
+
+    private static final List<PaymentType> MATURITY_PAYMENT_TYPES = List.of(
+            PaymentType.CHECK,
+            PaymentType.PROMISSORY_NOTE
+    );
 
     private final CollectionRepository collectionRepository;
     private final CustomerRepository customerRepository;
@@ -119,6 +125,26 @@ public class DashboardServiceImpl implements DashboardService {
                 .topCustomerTotalAmount(topCustomerAmount)
                 .mostUsedPaymentType(mostUsedPaymentType)
                 .mostUsedPaymentTypeCount(mostUsedPaymentTypeCount)
+                .pendingMaturityAmount(nullSafe(
+                        collectionRepository.sumAmountByStatusAndPaymentTypeInAndActiveTrue(
+                                CollectionStatus.PENDING,
+                                MATURITY_PAYMENT_TYPES
+                        )
+                ))
+                .dueMaturityCount(collectionRepository
+                        .countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+                                CollectionStatus.PENDING,
+                                MATURITY_PAYMENT_TYPES,
+                                today
+                        ))
+                .dueMaturityAmount(nullSafe(
+                        collectionRepository
+                                .sumAmountByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+                                        CollectionStatus.PENDING,
+                                        MATURITY_PAYMENT_TYPES,
+                                        today
+                                )
+                ))
                 .build();
     }
 

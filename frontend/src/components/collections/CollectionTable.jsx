@@ -23,6 +23,7 @@ function CollectionTable({
   onView,
   onEdit,
   onDelete,
+  onMarkAsPaid,
   disabled = false,
   deletingId = null,
 }) {
@@ -82,6 +83,7 @@ function CollectionTable({
                     onView={onView}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onMarkAsPaid={onMarkAsPaid}
                     disabled={disabled}
                     deletingId={deletingId}
                     variant="table"

@@ -3,6 +3,7 @@
 import useSidebar from "@/hooks/useSidebar";
 import { CustomersProvider } from "@/context/CustomersContext";
 import { PendingUsersCountProvider } from "@/context/PendingUsersCountContext";
+import { DueMaturityProvider } from "@/context/DueMaturityContext";
 import SessionMonitor from "@/components/auth/SessionMonitor";
 import Sidebar from "./SideBar";
 import MobileSidebar from "./MobileSidebar";
@@ -17,27 +18,29 @@ export default function DashboardShell({ children }) {
   return (
     <CustomersProvider>
       <PendingUsersCountProvider>
-        <BreadcrumbLabelsProvider>
-          <SessionMonitor />
-          <div className="dashboard-shell d-flex min-vh-100">
-            {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
-            <Sidebar />
+        <DueMaturityProvider>
+          <BreadcrumbLabelsProvider>
+            <SessionMonitor />
+            <div className="dashboard-shell d-flex min-vh-100">
+              {/* Fixed sidebar: CSS-hidden below 1024px (see .app-sidebar) */}
+              <Sidebar />
 
-            {/* Drawer: only visible when hamburger toggles isOpen */}
-            <MobileSidebar show={isOpen} onHide={close} />
+              {/* Drawer: only visible when hamburger toggles isOpen */}
+              <MobileSidebar show={isOpen} onHide={close} />
 
-            <div className="dashboard-shell__content d-flex flex-column min-v-0">
-              <Navbar onMenuToggle={toggle} />
-              <AppBreadcrumb />
+              <div className="dashboard-shell__content d-flex flex-column min-v-0">
+                <Navbar onMenuToggle={toggle} />
+                <AppBreadcrumb />
 
-              <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">
-                {children}
-              </main>
+                <main className="dashboard-shell__main flex-grow-1 p-3 p-md-4">
+                  {children}
+                </main>
+              </div>
+
+              <MobileTabBar />
             </div>
-
-            <MobileTabBar />
-          </div>
-        </BreadcrumbLabelsProvider>
+          </BreadcrumbLabelsProvider>
+        </DueMaturityProvider>
       </PendingUsersCountProvider>
     </CustomersProvider>
   );

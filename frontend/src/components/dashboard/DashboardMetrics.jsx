@@ -41,6 +41,16 @@ export default function DashboardMetrics() {
       value: formatCurrency(data?.currentYearCollectionsAmount),
     },
     {
+      title: "Bekleyen Çek/Senet",
+      value: formatCurrency(data?.pendingMaturityAmount),
+    },
+    {
+      title: "Vadesi Gelen Çek/Senet",
+      value: formatNumber(data?.dueMaturityCount),
+      subtitle: formatCurrency(data?.dueMaturityAmount),
+      href: "/collections?due=1",
+    },
+    {
       title: "Toplam Müşteri",
       value: formatNumber(data?.totalActiveCustomers),
     },
@@ -66,6 +76,7 @@ export default function DashboardMetrics() {
       title={metric.title}
       value={metric.value}
       subtitle={metric.subtitle}
+      href={metric.href}
     />
   ));
 }

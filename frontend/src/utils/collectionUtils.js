@@ -117,6 +117,52 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+function parseLocalIsoDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  const [year, month, day] = String(value).slice(0, 10).split("-").map(Number);
+
+  if (!year || !month || !day) {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  return new Date(year, month - 1, day);
+}
+
+export function isMaturityDue(collection) {
+  const maturity = parseLocalIsoDate(collection?.maturityDate);
+
+  if (!maturity) {
+    return false;
+  }
+
+  return maturity.getTime() <= startOfToday().getTime();
+}
+
+export function showsMarkAsPaidAction(collection) {
+  if (!hasMaturityTracking(collection)) {
+    return false;
+  }
+
+  const status = getEffectiveStatus(collection);
+  return status === "PENDING" || status === "OVERDUE";
+}
+
+export function canMarkCollectionAsPaid(collection) {
+  return showsMarkAsPaidAction(collection) && isMaturityDue(collection);
+}
+
+export function getMarkAsPaidButtonTitle(collection) {
+  if (canMarkCollectionAsPaid(collection)) {
+    return "Tahsil Edildi olarak işaretle";
+  }
+
+  return `Vade tarihinde aktif olur (${formatDate(collection?.maturityDate)})`;
+}
+
 /*
  * Backend'de OVERDUE status'u yok (PENDING / PAID / CANCELLED).
  * Vadesi gecmis PENDING kayitlar frontend'de OVERDUE olarak turetilir.
@@ -258,6 +304,7 @@ const QUICK_FILTER_OPTIONS = [
   { value: "THIS_MONTH", label: "Bu Ay" },
   { value: "PENDING", label: "Bekleyen" },
   { value: "OVERDUE", label: "Vadesi Geçen" },
+  { value: "DUE_MATURITY", label: "Vadesi Gelen" },
 ];
 
 export { PAYMENT_TYPE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, QUICK_FILTER_OPTIONS };
@@ -313,6 +360,10 @@ export function filterCollections(collections, filters = EMPTY_COLLECTION_FILTER
     }
 
     if (filters.quickFilter === "OVERDUE" && effectiveStatus !== "OVERDUE") {
+      return false;
+    }
+
+    if (filters.quickFilter === "DUE_MATURITY" && !canMarkCollectionAsPaid(collection)) {
       return false;
     }
 

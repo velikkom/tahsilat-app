@@ -3,14 +3,17 @@
 import { useEffect, useState } from "react";
 import { Badge, Button, Offcanvas } from "react-bootstrap";
 import {
+  canMarkCollectionAsPaid,
   formatCurrency,
   formatDate,
   formatDateTime,
   formatMaturityDays,
   getEffectiveStatus,
+  getMarkAsPaidButtonTitle,
   getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
+  showsMarkAsPaidAction,
 } from "@/utils/collectionUtils";
 
 function DetailField({ label, children }) {
@@ -55,7 +58,8 @@ export default function CustomerCollectionDrawer({
 
   const status = getEffectiveStatus(collection);
   const maturityDays = formatMaturityDays(collection);
-  const canMarkAsPaid = status === "PENDING" || status === "OVERDUE";
+  const showMarkAsPaid = showsMarkAsPaidAction(collection);
+  const markEnabled = canMarkCollectionAsPaid(collection);
 
   return (
     <Offcanvas
@@ -115,11 +119,12 @@ export default function CustomerCollectionDrawer({
         </div>
 
         <div className="d-flex flex-column gap-2 mt-auto">
-          {canMarkAsPaid && (
+          {showMarkAsPaid && (
             <Button
               variant="success"
-              disabled={busy}
+              disabled={busy || !markEnabled}
               onClick={() => onMarkAsPaid(collection)}
+              title={getMarkAsPaidButtonTitle(collection)}
             >
               <i className="pi pi-check me-2" aria-hidden="true" />
               Tahsil Edildi

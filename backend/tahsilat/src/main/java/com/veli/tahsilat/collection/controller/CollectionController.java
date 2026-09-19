@@ -3,6 +3,7 @@ package com.veli.tahsilat.collection.controller;
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
 import com.veli.tahsilat.collection.dto.request.UpdateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
+import com.veli.tahsilat.collection.dto.response.DueMaturitySummaryResponse;
 import com.veli.tahsilat.collection.service.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -71,6 +72,24 @@ public class CollectionController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<Page<CollectionResponse>> getOverdueCollections(Pageable pageable) {
         return ResponseEntity.ok(collectionService.getOverdueCollections(pageable));
+    }
+
+    @Operation(
+            summary = "Get due check and promissory-note collections"
+    )
+    @GetMapping("/due")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<Page<CollectionResponse>> getDueMaturityCollections(Pageable pageable) {
+        return ResponseEntity.ok(collectionService.getDueMaturityCollections(pageable));
+    }
+
+    @Operation(
+            summary = "Summary of due check and promissory-note collections"
+    )
+    @GetMapping("/due-summary")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<DueMaturitySummaryResponse> getDueMaturitySummary() {
+        return ResponseEntity.ok(collectionService.getDueMaturitySummary());
     }
 
     @Operation(

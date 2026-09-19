@@ -3,6 +3,7 @@ package com.veli.tahsilat.collection.service.impl;
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
 import com.veli.tahsilat.collection.dto.request.UpdateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
+import com.veli.tahsilat.collection.dto.response.DueMaturitySummaryResponse;
 import com.veli.tahsilat.collection.entity.Collection;
 import com.veli.tahsilat.collection.enums.CollectionStatus;
 import com.veli.tahsilat.collection.enums.PaymentType;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +41,11 @@ public class CollectionServiceImpl
         implements CollectionService {
 
     private static final Locale TURKISH = Locale.forLanguageTag("tr-TR");
+
+    private static final List<PaymentType> MATURITY_PAYMENT_TYPES = List.of(
+            PaymentType.CHECK,
+            PaymentType.PROMISSORY_NOTE
+    );
 
     private final CollectionRepository collectionRepository;
 
@@ -203,6 +210,12 @@ public class CollectionServiceImpl
             throw new BusinessException("Bu ödeme türü zaten tahsil edildi olarak kaydedilir.");
         }
 
+        LocalDate maturityDate = collection.getMaturityDate();
+
+        if (maturityDate == null || maturityDate.isAfter(LocalDate.now())) {
+            throw new BusinessException("Bu tahsilat vade tarihinde tahsil edildi olarak işaretlenebilir.");
+        }
+
         collection.setStatus(CollectionStatus.PAID);
 
         return collectionMapper.toResponse(collectionRepository.save(collection));
@@ -275,6 +288,75 @@ public class CollectionServiceImpl
                 getCurrentUser().getId(),
                 pageable
         ).map(collectionMapper::toResponse);
+    }
+
+    @Override
+    public Page<CollectionResponse> getDueMaturityCollections(Pageable pageable) {
+        LocalDate today = LocalDate.now();
+
+        if (isAdmin()) {
+            return collectionRepository
+                    .findByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+                            CollectionStatus.PENDING,
+                            MATURITY_PAYMENT_TYPES,
+                            today,
+                            pageable
+                    )
+                    .map(collectionMapper::toResponse);
+        }
+
+        return collectionRepository
+                .findByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+                        CollectionStatus.PENDING,
+                        MATURITY_PAYMENT_TYPES,
+                        today,
+                        getCurrentUser().getId(),
+                        pageable
+                )
+                .map(collectionMapper::toResponse);
+    }
+
+    @Override
+    public DueMaturitySummaryResponse getDueMaturitySummary() {
+        LocalDate today = LocalDate.now();
+        long count;
+        BigDecimal amount;
+
+        if (isAdmin()) {
+            count = collectionRepository
+                    .countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+                            CollectionStatus.PENDING,
+                            MATURITY_PAYMENT_TYPES,
+                            today
+                    );
+            amount = collectionRepository
+                    .sumAmountByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+                            CollectionStatus.PENDING,
+                            MATURITY_PAYMENT_TYPES,
+                            today
+                    );
+        } else {
+            UUID userId = getCurrentUser().getId();
+            count = collectionRepository
+                    .countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+                            CollectionStatus.PENDING,
+                            MATURITY_PAYMENT_TYPES,
+                            today,
+                            userId
+                    );
+            amount = collectionRepository
+                    .sumAmountByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+                            CollectionStatus.PENDING,
+                            MATURITY_PAYMENT_TYPES,
+                            today,
+                            userId
+                    );
+        }
+
+        return DueMaturitySummaryResponse.builder()
+                .count(count)
+                .amount(amount != null ? amount : BigDecimal.ZERO)
+                .build();
     }
 
     private Collection findActiveCollection(UUID id) {

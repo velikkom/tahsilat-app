@@ -2,13 +2,16 @@
 
 import { Badge, Button } from "react-bootstrap";
 import {
+  canMarkCollectionAsPaid,
   formatCurrency,
   formatDate,
   formatMaturityDays,
   getEffectiveStatus,
+  getMarkAsPaidButtonTitle,
   getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
+  showsMarkAsPaidAction,
 } from "@/utils/collectionUtils";
 
 export default function CustomerCollectionCard({
@@ -19,7 +22,8 @@ export default function CustomerCollectionCard({
 }) {
   const status = getEffectiveStatus(collection);
   const maturityDays = formatMaturityDays(collection);
-  const canMarkAsPaid = status === "PENDING" || status === "OVERDUE";
+  const showMarkAsPaid = showsMarkAsPaidAction(collection);
+  const markEnabled = canMarkCollectionAsPaid(collection);
 
   return (
     <div
@@ -61,14 +65,15 @@ export default function CustomerCollectionCard({
           </div>
         )}
 
-        {canMarkAsPaid && (
+        {showMarkAsPaid && (
           <div onClick={(e) => e.stopPropagation()}>
             <Button
               size="sm"
               variant="outline-success"
               className="w-100"
-              disabled={busy}
+              disabled={busy || !markEnabled}
               onClick={() => onMarkAsPaid(collection)}
+              title={getMarkAsPaidButtonTitle(collection)}
             >
               <i className="pi pi-check me-1" aria-hidden="true" />
               Tahsil Edildi

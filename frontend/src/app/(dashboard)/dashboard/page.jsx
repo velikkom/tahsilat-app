@@ -1,6 +1,7 @@
 "use client";
 
 import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
+import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
 import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
@@ -21,6 +22,8 @@ function DashboardContent() {
         </div>
         <DashboardYearFilter />
       </div>
+
+      <DueMaturityBanner />
 
       <DashboardInsights />
 

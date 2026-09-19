@@ -276,6 +276,52 @@ body.sidebar-drawer-open {
   font-size: 0.85rem;
 }
 
+.new-user-notification--due {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.new-user-notification--due:hover {
+  background: rgba(220, 38, 38, 0.2);
+  color: #991b1b;
+}
+
+.due-maturity-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-left: 4px solid #dc2626;
+  color: #9a3412;
+  font-size: 0.9rem;
+}
+
+.due-maturity-banner:hover {
+  background: #ffedd5;
+  color: #7c2d12;
+}
+
+.due-maturity-banner__action {
+  margin-left: auto;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.metric-card--link {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.metric-card--link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(185, 28, 28, 0.12) !important;
+}
+
 @media (max-width: 575px) {
   .new-user-notification__text {
     display: none;

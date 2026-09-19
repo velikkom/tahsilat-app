@@ -49,6 +49,34 @@ public interface CollectionRepository
             Pageable pageable
     );
 
+    Page<Collection> findByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate,
+            Pageable pageable
+    );
+
+    Page<Collection> findByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate,
+            UUID collectedById,
+            Pageable pageable
+    );
+
+    long countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate
+    );
+
+    long countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate,
+            UUID collectedById
+    );
+
     List<Collection>findByActiveTrue();
 
     List<Collection>findByStatusAndActiveTrue(
@@ -96,6 +124,62 @@ public interface CollectionRepository
             """)
     BigDecimal sumAmountByStatusAndActiveTrue(
             @Param("status") CollectionStatus status
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.collectedBy.id = :collectedById
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndCollectedByIdAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("collectedById") UUID collectedById
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.maturityDate <= :maturityDate
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("maturityDate") LocalDate maturityDate
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.maturityDate <= :maturityDate
+            AND c.collectedBy.id = :collectedById
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndCollectedByIdAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("maturityDate") LocalDate maturityDate,
+            @Param("collectedById") UUID collectedById
     );
 
     @Query("""

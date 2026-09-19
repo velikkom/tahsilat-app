@@ -3,6 +3,7 @@ package com.veli.tahsilat.collection.service;
 import com.veli.tahsilat.collection.dto.request.CreateCollectionRequest;
 import com.veli.tahsilat.collection.dto.request.UpdateCollectionRequest;
 import com.veli.tahsilat.collection.dto.response.CollectionResponse;
+import com.veli.tahsilat.collection.dto.response.DueMaturitySummaryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -36,6 +37,10 @@ public interface CollectionService {
     Page<CollectionResponse> getOverdueCollections(
             Pageable pageable
     );
+
+    Page<CollectionResponse> getDueMaturityCollections(Pageable pageable);
+
+    DueMaturitySummaryResponse getDueMaturitySummary();
 
     List<String> listMailOrderCompanies();
 }

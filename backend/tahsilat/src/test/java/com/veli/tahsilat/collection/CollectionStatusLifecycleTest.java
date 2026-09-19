@@ -289,6 +289,65 @@ class CollectionStatusLifecycleTest {
     }
 
     @Test
+    void markAsPaidRejectedBeforeMaturityDate() throws Exception {
+        String token = login();
+
+        String collectionId = createCollection(
+                token,
+                PaymentType.CHECK,
+                LocalDate.now().plusDays(10),
+                new BigDecimal("1000.00")
+        );
+
+        mockMvc.perform(patch("/api/v1/collections/{id}/paid", collectionId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(
+                        "Bu tahsilat vade tarihinde tahsil edildi olarak işaretlenebilir."));
+    }
+
+    @Test
+    void dueSummaryIncludesChecksDueTodayOrEarlier() throws Exception {
+        String token = login();
+
+        String dueId = createCollection(
+                token,
+                PaymentType.PROMISSORY_NOTE,
+                LocalDate.now(),
+                new BigDecimal("136000.00")
+        );
+        createCollection(
+                token,
+                PaymentType.CHECK,
+                LocalDate.now().plusDays(20),
+                new BigDecimal("500.00")
+        );
+
+        mockMvc.perform(get("/api/v1/collections/due-summary")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").value(1))
+                .andExpect(jsonPath("$.amount").value(136000.0));
+
+        mockMvc.perform(get("/api/v1/dashboard/metrics")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pendingMaturityAmount").value(136500.0))
+                .andExpect(jsonPath("$.dueMaturityCount").value(1))
+                .andExpect(jsonPath("$.dueMaturityAmount").value(136000.0));
+
+        mockMvc.perform(get("/api/v1/collections/due")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[?(@.id == '%s')]".formatted(dueId)).isNotEmpty());
+
+        mockMvc.perform(patch("/api/v1/collections/{id}/paid", dueId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAID"));
+    }
+
+    @Test
     void preExistingPaidCollectionsAreUnaffectedByLifecycleFix() throws Exception {
         // Simulates a collection persisted before this fix (directly via the
         // repository, bypassing createCollection()) to prove the status-derivation

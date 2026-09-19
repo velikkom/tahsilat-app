@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 
 import useBreakpoint from "@/hooks/useBreakpoint";
 import useCustomerCollections from "@/hooks/useCustomerCollections";
+import useDueMaturitySummary from "@/context/DueMaturityContext";
 import {
   deleteCollection,
   updateCollection,
@@ -14,6 +15,7 @@ import {
 } from "@/services/collectionService";
 import {
   buildCollectionsSummary,
+  canMarkCollectionAsPaid,
   formatCurrency,
   getEffectiveStatus,
   getPaymentTypeLabel,
@@ -33,6 +35,7 @@ export default function CustomerCollectionsTab({ customer }) {
   const { collections, loading, refresh } = useCustomerCollections(
     customer.id
   );
+  const { refresh: refreshDueMaturity } = useDueMaturitySummary();
   const { isMobile } = useBreakpoint();
 
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -51,6 +54,11 @@ export default function CustomerCollectionsTab({ customer }) {
   const mutationLockRef = useRef(false);
 
   const busy = isSubmitting || isMutating;
+
+  const refreshAll = useCallback(async () => {
+    await refresh();
+    await refreshDueMaturity({ silent: true });
+  }, [refresh, refreshDueMaturity]);
 
   const summary = useMemo(
     () => buildCollectionsSummary(collections),
@@ -176,7 +184,7 @@ export default function CustomerCollectionsTab({ customer }) {
           confirmButtonText: "Tamam",
         });
 
-        await refresh();
+        await refreshAll();
       } catch (error) {
         console.error(error);
 
@@ -189,7 +197,7 @@ export default function CustomerCollectionsTab({ customer }) {
         setIsSubmitting(false);
       }
     },
-    [modalMode, editingCollection, refresh]
+    [modalMode, editingCollection, refreshAll]
   );
 
   const handleDeleteCollection = useCallback(
@@ -228,7 +236,7 @@ export default function CustomerCollectionsTab({ customer }) {
           confirmButtonText: "Tamam",
         });
 
-        await refresh();
+        await refreshAll();
       } catch (error) {
         console.error(error);
 
@@ -242,11 +250,16 @@ export default function CustomerCollectionsTab({ customer }) {
         setIsMutating(false);
       }
     },
-    [busy, refresh]
+    [busy, refreshAll]
   );
 
   const handleMarkAsPaid = useCallback(async (collection) => {
-    if (!collection?.id || busy || mutationLockRef.current) {
+    if (
+      !collection?.id ||
+      busy ||
+      mutationLockRef.current ||
+      !canMarkCollectionAsPaid(collection)
+    ) {
       return;
     }
 
@@ -282,7 +295,7 @@ export default function CustomerCollectionsTab({ customer }) {
         confirmButtonText: "Tamam",
       });
 
-      await refresh();
+      await refreshAll();
     } catch (error) {
       console.error(error);
 
@@ -297,7 +310,7 @@ export default function CustomerCollectionsTab({ customer }) {
       mutationLockRef.current = false;
       setIsMutating(false);
     }
-  }, [busy, refresh]);
+  }, [busy, refreshAll]);
 
   if (loading) {
     return (

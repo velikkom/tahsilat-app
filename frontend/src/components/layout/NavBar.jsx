@@ -3,6 +3,7 @@
 import { FaBars } from "react-icons/fa";
 import { usePathname } from "next/navigation";
 import NewUserNotification from "./NewUserNotification";
+import DueMaturityNotification from "./DueMaturityNotification";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PAGE_TITLES = [
@@ -47,6 +48,7 @@ export default function Navbar({ onMenuToggle }) {
       </div>
 
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
+        <DueMaturityNotification />
         <NewUserNotification />
         <span className="app-navbar__welcome text-muted small">
           Hoş geldiniz, {displayName}
