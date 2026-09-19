@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Spinner } from "react-bootstrap";
 import { FaFilter, FaPlus } from "react-icons/fa";
-import Swal from "sweetalert2";
 
 import CustomersHeader from "@/components/customers/CustomersHeader";
 import CustomerStats from "@/components/customers/CustomerStats";
@@ -19,6 +18,7 @@ import CustomerEmptyState from "@/components/customers/CustomerEmptyState";
 import FloatingAddButton from "@/components/ui/FloatingAddButton";
 import NewCollectionModal from "@/components/collections/NewCollectionModal";
 
+import useConfirmedMutation from "@/hooks/useConfirmedMutation";
 import useCustomers from "@/hooks/useCustomers";
 import useCurrentUser from "@/hooks/useCurrentUser";
 import { createCollection } from "@/services/collectionService";
@@ -63,12 +63,16 @@ export default function CustomersView() {
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [collectionCustomerId, setCollectionCustomerId] = useState("");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmittingCollection, setIsSubmittingCollection] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
-  const isBusy = isSubmitting || isSubmittingCollection || isDeleting;
+  const customerMutation = useConfirmedMutation();
+  const collectionMutation = useConfirmedMutation();
+  const deleteMutation = useConfirmedMutation();
+
+  const isBusy =
+    customerMutation.isRunning ||
+    collectionMutation.isRunning ||
+    deleteMutation.isRunning;
 
   const stats = useMemo(
     () => buildPageCustomerStats(customers),
@@ -150,49 +154,36 @@ export default function CustomersView() {
   );
 
   const closeCollectionModal = useCallback(() => {
-    if (isSubmittingCollection) {
+    if (collectionMutation.isRunning) {
       return;
     }
 
     setShowCollectionModal(false);
     setCollectionCustomerId("");
     clearLastCreatedCustomerId();
-  }, [isSubmittingCollection, clearLastCreatedCustomerId]);
+  }, [collectionMutation.isRunning, clearLastCreatedCustomerId]);
 
-  const handleCollectionSubmit = useCallback(async (payload) => {
-    setIsSubmittingCollection(true);
-
-    try {
-      await createCollection(payload);
-
-      await Swal.fire({
-        icon: "success",
-        title: "Başarılı",
-        text: "Tahsilat başarıyla oluşturuldu.",
-        confirmButtonText: "Tamam",
+  const handleCollectionSubmit = useCallback(
+    async (payload) => {
+      await collectionMutation.run({
+        action: () => createCollection(payload),
+        successText: "Tahsilat başarıyla oluşturuldu.",
+        errorText: "Tahsilat kaydedilemedi.",
+        onSuccess: closeCollectionModal,
       });
-
-      closeCollectionModal();
-    } catch (error) {
-      await Swal.fire({
-        icon: "error",
-        title: "Hata",
-        text: error.message || "Tahsilat kaydedilemedi.",
-      });
-    } finally {
-      setIsSubmittingCollection(false);
-    }
-  }, [closeCollectionModal]);
+    },
+    [collectionMutation, closeCollectionModal]
+  );
 
   const closeCustomerModal = useCallback(() => {
-    if (isSubmitting) {
+    if (customerMutation.isRunning) {
       return;
     }
 
     setShowCustomerModal(false);
     setEditingCustomer(null);
     setModalMode("create");
-  }, [isSubmitting]);
+  }, [customerMutation.isRunning]);
 
   const handleApplyFilters = useCallback((nextFilters) => {
     setFilters(nextFilters);
@@ -206,41 +197,37 @@ export default function CustomersView() {
 
   const handleModalSubmit = useCallback(
     async (payload) => {
-      setIsSubmitting(true);
-
-      try {
-        if (modalMode === "edit" && editingCustomer?.id) {
-          await updateCustomer(editingCustomer.id, payload);
-          await Swal.fire({
-            icon: "success",
-            title: "Başarılı",
-            text: "Müşteri başarıyla güncellendi.",
-            confirmButtonText: "Tamam",
-          });
-          closeCustomerModal();
-          await refresh();
-        } else {
-          const createdCustomer = await createCustomer(payload);
-          await registerCustomerCreated(createdCustomer);
-          await Swal.fire({
-            icon: "success",
-            title: "Başarılı",
-            text: "Müşteri başarıyla oluşturuldu.",
-            confirmButtonText: "Tamam",
-          });
-          closeCustomerModal();
-        }
-      } catch (error) {
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Müşteri kaydedilemedi.",
+      if (modalMode === "edit" && editingCustomer?.id) {
+        await customerMutation.run({
+          action: () => updateCustomer(editingCustomer.id, payload),
+          successText: "Müşteri başarıyla güncellendi.",
+          errorText: "Müşteri kaydedilemedi.",
+          onSuccess: async () => {
+            closeCustomerModal();
+            await refresh();
+          },
         });
-      } finally {
-        setIsSubmitting(false);
+        return;
       }
+
+      await customerMutation.run({
+        action: () => createCustomer(payload),
+        successText: "Müşteri başarıyla oluşturuldu.",
+        errorText: "Müşteri kaydedilemedi.",
+        onSuccess: async (createdCustomer) => {
+          await registerCustomerCreated(createdCustomer);
+          closeCustomerModal();
+        },
+      });
     },
-    [modalMode, editingCustomer, closeCustomerModal, refresh, registerCustomerCreated]
+    [
+      modalMode,
+      editingCustomer,
+      customerMutation,
+      closeCustomerModal,
+      refresh,
+      registerCustomerCreated,
+    ]
   );
 
   const handleDeleteCustomer = useCallback(
@@ -249,47 +236,22 @@ export default function CustomersView() {
         return;
       }
 
-      const confirmation = await Swal.fire({
-        title: "Emin misiniz?",
-        text: `${customer.companyName} müşterisini silmek istediğinize emin misiniz?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Evet, sil",
-        cancelButtonText: "İptal",
-        reverseButtons: true,
-        focusCancel: true,
+      await deleteMutation.run({
+        confirm: {
+          title: "Emin misiniz?",
+          text: `${customer.companyName} müşterisini silmek istediğinize emin misiniz?`,
+          confirmButtonText: "Evet, sil",
+        },
+        onConfirmed: () => setDeletingId(customer.id),
+        action: () => deleteCustomer(customer.id),
+        successText: "Müşteri başarıyla silindi.",
+        errorText: "Müşteri silinemedi.",
+        onSuccess: refresh,
       });
 
-      if (!confirmation.isConfirmed) {
-        return;
-      }
-
-      setIsDeleting(true);
-      setDeletingId(customer.id);
-
-      try {
-        await deleteCustomer(customer.id);
-
-        await Swal.fire({
-          icon: "success",
-          title: "Başarılı",
-          text: "Müşteri başarıyla silindi.",
-          confirmButtonText: "Tamam",
-        });
-
-        await refresh();
-      } catch (error) {
-        await Swal.fire({
-          icon: "error",
-          title: "Hata",
-          text: error.message || "Müşteri silinemedi.",
-        });
-      } finally {
-        setIsDeleting(false);
-        setDeletingId(null);
-      }
+      setDeletingId(null);
     },
-    [isBusy, refresh]
+    [isBusy, refresh, deleteMutation]
   );
 
   const hasCustomers = customers.length > 0;
@@ -456,7 +418,7 @@ export default function CustomersView() {
         show={showCustomerModal}
         mode={modalMode}
         customer={editingCustomer}
-        submitting={isSubmitting}
+        submitting={customerMutation.isRunning}
         onClose={closeCustomerModal}
         onSubmit={handleModalSubmit}
       />
@@ -466,7 +428,7 @@ export default function CustomersView() {
         onClose={closeCollectionModal}
         onSubmit={handleCollectionSubmit}
         customers={customers}
-        submitting={isSubmittingCollection}
+        submitting={collectionMutation.isRunning}
         loadingCustomers={loading}
         defaultCustomerId={collectionCustomerId || lastCreatedCustomerId}
         lockCustomerSelection={Boolean(
