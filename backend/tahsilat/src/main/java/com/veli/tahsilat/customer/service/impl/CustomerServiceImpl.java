@@ -75,7 +75,7 @@ public class CustomerServiceImpl
     @Override
     public CustomerResponse getCustomerById(UUID id) {
 
-      Customer customer = customerRepository.findById(id)
+      Customer customer = customerRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer not found"
                 ));
@@ -115,7 +115,11 @@ public class CustomerServiceImpl
 
         customer.setActive(false);
 
-        customerRepository.save(customer);
+        // deactivateActiveByCustomerId is a @Modifying(clearAutomatically = true)
+        // bulk query: it clears the persistence context after running, which would
+        // silently discard the pending active=false change above if it were not
+        // flushed to the database first.
+        customerRepository.saveAndFlush(customer);
         collectionRepository.deactivateActiveByCustomerId(id);
     }
 
