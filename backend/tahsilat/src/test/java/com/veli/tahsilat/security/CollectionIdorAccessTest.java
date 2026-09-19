@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -112,6 +113,10 @@ class CollectionIdorAccessTest {
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(delete("/api/v1/collections/{id}", foreignId)
+                        .header("Authorization", bearer(tokenB)))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch("/api/v1/collections/{id}/paid", foreignId)
                         .header("Authorization", bearer(tokenB)))
                 .andExpect(status().isNotFound());
 

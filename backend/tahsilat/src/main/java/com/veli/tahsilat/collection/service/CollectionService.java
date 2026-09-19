@@ -22,6 +22,8 @@ public interface CollectionService {
             UpdateCollectionRequest request
     );
 
+    CollectionResponse markCollectionAsPaid(UUID id);
+
     void deleteCollection(UUID id);
 
     Page<CollectionResponse>getAllCollections(Pageable pageable);

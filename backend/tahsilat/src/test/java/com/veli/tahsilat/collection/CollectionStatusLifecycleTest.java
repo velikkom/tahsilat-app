@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -241,6 +242,50 @@ class CollectionStatusLifecycleTest {
         mockMvc.perform(get("/api/v1/reports/dashboard-summary")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(jsonPath("$.pendingCollections").value(0));
+    }
+
+    @Test
+    void markPendingCheckAsPaid() throws Exception {
+        String token = login();
+        LocalDate maturityDate = LocalDate.now().minusDays(5);
+
+        String collectionId = createCollection(
+                token,
+                PaymentType.CHECK,
+                maturityDate,
+                new BigDecimal("447000.00")
+        );
+
+        mockMvc.perform(patch("/api/v1/collections/{id}/paid", collectionId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAID"));
+
+        mockMvc.perform(get("/api/v1/collections/overdue")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[?(@.id == '%s')]".formatted(collectionId)).isEmpty());
+
+        mockMvc.perform(put("/api/v1/collections/{id}", collectionId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "customerId": "%s",
+                                  "amount": 447000,
+                                  "collectionDate": "2026-09-19",
+                                  "paymentType": "CHECK",
+                                  "maturityDate": "%s"
+                                }
+                                """.formatted(customer.getId(), maturityDate)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAID"));
+
+        mockMvc.perform(patch("/api/v1/collections/{id}/paid", collectionId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(
+                        "Bu tahsilat zaten tahsil edildi olarak işaretlenmiş."));
     }
 
     @Test

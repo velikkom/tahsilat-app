@@ -22,6 +22,7 @@ import useCustomers from "@/hooks/useCustomers";
 import {
   createCollection,
   deleteCollection,
+  markCollectionAsPaid,
   updateCollection,
 } from "@/services/collectionService";
 import {
@@ -281,15 +282,59 @@ export default function CollectionsView() {
   }, []);
 
   const handleMarkAsPaid = useCallback(async (collection) => {
-    await Swal.fire({
-      icon: "info",
-      title: "Yakında",
+    if (!collection?.id || isBusy || submittingRef.current || deletingRef.current) {
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: "Emin misiniz?",
       text: `"${formatCurrency(
         collection.amount
-      )}" tutarındaki tahsilatı tahsil edildi olarak işaretleme özelliği için backend endpoint'i bekleniyor.`,
-      confirmButtonText: "Tamam",
+      )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Evet, işaretle",
+      cancelButtonText: "İptal",
+      reverseButtons: true,
+      focusCancel: true,
     });
-  }, []);
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    submittingRef.current = true;
+    setIsSubmitting(true);
+
+    try {
+      await markCollectionAsPaid(collection.id);
+
+      setShowDrawer(false);
+      setSelectedCollection(null);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Başarılı",
+        text: "Tahsilat tahsil edildi olarak işaretlendi.",
+        confirmButtonText: "Tamam",
+      });
+
+      await refresh();
+    } catch (error) {
+      console.error(error);
+
+      await Swal.fire({
+        icon: "error",
+        title: "Hata",
+        text:
+          error.message ||
+          "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
+      });
+    } finally {
+      submittingRef.current = false;
+      setIsSubmitting(false);
+    }
+  }, [isBusy, refresh]);
 
   const selectedCustomerName =
     selectedCollection?.customerName ||

@@ -10,6 +10,7 @@ import {
   deleteCollection,
   updateCollection,
   createCollection,
+  markCollectionAsPaid,
 } from "@/services/collectionService";
 import {
   buildCollectionsSummary,
@@ -244,23 +245,59 @@ export default function CustomerCollectionsTab({ customer }) {
     [busy, refresh]
   );
 
-  /*
-   * TODO(backend): Status guncellemek icin ayri bir endpoint yok.
-   * UpdateCollectionRequest status alani icermiyor ve PUT /collections/{id}
-   * tum alanlari zorunlu kiliyor. Backend'e
-   * PATCH /api/v1/collections/{id}/status (veya mark-as-paid) endpoint'i
-   * eklendiginde asagidaki bilgilendirme yerine gercek cagri baglanmali.
-   */
   const handleMarkAsPaid = useCallback(async (collection) => {
-    await Swal.fire({
-      icon: "info",
-      title: "Yakında",
+    if (!collection?.id || busy || mutationLockRef.current) {
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: "Emin misiniz?",
       text: `"${formatCurrency(
         collection.amount
-      )}" tutarındaki tahsilatı tahsil edildi olarak işaretleme özelliği için backend endpoint'i bekleniyor.`,
-      confirmButtonText: "Tamam",
+      )}" tutarındaki tahsilatı tahsil edildi olarak işaretlemek istediğinize emin misiniz?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Evet, işaretle",
+      cancelButtonText: "İptal",
+      reverseButtons: true,
+      focusCancel: true,
     });
-  }, []);
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    mutationLockRef.current = true;
+    setIsMutating(true);
+
+    try {
+      await markCollectionAsPaid(collection.id);
+
+      setShowDrawer(false);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Başarılı",
+        text: "Tahsilat tahsil edildi olarak işaretlendi.",
+        confirmButtonText: "Tamam",
+      });
+
+      await refresh();
+    } catch (error) {
+      console.error(error);
+
+      await Swal.fire({
+        icon: "error",
+        title: "Hata",
+        text:
+          error.message ||
+          "Tahsilat tahsil edildi olarak işaretlenirken hata oluştu.",
+      });
+    } finally {
+      mutationLockRef.current = false;
+      setIsMutating(false);
+    }
+  }, [busy, refresh]);
 
   if (loading) {
     return (

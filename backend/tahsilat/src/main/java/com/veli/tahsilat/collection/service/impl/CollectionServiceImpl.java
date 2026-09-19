@@ -131,6 +131,11 @@ public class CollectionServiceImpl
                 id
         );
 
+        CollectionStatus nextStatus = resolveStatusForUpdate(
+                request.getPaymentType(),
+                collection
+        );
+
         applyCollectionFields(
                 collection,
                 customer,
@@ -146,7 +151,7 @@ public class CollectionServiceImpl
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
         collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
-        collection.setStatus(resolveInitialStatus(request.getPaymentType()));
+        collection.setStatus(nextStatus);
 
         Collection savedCollection =
                 collectionRepository.save(collection);
@@ -155,20 +160,52 @@ public class CollectionServiceImpl
     }
 
     /**
-     * CHECK/PROMISSORY_NOTE settle on their maturity date, not at creation, so they
-     * start PENDING until a future reconciliation flow (not yet designed) marks them
-     * PAID; every other payment type is settled immediately. There is currently no
-     * manual "mark as paid" action, so update() re-derives status from paymentType
-     * the same way create() does.
+     * CHECK/PROMISSORY_NOTE settle when they are actually collected, so they start
+     * PENDING. Every other payment type is settled immediately.
      */
     private CollectionStatus resolveInitialStatus(PaymentType paymentType) {
-        boolean settlesOnMaturity =
-                paymentType == PaymentType.CHECK
-                        || paymentType == PaymentType.PROMISSORY_NOTE;
-
-        return settlesOnMaturity
+        return settlesOnCollection(paymentType)
                 ? CollectionStatus.PENDING
                 : CollectionStatus.PAID;
+    }
+
+    private CollectionStatus resolveStatusForUpdate(
+            PaymentType nextPaymentType,
+            Collection current
+    ) {
+        if (!settlesOnCollection(nextPaymentType)) {
+            return CollectionStatus.PAID;
+        }
+
+        if (current.getPaymentType() == nextPaymentType
+                && current.getStatus() == CollectionStatus.PAID) {
+            return CollectionStatus.PAID;
+        }
+
+        return CollectionStatus.PENDING;
+    }
+
+    private boolean settlesOnCollection(PaymentType paymentType) {
+        return paymentType == PaymentType.CHECK
+                || paymentType == PaymentType.PROMISSORY_NOTE;
+    }
+
+    @Override
+    @Transactional
+    public CollectionResponse markCollectionAsPaid(UUID id) {
+        Collection collection = findAccessibleCollection(id);
+
+        if (collection.getStatus() == CollectionStatus.PAID) {
+            throw new BusinessException("Bu tahsilat zaten tahsil edildi olarak işaretlenmiş.");
+        }
+
+        if (!settlesOnCollection(collection.getPaymentType())) {
+            throw new BusinessException("Bu ödeme türü zaten tahsil edildi olarak kaydedilir.");
+        }
+
+        collection.setStatus(CollectionStatus.PAID);
+
+        return collectionMapper.toResponse(collectionRepository.save(collection));
     }
 
     @Override

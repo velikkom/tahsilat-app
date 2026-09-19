@@ -34,6 +34,13 @@ export function updateCollection(id, payload) {
   });
 }
 
+export function markCollectionAsPaid(id) {
+  return apiFetchJson(`/collections/${id}/paid`, {
+    method: "PATCH",
+    errorMessage: "Tahsilat tahsil edildi olarak işaretlenemedi",
+  });
+}
+
 export async function deleteCollection(id) {
   await apiFetchJson(`/collections/${id}`, {
     method: "DELETE",

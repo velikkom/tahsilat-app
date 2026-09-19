@@ -97,6 +97,15 @@ public class CollectionController {
     }
 
     @Operation(
+            summary = "Mark a pending check or promissory note as paid"
+    )
+    @PatchMapping("/{id}/paid")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<CollectionResponse> markCollectionAsPaid(@PathVariable UUID id) {
+        return ResponseEntity.ok(collectionService.markCollectionAsPaid(id));
+    }
+
+    @Operation(
             summary = "Delete collection by id"
     )
     @DeleteMapping("/{id}")
