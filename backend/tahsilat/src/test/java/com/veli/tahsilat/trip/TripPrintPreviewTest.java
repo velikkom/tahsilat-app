@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -81,25 +82,54 @@ class TripPrintPreviewTest {
     }
 
     @Test
-    void creditCardCollectionIsExcludedFromPrintPreviewTotals() throws Exception {
+    void creditCardCollectionIsExcludedFromPrintPreview() throws Exception {
         String tokenA = login(salesmanA.getEmail());
         String tripId = createTrip(tokenA, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 4));
 
-        saveCollection(salesmanA, new BigDecimal("500.00"), PaymentType.CASH);
-        saveCollection(salesmanA, new BigDecimal("700.00"), PaymentType.CREDIT_CARD);
+        saveCollection(salesmanA, customer, new BigDecimal("500.00"), PaymentType.CASH);
+        saveCollection(salesmanA, customer, new BigDecimal("700.00"), PaymentType.CREDIT_CARD);
 
-        MvcResult result = mockMvc.perform(get("/api/v1/trips/" + tripId + "/print-preview")
+        mockMvc.perform(get("/api/v1/trips/" + tripId + "/print-preview")
                         .header("Authorization", bearer(tokenA)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collectionRows.length()").value(2))
+                .andExpect(jsonPath("$.collectionRows.length()").value(1))
+                .andExpect(jsonPath("$.collectionRows[0].nakitTutari").value(500.0))
                 .andExpect(jsonPath("$.collectionTotals.cash").value(500.0))
-                .andExpect(jsonPath("$.collectionTotals.genelToplam").value(500.0))
-                .andReturn();
+                .andExpect(jsonPath("$.collectionTotals.genelToplam").value(500.0));
+    }
 
-        JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
-        JsonNode creditCardRow = findCreditCardRow(body.get("collectionRows"));
+    @Test
+    void deletedCollectionDisappearsFromPrintPreview() throws Exception {
+        String tokenA = login(salesmanA.getEmail());
+        String tripId = createTrip(tokenA, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 4));
+        Collection saved = saveCollection(salesmanA, customer, new BigDecimal("500.00"), PaymentType.CASH);
 
-        assertAllAmountFieldsNull(creditCardRow);
+        mockMvc.perform(delete("/api/v1/collections/" + saved.getId())
+                        .header("Authorization", bearer(tokenA)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/trips/" + tripId + "/print-preview")
+                        .header("Authorization", bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.collectionRows.length()").value(0))
+                .andExpect(jsonPath("$.collectionTotals.cash").value(0.0))
+                .andExpect(jsonPath("$.collectionTotals.genelToplam").value(0.0));
+    }
+
+    @Test
+    void inactiveCustomerCollectionDisappearsFromPrintPreview() throws Exception {
+        String tokenA = login(salesmanA.getEmail());
+        String tripId = createTrip(tokenA, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 4));
+        saveCollection(salesmanA, customer, new BigDecimal("500.00"), PaymentType.CASH);
+
+        customer.setActive(false);
+        customerRepository.saveAndFlush(customer);
+
+        mockMvc.perform(get("/api/v1/trips/" + tripId + "/print-preview")
+                        .header("Authorization", bearer(tokenA)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.collectionRows.length()").value(0))
+                .andExpect(jsonPath("$.collectionTotals.cash").value(0.0));
     }
 
     @Test
@@ -114,30 +144,20 @@ class TripPrintPreviewTest {
                 .andExpect(status().isNotFound());
     }
 
-    /**
-     * A CREDIT_CARD collection has no amount in any typed field, so it's
-     * located by the *absence* of nakitTutari - the CASH row is the only
-     * other row in this test and has it set.
-     */
-    private JsonNode findCreditCardRow(JsonNode rows) {
-        for (JsonNode row : rows) {
-            if (row.get("nakitTutari").isNull()) {
-                return row;
-            }
-        }
-
-        throw new AssertionError("Credit card row not found");
-    }
-
-    private void assertAllAmountFieldsNull(JsonNode row) {
-        for (String field : new String[] {
-                "nakitTutari", "senetTutar", "cekTutar",
-                "mailorder", "havaleTutar", "posYkb", "posTeb"
-        }) {
-            if (!row.get(field).isNull()) {
-                throw new AssertionError("Expected " + field + " to be null for CREDIT_CARD row but was " + row.get(field));
-            }
-        }
+    private Collection saveCollection(
+            User owner,
+            Customer ownerCustomer,
+            BigDecimal amount,
+            PaymentType paymentType
+    ) {
+        Collection collection = new Collection();
+        collection.setCustomer(ownerCustomer);
+        collection.setAmount(amount);
+        collection.setCollectionDate(LocalDate.of(2026, 3, 3));
+        collection.setPaymentType(paymentType);
+        collection.setStatus(CollectionStatus.PAID);
+        collection.setCollectedBy(owner);
+        return collectionRepository.saveAndFlush(collection);
     }
 
     private String createTrip(String token, LocalDate startDate, LocalDate endDate) throws Exception {
@@ -154,17 +174,6 @@ class TripPrintPreviewTest {
 
         JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
         return body.get("id").asText();
-    }
-
-    private Collection saveCollection(User owner, BigDecimal amount, PaymentType paymentType) {
-        Collection collection = new Collection();
-        collection.setCustomer(customer);
-        collection.setAmount(amount);
-        collection.setCollectionDate(LocalDate.of(2026, 3, 3));
-        collection.setPaymentType(paymentType);
-        collection.setStatus(CollectionStatus.PAID);
-        collection.setCollectedBy(owner);
-        return collectionRepository.saveAndFlush(collection);
     }
 
     private User saveUser(String email, Role role) {

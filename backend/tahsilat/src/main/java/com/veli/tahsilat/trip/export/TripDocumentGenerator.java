@@ -44,6 +44,7 @@ public class TripDocumentGenerator {
 
     public byte[] generate(Trip trip, List<Collection> collections) {
         List<LocalDate> days = tripDays(trip);
+        List<Collection> documentRows = PaymentTypeBreakdown.appearingOnDocument(collections);
 
         try (XSSFWorkbook workbook = template.load()) {
             List<Sheet> onSheets = continuationSheets(
@@ -54,16 +55,16 @@ public class TripDocumentGenerator {
             List<Sheet> arkaSheets = continuationSheets(
                     workbook,
                     TripDocumentTemplate.SHEET_ARKA,
-                    pageCount(collections.size(), Arka.DATA_ROW_CAPACITY)
+                    pageCount(documentRows.size(), Arka.DATA_ROW_CAPACITY)
             );
 
             for (int page = 0; page < arkaSheets.size(); page++) {
                 int from = page * Arka.DATA_ROW_CAPACITY;
-                int to = Math.min(collections.size(), from + Arka.DATA_ROW_CAPACITY);
+                int to = Math.min(documentRows.size(), from + Arka.DATA_ROW_CAPACITY);
                 fillArka(
                         arkaSheets.get(page),
                         trip,
-                        collections.subList(from, to),
+                        documentRows.subList(from, to),
                         from
                 );
             }
@@ -160,16 +161,18 @@ public class TripDocumentGenerator {
     // ----- ARKA: collection list -----
 
     private void fillArka(Sheet sheet, Trip trip, List<Collection> collections, int siraOffset) {
+        List<Collection> rows = PaymentTypeBreakdown.appearingOnDocument(collections);
+
         appendSalesmanName(sheet, trip);
         setDate(sheet, Arka.ROW_SALESMAN, Arka.COL_FORM_DATE, trip.getEndDate());
 
-        for (int i = 0; i < collections.size(); i++) {
+        for (int i = 0; i < rows.size(); i++) {
             int rowIndex = Arka.FIRST_DATA_ROW + i;
             setInteger(sheet, rowIndex, Arka.COL_SIRA_NO, siraOffset + i + 1);
-            writeCollectionRow(sheet, rowIndex, collections.get(i));
+            writeCollectionRow(sheet, rowIndex, rows.get(i));
         }
 
-        writeArkaTotals(sheet, collections);
+        writeArkaTotals(sheet, rows);
     }
 
     /**

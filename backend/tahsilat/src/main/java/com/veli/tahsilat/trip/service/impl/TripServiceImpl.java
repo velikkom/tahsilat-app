@@ -177,14 +177,7 @@ public class TripServiceImpl implements TripService {
     public byte[] generateCollectionDocument(UUID id) {
         Trip trip = findAccessibleTrip(id);
 
-        List<Collection> collections =
-                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
-                        trip.getSalesman().getId(),
-                        trip.getStartDate(),
-                        trip.getEndDate()
-                );
-
-        return tripCollectionDocumentGenerator.generate(trip, collections);
+        return tripCollectionDocumentGenerator.generate(trip, collectionsForDocument(trip));
     }
 
     @Override
@@ -192,14 +185,7 @@ public class TripServiceImpl implements TripService {
     public byte[] generateTahsilatDokumu(UUID id) {
         Trip trip = findAccessibleTrip(id);
 
-        List<Collection> collections =
-                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
-                        trip.getSalesman().getId(),
-                        trip.getStartDate(),
-                        trip.getEndDate()
-                );
-
-        return tripDocumentGenerator.generate(trip, collections);
+        return tripDocumentGenerator.generate(trip, collectionsForDocument(trip));
     }
 
     @Override
@@ -207,14 +193,15 @@ public class TripServiceImpl implements TripService {
     public TripPrintPreviewResponse getPrintPreview(UUID id) {
         Trip trip = findAccessibleTrip(id);
 
-        List<Collection> collections =
-                collectionRepository.findByCollectedByIdAndCollectionDateBetweenAndActiveTrueOrderByCollectionDateAsc(
-                        trip.getSalesman().getId(),
-                        trip.getStartDate(),
-                        trip.getEndDate()
-                );
+        return tripPrintPreviewBuilder.build(trip, collectionsForDocument(trip));
+    }
 
-        return tripPrintPreviewBuilder.build(trip, collections);
+    private List<Collection> collectionsForDocument(Trip trip) {
+        return collectionRepository.findDocumentCollections(
+                trip.getSalesman().getId(),
+                trip.getStartDate(),
+                trip.getEndDate()
+        );
     }
 
     private Trip findAccessibleTrip(UUID id) {

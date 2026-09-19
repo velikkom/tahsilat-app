@@ -7,6 +7,7 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -320,6 +321,30 @@ public interface CollectionRepository
             LocalDate startDate,
             LocalDate endDate
     );
+
+    @Query("""
+            SELECT c FROM Collection c
+            JOIN FETCH c.customer
+            WHERE c.collectedBy.id = :collectedById
+            AND c.collectionDate BETWEEN :startDate AND :endDate
+            AND c.active = true
+            AND c.customer.active = true
+            ORDER BY c.collectionDate ASC, c.id ASC
+            """)
+    List<Collection> findDocumentCollections(
+            @Param("collectedById") UUID collectedById,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+            UPDATE Collection c
+            SET c.active = false
+            WHERE c.customer.id = :customerId
+            AND c.active = true
+            """)
+    int deactivateActiveByCustomerId(@Param("customerId") UUID customerId);
 
     @Query("""
             SELECT DISTINCT c.mailOrderCompany

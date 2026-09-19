@@ -157,6 +157,7 @@ public class CollectionServiceImpl
     }
 
     @Override
+    @Transactional
     public void deleteCollection(UUID id) {
         Collection collection = findAccessibleCollection(id);
 

@@ -31,6 +31,36 @@ public record PaymentTypeBreakdown(
                 .add(posTeb);
     }
 
+    /**
+     * Rows that belong on the paper form: active customer, and a payment
+     * type that has a column. CREDIT_CARD is stored for the collection
+     * list but has no form slot, so keeping it would leave a customer
+     * name with a blank amount after the real tahsilat is gone.
+     */
+    public static boolean appearsOnDocument(Collection collection) {
+        if (collection == null || collection.getPaymentType() == null) {
+            return false;
+        }
+
+        if (collection.getCustomer() != null
+                && !Boolean.TRUE.equals(collection.getCustomer().getActive())) {
+            return false;
+        }
+
+        return switch (collection.getPaymentType()) {
+            case CASH, PROMISSORY_NOTE, CHECK, BANK_TRANSFER, MAIL_ORDER, POS_YKB, POS_TEB -> true;
+            case CREDIT_CARD -> false;
+        };
+    }
+
+    public static List<Collection> appearingOnDocument(List<Collection> collections) {
+        if (collections == null || collections.isEmpty()) {
+            return List.of();
+        }
+
+        return collections.stream().filter(PaymentTypeBreakdown::appearsOnDocument).toList();
+    }
+
     public static PaymentTypeBreakdown fromCollections(List<Collection> collections) {
         BigDecimal cash = BigDecimal.ZERO;
         BigDecimal promissoryNote = BigDecimal.ZERO;
@@ -40,7 +70,7 @@ public record PaymentTypeBreakdown(
         BigDecimal posYkb = BigDecimal.ZERO;
         BigDecimal posTeb = BigDecimal.ZERO;
 
-        for (Collection collection : collections) {
+        for (Collection collection : appearingOnDocument(collections)) {
             BigDecimal amount = collection.getAmount() == null ? BigDecimal.ZERO : collection.getAmount();
 
             switch (collection.getPaymentType()) {

@@ -53,33 +53,31 @@ class TripCollectionDocumentGeneratorTest {
     }
 
     @Test
-    void creditCardCollectionIsWrittenToNoColumnAndExcludedFromTotal() throws IOException {
+    void creditCardCollectionIsOmittedFromDocument() throws IOException {
         Trip trip = baseTrip();
+        Collection cashCollection = collection("Nakit Musteri", PaymentType.CASH, new BigDecimal("500"), null);
         Collection creditCardCollection =
                 collection("Kart Musteri", PaymentType.CREDIT_CARD, new BigDecimal("750"), null);
 
-        byte[] bytes = generator.generate(trip, List.of(creditCardCollection));
+        byte[] bytes = generator.generate(trip, List.of(cashCollection, creditCardCollection));
 
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            int rowIndex = findRowByUnvani(sheet, "Kart Musteri");
             int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
-            int senetColumn = findColumnIndex(sheet, "TUTAR", 0);
-            int cekColumn = findColumnIndex(sheet, "TUTAR", 1);
-            int mailorderTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
-            int havaleColumn = findColumnIndex(sheet, "TUTAR", 3);
-            int mailorderFirmaColumn = findColumnIndex(sheet, "GEÇİLEN FİRMA");
-
-            assertNull(numericValue(sheet, rowIndex, nakitColumn));
-            assertNull(numericValue(sheet, rowIndex, senetColumn));
-            assertNull(numericValue(sheet, rowIndex, cekColumn));
-            assertNull(numericValue(sheet, rowIndex, havaleColumn));
-            assertNull(numericValue(sheet, rowIndex, mailorderTutarColumn));
-            assertNull(stringValue(sheet, rowIndex, mailorderFirmaColumn));
-
             int totalRowIndex = findRowByUnvani(sheet, "GENEL TOPLAM");
-            assertEquals(0.0, numericValueOrZero(sheet, totalRowIndex, nakitColumn), 0.001);
+
+            assertEquals(500.0, numericValue(sheet, findRowByUnvani(sheet, "Nakit Musteri"), nakitColumn), 0.001);
+            assertEquals(500.0, numericValueOrZero(sheet, totalRowIndex, nakitColumn), 0.001);
+
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING
+                            && "Kart Musteri".equals(cell.getStringCellValue())) {
+                        throw new AssertionError("CREDIT_CARD customer should not appear on the document");
+                    }
+                }
+            }
         }
     }
 

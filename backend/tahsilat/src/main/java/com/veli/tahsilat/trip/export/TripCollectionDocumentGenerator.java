@@ -74,9 +74,10 @@ public class TripCollectionDocumentGenerator {
 
             rowIndex = writeTableHeader(sheet, headerStyle, rowIndex);
 
-            List<Collection> rows = collections.size() > MAX_ROWS
-                    ? collections.subList(0, MAX_ROWS)
-                    : collections;
+            List<Collection> documentRows = PaymentTypeBreakdown.appearingOnDocument(collections);
+            List<Collection> rows = documentRows.size() > MAX_ROWS
+                    ? documentRows.subList(0, MAX_ROWS)
+                    : documentRows;
 
             int siraNo = 1;
 

@@ -14,12 +14,14 @@ import com.veli.tahsilat.customer.repository.CustomerRepository;
 
 import com.veli.tahsilat.customer.service.CustomerService;
 import com.veli.tahsilat.customer.validation.CustomerDuplicateValidator;
+import com.veli.tahsilat.collection.repository.CollectionRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -33,6 +35,8 @@ public class CustomerServiceImpl
     private final CustomerMapper customerMapper;
 
     private final CustomerDuplicateValidator customerDuplicateValidator;
+
+    private final CollectionRepository collectionRepository;
 
     @Override
     public CustomerResponse createCustomer(
@@ -100,6 +104,7 @@ public class CustomerServiceImpl
     }
 
     @Override
+    @Transactional
     public void deleteCustomer(UUID id) {
 
         Customer customer =
@@ -111,6 +116,7 @@ public class CustomerServiceImpl
         customer.setActive(false);
 
         customerRepository.save(customer);
+        collectionRepository.deactivateActiveByCustomerId(id);
     }
 
     @Override

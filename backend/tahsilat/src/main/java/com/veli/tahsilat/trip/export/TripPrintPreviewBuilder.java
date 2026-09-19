@@ -30,7 +30,8 @@ public class TripPrintPreviewBuilder {
     private final TripMapper tripMapper;
 
     public TripPrintPreviewResponse build(Trip trip, List<Collection> collections) {
-        PaymentTypeBreakdown breakdown = PaymentTypeBreakdown.fromCollections(collections);
+        List<Collection> rows = PaymentTypeBreakdown.appearingOnDocument(collections);
+        PaymentTypeBreakdown breakdown = PaymentTypeBreakdown.fromCollections(rows);
 
         BigDecimal expenseTotal = totalExpenses(trip.getDailyExpenses());
         BigDecimal remainingCash = breakdown.cash()
@@ -66,7 +67,7 @@ public class TripPrintPreviewBuilder {
                 .expenseTotal(expenseTotal)
                 .collectionTotals(toTotalsResponse(breakdown))
                 .remainingCash(remainingCash)
-                .collectionRows(toRows(collections))
+                .collectionRows(toRows(rows))
                 .build();
     }
 
