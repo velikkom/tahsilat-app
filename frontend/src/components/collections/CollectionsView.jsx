@@ -34,11 +34,12 @@ import {
   canMarkCollectionAsPaid,
   filterCollections,
   formatCurrency,
+  quickFilterFromSearchParams,
 } from "@/utils/collectionUtils";
 
 export default function CollectionsView() {
   const searchParams = useSearchParams();
-  const dueFromQuery = searchParams.get("due") === "1";
+  const queryFilter = quickFilterFromSearchParams(searchParams);
   const { collections, loading, refresh } = useCollections();
   const { refresh: refreshDueMaturity } = useDueMaturitySummary();
   const {
@@ -50,7 +51,7 @@ export default function CollectionsView() {
 
   const [filters, setFilters] = useState(() => ({
     ...EMPTY_COLLECTION_FILTERS,
-    quickFilter: dueFromQuery ? "DUE_MATURITY" : "ALL",
+    quickFilter: queryFilter,
   }));
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -61,20 +62,20 @@ export default function CollectionsView() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [dueQueryApplied, setDueQueryApplied] = useState(dueFromQuery);
+  const [queryFilterApplied, setQueryFilterApplied] = useState(queryFilter);
 
   const submittingRef = useRef(false);
   const deletingRef = useRef(false);
 
   const isBusy = isSubmitting || isDeleting;
 
-  if (dueFromQuery && !dueQueryApplied) {
-    setDueQueryApplied(true);
-    setFilters((prev) => ({ ...prev, quickFilter: "DUE_MATURITY" }));
+  if (queryFilter !== "ALL" && queryFilterApplied !== queryFilter) {
+    setQueryFilterApplied(queryFilter);
+    setFilters((prev) => ({ ...prev, quickFilter: queryFilter }));
   }
 
-  if (!dueFromQuery && dueQueryApplied) {
-    setDueQueryApplied(false);
+  if (queryFilter === "ALL" && queryFilterApplied !== "ALL") {
+    setQueryFilterApplied("ALL");
   }
 
   const refreshAll = useCallback(async () => {

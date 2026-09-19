@@ -187,6 +187,12 @@ class CollectionStatusLifecycleTest {
                 .andExpect(jsonPath("$.paidCollections").value(1000.0))
                 .andExpect(jsonPath("$.pendingCollections").value(250.0))
                 .andExpect(jsonPath("$.totalCollections").value(1250.0));
+
+        mockMvc.perform(get("/api/v1/dashboard/metrics")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paidAmount").value(1000.0))
+                .andExpect(jsonPath("$.unpaidAmount").value(250.0));
     }
 
     @Test
@@ -334,7 +340,16 @@ class CollectionStatusLifecycleTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pendingMaturityAmount").value(136500.0))
                 .andExpect(jsonPath("$.dueMaturityCount").value(1))
-                .andExpect(jsonPath("$.dueMaturityAmount").value(136000.0));
+                .andExpect(jsonPath("$.dueMaturityAmount").value(136000.0))
+                .andExpect(jsonPath("$.paidAmount").value(0))
+                .andExpect(jsonPath("$.unpaidAmount").value(136500.0));
+
+        mockMvc.perform(get("/api/v1/dashboard/aging")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dueTodayCount").value(1))
+                .andExpect(jsonPath("$.dueTodayAmount").value(136000.0))
+                .andExpect(jsonPath("$.upcomingCount").value(0));
 
         mockMvc.perform(get("/api/v1/collections/due")
                         .header("Authorization", "Bearer " + token))

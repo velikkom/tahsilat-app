@@ -1,53 +1,45 @@
 "use client";
 
-import DashboardMetrics from "@/components/dashboard/DashboardMetrics";
-import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
-import DashboardInsights from "@/components/dashboard/DashboardInsights";
+import DashboardSummary from "@/components/dashboard/DashboardSummary";
+import DashboardCustomers from "@/components/dashboard/DashboardCustomers";
+import DashboardPaymentTypes from "@/components/dashboard/DashboardPaymentTypes";
+import DashboardAging from "@/components/dashboard/DashboardAging";
 import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
-import PaymentTypeChart from "@/components/dashboard/PaymentTypeChart";
-import TopCustomersChart from "@/components/dashboard/TopCustomersChart";
-import RecentCollectionsTable from "@/components/dashboard/RecentCollectionsTable";
+import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
 import { DashboardYearProvider } from "@/context/DashboardYearContext";
 
 function DashboardContent() {
   return (
     <div className="dashboard-page d-flex flex-column gap-3 gap-md-4">
-      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
-        <div>
-          <h1 className="fw-bold mb-1 page-header__title">Tahsilat Analitiği</h1>
-          <p className="text-muted mb-0">
-            Tahsilat performansını ve dağılımını gerçek zamanlı izleyin.
-          </p>
-        </div>
-        <DashboardYearFilter />
+      <div>
+        <h1 className="fw-bold mb-1 page-header__title">Ana Sayfa</h1>
+        <p className="text-muted mb-0">
+          Ödenen, bekleyen ve vadesi gelen tahsilatların özeti.
+        </p>
       </div>
 
       <DueMaturityBanner />
 
-      <DashboardInsights />
+      <DashboardSummary />
 
-      <div className="row g-3">
-        <DashboardMetrics />
+      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+        <h2 className="h5 fw-bold mb-0">Kırılımlar</h2>
+        <DashboardYearFilter />
       </div>
 
       <div className="row g-3">
-        <div className="col-12 col-md-6 col-lg-8">
-          <MonthlyCollectionsChart />
+        <div className="col-12 col-lg-6">
+          <DashboardCustomers />
         </div>
-        <div className="col-12 col-md-6 col-lg-4">
-          <PaymentTypeChart />
+        <div className="col-12 col-lg-6">
+          <DashboardPaymentTypes />
         </div>
       </div>
 
-      <div className="row g-3">
-        <div className="col-12 col-md-6">
-          <TopCustomersChart />
-        </div>
-        <div className="col-12 col-md-6">
-          <RecentCollectionsTable />
-        </div>
-      </div>
+      <MonthlyCollectionsChart />
+
+      <DashboardAging />
     </div>
   );
 }

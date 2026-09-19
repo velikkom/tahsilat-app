@@ -30,15 +30,65 @@
   word-break: break-word;
 }
 
-.metric-card__icon {
-  width: 42px;
-  height: 42px;
+.ui-stat-card--danger {
+  border-left-color: #dc2626 !important;
+}
+
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dashboard-list__row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: rgba(13, 110, 253, 0.1);
-  color: #0d6efd;
-  flex-shrink: 0;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.15rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+}
+
+.dashboard-list__row:last-of-type {
+  border-bottom: 0;
+}
+
+.dashboard-list__row:hover {
+  color: var(--color-ink);
+}
+
+.dashboard-list__row--button {
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.dashboard-list__more {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.dashboard-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.dashboard-bar > span {
+  display: block;
+  height: 100%;
+  background: #0f766e;
+  border-radius: inherit;
 }
 
 @media (min-width: 768px) {

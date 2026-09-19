@@ -273,6 +273,32 @@ export function buildCollectionsSummary(collections) {
   return summary;
 }
 
+export function quickFilterFromSearchParams(searchParams) {
+  if (!searchParams) {
+    return "ALL";
+  }
+
+  if (searchParams.get("due") === "1") {
+    return "DUE_MATURITY";
+  }
+
+  const aging = searchParams.get("aging");
+
+  if (aging === "overdue") {
+    return "OVERDUE";
+  }
+
+  if (aging === "today") {
+    return "TODAY_MATURITY";
+  }
+
+  if (aging === "soon") {
+    return "SOON_MATURITY";
+  }
+
+  return "ALL";
+}
+
 export const EMPTY_COLLECTION_FILTERS = {
   searchQuery: "",
   paymentType: "ALL",
@@ -305,6 +331,8 @@ const QUICK_FILTER_OPTIONS = [
   { value: "PENDING", label: "Bekleyen" },
   { value: "OVERDUE", label: "Vadesi Geçen" },
   { value: "DUE_MATURITY", label: "Vadesi Gelen" },
+  { value: "TODAY_MATURITY", label: "Vadesi Bugün" },
+  { value: "SOON_MATURITY", label: "7 Gün İçinde" },
 ];
 
 export { PAYMENT_TYPE_FILTER_OPTIONS, STATUS_FILTER_OPTIONS, QUICK_FILTER_OPTIONS };
@@ -365,6 +393,20 @@ export function filterCollections(collections, filters = EMPTY_COLLECTION_FILTER
 
     if (filters.quickFilter === "DUE_MATURITY" && !canMarkCollectionAsPaid(collection)) {
       return false;
+    }
+
+    if (filters.quickFilter === "TODAY_MATURITY") {
+      const days = getMaturityDays(collection);
+      if (days !== 0 || !showsMarkAsPaidAction(collection)) {
+        return false;
+      }
+    }
+
+    if (filters.quickFilter === "SOON_MATURITY") {
+      const days = getMaturityDays(collection);
+      if (days == null || days < 1 || days > 7) {
+        return false;
+      }
     }
 
     if (!normalizedSearch) {

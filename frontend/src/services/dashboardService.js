@@ -95,3 +95,7 @@ export function getDashboardInsights(year) {
     "Dashboard insight verileri alınamadı"
   );
 }
+
+export function getDashboardAging() {
+  return dashboardFetch("/aging", "Vade yaşlandırma verileri alınamadı");
+}

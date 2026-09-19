@@ -31,4 +31,8 @@ public class DashboardMetricsResponse {
     private Long dueMaturityCount;
 
     private BigDecimal dueMaturityAmount;
+
+    private BigDecimal paidAmount;
+
+    private BigDecimal unpaidAmount;
 }

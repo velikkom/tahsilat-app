@@ -6,6 +6,7 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.collection.mapper.CollectionMapper;
 import com.veli.tahsilat.collection.repository.CollectionRepository;
 import com.veli.tahsilat.customer.repository.CustomerRepository;
+import com.veli.tahsilat.dashboard.dto.response.DashboardAgingResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
@@ -29,7 +30,9 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,6 +119,13 @@ public class DashboardServiceImpl implements DashboardService {
             mostUsedPaymentTypeCount = (Long) row[1];
         }
 
+        BigDecimal paidAmount = nullSafe(
+                collectionRepository.sumAmountByStatusAndActiveTrue(CollectionStatus.PAID)
+        );
+        BigDecimal unpaidAmount = nullSafe(
+                collectionRepository.sumAmountByStatusAndActiveTrue(CollectionStatus.PENDING)
+        );
+
         return DashboardMetricsResponse.builder()
                 .totalCollectionsAmount(totalAmount)
                 .currentMonthCollectionsAmount(monthAmount)
@@ -125,12 +135,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .topCustomerTotalAmount(topCustomerAmount)
                 .mostUsedPaymentType(mostUsedPaymentType)
                 .mostUsedPaymentTypeCount(mostUsedPaymentTypeCount)
-                .pendingMaturityAmount(nullSafe(
-                        collectionRepository.sumAmountByStatusAndPaymentTypeInAndActiveTrue(
-                                CollectionStatus.PENDING,
-                                MATURITY_PAYMENT_TYPES
-                        )
-                ))
+                .pendingMaturityAmount(unpaidAmount)
                 .dueMaturityCount(collectionRepository
                         .countByStatusAndPaymentTypeInAndMaturityDateLessThanEqualAndActiveTrue(
                                 CollectionStatus.PENDING,
@@ -145,6 +150,62 @@ public class DashboardServiceImpl implements DashboardService {
                                         today
                                 )
                 ))
+                .paidAmount(paidAmount)
+                .unpaidAmount(unpaidAmount)
+                .build();
+    }
+
+    @Override
+    public DashboardAgingResponse getAging() {
+        LocalDate today = LocalDate.now();
+        LocalDate upcomingStart = today.plusDays(1);
+        LocalDate upcomingEnd = today.plusDays(7);
+
+        return DashboardAgingResponse.builder()
+                .overdueCount(collectionRepository
+                        .countByStatusAndPaymentTypeInAndMaturityDateBeforeAndActiveTrue(
+                                CollectionStatus.PENDING,
+                                MATURITY_PAYMENT_TYPES,
+                                today
+                        ))
+                .overdueAmount(nullSafe(
+                        collectionRepository
+                                .sumAmountByStatusAndPaymentTypeInAndMaturityDateBeforeAndActiveTrue(
+                                        CollectionStatus.PENDING,
+                                        MATURITY_PAYMENT_TYPES,
+                                        today
+                                )
+                ))
+                .dueTodayCount(collectionRepository
+                        .countByStatusAndPaymentTypeInAndMaturityDateAndActiveTrue(
+                                CollectionStatus.PENDING,
+                                MATURITY_PAYMENT_TYPES,
+                                today
+                        ))
+                .dueTodayAmount(nullSafe(
+                        collectionRepository
+                                .sumAmountByStatusAndPaymentTypeInAndMaturityDateAndActiveTrue(
+                                        CollectionStatus.PENDING,
+                                        MATURITY_PAYMENT_TYPES,
+                                        today
+                                )
+                ))
+                .upcomingCount(collectionRepository
+                        .countByStatusAndPaymentTypeInAndMaturityDateBetweenAndActiveTrue(
+                                CollectionStatus.PENDING,
+                                MATURITY_PAYMENT_TYPES,
+                                upcomingStart,
+                                upcomingEnd
+                        ))
+                .upcomingAmount(nullSafe(
+                        collectionRepository
+                                .sumAmountByStatusAndPaymentTypeInAndMaturityDateBetweenAndActiveTrue(
+                                        CollectionStatus.PENDING,
+                                        MATURITY_PAYMENT_TYPES,
+                                        upcomingStart,
+                                        upcomingEnd
+                                )
+                ))
                 .build();
     }
 
@@ -153,29 +214,36 @@ public class DashboardServiceImpl implements DashboardService {
         int targetYear = year != null ? year : LocalDate.now().getYear();
 
         List<Object[]> rawRows =
-                collectionRepository.sumAmountGroupByMonthForYear(targetYear);
+                collectionRepository.sumAmountGroupByMonthAndStatusForYear(targetYear);
 
-        Map<Integer, BigDecimal> monthTotals = new HashMap<>();
+        Map<Integer, BigDecimal> paidTotals = new HashMap<>();
+        Map<Integer, BigDecimal> unpaidTotals = new HashMap<>();
 
         for (Object[] row : rawRows) {
             int month = ((Number) row[0]).intValue();
-            BigDecimal amount = (BigDecimal) row[1];
-            monthTotals.put(month, amount);
+            CollectionStatus status = (CollectionStatus) row[1];
+            BigDecimal amount = nullSafe((BigDecimal) row[2]);
+
+            if (status == CollectionStatus.PAID) {
+                paidTotals.merge(month, amount, BigDecimal::add);
+            } else if (status == CollectionStatus.PENDING) {
+                unpaidTotals.merge(month, amount, BigDecimal::add);
+            }
         }
 
         List<MonthlyCollectionItemResponse> months = new ArrayList<>();
 
         for (int month = 1; month <= 12; month++) {
+            BigDecimal paid = paidTotals.getOrDefault(month, BigDecimal.ZERO);
+            BigDecimal unpaid = unpaidTotals.getOrDefault(month, BigDecimal.ZERO);
+
             months.add(
                     MonthlyCollectionItemResponse.builder()
                             .month(month)
                             .monthName(TURKISH_MONTH_NAMES[month - 1])
-                            .totalAmount(
-                                    monthTotals.getOrDefault(
-                                            month,
-                                            BigDecimal.ZERO
-                                    )
-                            )
+                            .paidAmount(paid)
+                            .unpaidAmount(unpaid)
+                            .totalAmount(paid.add(unpaid))
                             .build()
             );
         }
@@ -232,19 +300,40 @@ public class DashboardServiceImpl implements DashboardService {
     public TopCustomersResponse getTopCustomers(int limit, Integer year) {
         int pageSize = Math.max(1, Math.min(limit, 50));
 
-        List<Object[]> rawRows = collectionRepository.findTopCustomersByAmountAndOptionalYear(
-                year,
-                PageRequest.of(0, pageSize)
-        );
+        List<Object[]> rawRows = collectionRepository.findCustomerAmountByStatusAndOptionalYear(year);
+        Map<UUID, BigDecimal> paidByCustomer = new HashMap<>();
+        Map<UUID, BigDecimal> unpaidByCustomer = new HashMap<>();
+        Map<UUID, String> names = new LinkedHashMap<>();
 
-        List<TopCustomerItemResponse> customers = rawRows.stream()
-                .map(row ->
-                        TopCustomerItemResponse.builder()
-                                .customerId((UUID) row[0])
-                                .companyName((String) row[1])
-                                .totalAmount((BigDecimal) row[2])
-                                .build()
-                )
+        for (Object[] row : rawRows) {
+            UUID customerId = (UUID) row[0];
+            String companyName = (String) row[1];
+            CollectionStatus status = (CollectionStatus) row[2];
+            BigDecimal amount = nullSafe((BigDecimal) row[3]);
+
+            names.putIfAbsent(customerId, companyName);
+
+            if (status == CollectionStatus.PAID) {
+                paidByCustomer.merge(customerId, amount, BigDecimal::add);
+            } else if (status == CollectionStatus.PENDING) {
+                unpaidByCustomer.merge(customerId, amount, BigDecimal::add);
+            }
+        }
+
+        List<TopCustomerItemResponse> customers = names.entrySet().stream()
+                .map((entry) -> {
+                    BigDecimal paid = paidByCustomer.getOrDefault(entry.getKey(), BigDecimal.ZERO);
+                    BigDecimal unpaid = unpaidByCustomer.getOrDefault(entry.getKey(), BigDecimal.ZERO);
+                    return TopCustomerItemResponse.builder()
+                            .customerId(entry.getKey())
+                            .companyName(entry.getValue())
+                            .paidAmount(paid)
+                            .unpaidAmount(unpaid)
+                            .totalAmount(paid.add(unpaid))
+                            .build();
+                })
+                .sorted(Comparator.comparing(TopCustomerItemResponse::getTotalAmount).reversed())
+                .limit(pageSize)
                 .toList();
 
         return TopCustomersResponse.builder()

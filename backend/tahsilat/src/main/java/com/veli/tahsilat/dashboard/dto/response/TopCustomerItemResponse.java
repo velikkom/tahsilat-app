@@ -15,4 +15,8 @@ public class TopCustomerItemResponse {
     private String companyName;
 
     private BigDecimal totalAmount;
+
+    private BigDecimal paidAmount;
+
+    private BigDecimal unpaidAmount;
 }

@@ -59,6 +59,10 @@
   border-left-color: #f59e0b !important;
 }
 
+.ui-stat-card--danger {
+  border-left-color: #dc2626 !important;
+}
+
 .ui-stat-card--secondary {
   border-left-color: #6b7280 !important;
 }

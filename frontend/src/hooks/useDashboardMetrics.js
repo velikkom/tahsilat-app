@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getDashboardInsights,
   getDashboardMetrics,
+  getDashboardAging,
   getMonthlyCollections,
   getPaymentTypeDistribution,
   getRecentCollections,
@@ -74,4 +75,8 @@ export function useRecentCollections(limit = 10, year) {
 
 export function useDashboardInsights(year) {
   return useDashboardQuery(() => getDashboardInsights(year), [year]);
+}
+
+export function useDashboardAging() {
+  return useDashboardQuery(() => getDashboardAging(), []);
 }

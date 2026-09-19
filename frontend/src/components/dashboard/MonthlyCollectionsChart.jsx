@@ -22,12 +22,22 @@ export default function MonthlyCollectionsChart() {
       labels: months.map((item) => item.monthName),
       datasets: [
         {
-          label: "Tahsilat",
-          data: months.map((item) => Number(item.totalAmount ?? 0)),
-          backgroundColor: "rgba(13, 110, 253, 0.7)",
-          borderColor: "rgb(13, 110, 253)",
+          label: "Ödendi",
+          data: months.map((item) => Number(item.paidAmount ?? item.totalAmount ?? 0)),
+          backgroundColor: "rgba(22, 163, 74, 0.75)",
+          borderColor: "rgb(22, 163, 74)",
           borderWidth: 1,
-          borderRadius: 6,
+          borderRadius: 4,
+          stack: "collections",
+        },
+        {
+          label: "Ödenmedi",
+          data: months.map((item) => Number(item.unpaidAmount ?? 0)),
+          backgroundColor: "rgba(217, 119, 6, 0.75)",
+          borderColor: "rgb(217, 119, 6)",
+          borderWidth: 1,
+          borderRadius: 4,
+          stack: "collections",
         },
       ],
     };
@@ -50,20 +60,31 @@ export default function MonthlyCollectionsChart() {
       },
       plugins: {
         legend: {
-          display: false,
+          display: true,
+          position: "bottom",
         },
         tooltip: {
           callbacks: {
             label(context) {
-              return new Intl.NumberFormat("tr-TR", {
+              return `${context.dataset.label}: ${new Intl.NumberFormat("tr-TR", {
                 style: "currency",
                 currency: "TRY",
-              }).format(context.raw ?? 0);
+              }).format(context.raw ?? 0)}`;
             },
           },
         },
       },
-      scales: buildBarChartScaleOptions(isMobile),
+      scales: {
+        ...buildBarChartScaleOptions(isMobile),
+        x: {
+          ...buildBarChartScaleOptions(isMobile).x,
+          stacked: true,
+        },
+        y: {
+          ...buildBarChartScaleOptions(isMobile).y,
+          stacked: true,
+        },
+      },
     }),
     [data, isMobile]
   );
@@ -73,7 +94,7 @@ export default function MonthlyCollectionsChart() {
   return (
     <>
       <DashboardWidget
-        title={`Aylık Tahsilat (${displayYear})`}
+        title={`Aylık tahsilat (${displayYear})`}
         loading={loading}
         error={error}
         onRetry={refresh}

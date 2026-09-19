@@ -1,6 +1,7 @@
 package com.veli.tahsilat.dashboard.controller;
 
 import com.veli.tahsilat.collection.enums.PaymentType;
+import com.veli.tahsilat.dashboard.dto.response.DashboardAgingResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
@@ -33,6 +34,13 @@ public class DashboardController {
             @RequestParam(required = false) Integer year
     ) {
         return ResponseEntity.ok(dashboardService.getMetrics(year));
+    }
+
+    @Operation(summary = "Pending check and promissory-note aging")
+    @GetMapping("/aging")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<DashboardAgingResponse> getAging() {
+        return ResponseEntity.ok(dashboardService.getAging());
     }
 
     @Operation(summary = "Monthly collections for a year")

@@ -290,6 +290,86 @@ public interface CollectionRepository
     );
 
     @Query("""
+            SELECT c.customer.id, c.customer.companyName, c.status, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            GROUP BY c.customer.id, c.customer.companyName, c.status
+            """)
+    List<Object[]> findCustomerAmountByStatusAndOptionalYear(@Param("year") Integer year);
+
+    @Query("""
+            SELECT EXTRACT(MONTH FROM c.collectionDate), c.status, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            GROUP BY EXTRACT(MONTH FROM c.collectionDate), c.status
+            """)
+    List<Object[]> sumAmountGroupByMonthAndStatusForYear(@Param("year") int year);
+
+    long countByStatusAndPaymentTypeInAndMaturityDateAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate
+    );
+
+    long countByStatusAndPaymentTypeInAndMaturityDateBeforeAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate maturityDate
+    );
+
+    long countByStatusAndPaymentTypeInAndMaturityDateBetweenAndActiveTrue(
+            CollectionStatus status,
+            List<PaymentType> paymentTypes,
+            LocalDate startDate,
+            LocalDate endDate
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.maturityDate = :maturityDate
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndMaturityDateAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("maturityDate") LocalDate maturityDate
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.maturityDate < :maturityDate
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndMaturityDateBeforeAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("maturityDate") LocalDate maturityDate
+    );
+
+    @Query("""
+            SELECT COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = :status
+            AND c.paymentType IN :paymentTypes
+            AND c.maturityDate BETWEEN :startDate AND :endDate
+            """)
+    BigDecimal sumAmountByStatusAndPaymentTypeInAndMaturityDateBetweenAndActiveTrue(
+            @Param("status") CollectionStatus status,
+            @Param("paymentTypes") List<PaymentType> paymentTypes,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
             SELECT c
             FROM Collection c
             WHERE c.active = true
