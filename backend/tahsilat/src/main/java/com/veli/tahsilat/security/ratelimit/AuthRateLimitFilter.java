@@ -50,6 +50,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
         if (!rateLimiter.tryAcquire(key)) {
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.setHeader("Retry-After", String.valueOf(rateLimiter.retryAfterSeconds(key)));
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.getWriter().write(TOO_MANY_REQUESTS_BODY);
             return;
