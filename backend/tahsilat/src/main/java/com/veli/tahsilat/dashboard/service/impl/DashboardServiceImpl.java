@@ -9,6 +9,7 @@ import com.veli.tahsilat.customer.repository.CustomerRepository;
 import com.veli.tahsilat.dashboard.dto.response.DashboardAgingResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
+import com.veli.tahsilat.dashboard.dto.response.MailOrderCompanyAmountItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
@@ -297,10 +298,13 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public TopCustomersResponse getTopCustomers(int limit, Integer year) {
+    public TopCustomersResponse getTopCustomers(int limit, Integer year, Integer month) {
         int pageSize = Math.max(1, Math.min(limit, 50));
 
-        List<Object[]> rawRows = collectionRepository.findCustomerAmountByStatusAndOptionalYear(year);
+        List<Object[]> rawRows = collectionRepository.findCustomerAmountByStatusAndOptionalYearAndMonth(
+                year,
+                month
+        );
         Map<UUID, BigDecimal> paidByCustomer = new HashMap<>();
         Map<UUID, BigDecimal> unpaidByCustomer = new HashMap<>();
         Map<UUID, String> names = new LinkedHashMap<>();
@@ -367,30 +371,99 @@ public class DashboardServiceImpl implements DashboardService {
             throw new IllegalArgumentException("Month must be between 1 and 12");
         }
 
-        List<Object[]> rawRows = collectionRepository.sumAmountGroupByPaymentTypeForMonth(
-                year,
-                month
-        );
+        Map<PaymentType, BigDecimal> amountByType = new HashMap<>();
 
-        List<PaymentTypeAmountItemResponse> items = rawRows.stream()
-                .map(row ->
-                        PaymentTypeAmountItemResponse.builder()
-                                .paymentType((PaymentType) row[0])
-                                .totalAmount((BigDecimal) row[1])
-                                .build()
-                )
+        for (Object[] row : collectionRepository.sumAmountGroupByPaymentTypeForMonth(year, month)) {
+            amountByType.put((PaymentType) row[0], nullSafe((BigDecimal) row[1]));
+        }
+
+        List<PaymentTypeAmountItemResponse> items = new ArrayList<>();
+
+        for (PaymentType paymentType : PaymentType.values()) {
+            items.add(
+                    PaymentTypeAmountItemResponse.builder()
+                            .paymentType(paymentType)
+                            .totalAmount(amountByType.getOrDefault(paymentType, BigDecimal.ZERO))
+                            .build()
+            );
+        }
+
+        items.sort(Comparator.comparing(PaymentTypeAmountItemResponse::getTotalAmount).reversed());
+
+        BigDecimal paidAmount = BigDecimal.ZERO;
+        BigDecimal unpaidAmount = BigDecimal.ZERO;
+
+        for (Object[] row : collectionRepository.sumAmountGroupByStatusForMonth(year, month)) {
+            CollectionStatus status = (CollectionStatus) row[0];
+            BigDecimal amount = nullSafe((BigDecimal) row[1]);
+
+            if (status == CollectionStatus.PAID) {
+                paidAmount = paidAmount.add(amount);
+            } else if (status == CollectionStatus.PENDING) {
+                unpaidAmount = unpaidAmount.add(amount);
+            }
+        }
+
+        List<MailOrderCompanyAmountItemResponse> mailOrderCompanies =
+                collectionRepository.sumMailOrderCompaniesForMonth(PaymentType.MAIL_ORDER, year, month)
+                        .stream()
+                        .map(row -> {
+                            String companyName = (String) row[0];
+                            return MailOrderCompanyAmountItemResponse.builder()
+                                    .companyName(
+                                            companyName == null || companyName.isBlank()
+                                                    ? "Belirtilmemiş"
+                                                    : companyName
+                                    )
+                                    .totalAmount(nullSafe((BigDecimal) row[1]))
+                                    .count(row[2] instanceof Number ? ((Number) row[2]).longValue() : 0L)
+                                    .build();
+                        })
+                        .toList();
+
+        Map<UUID, BigDecimal> paidByCustomer = new HashMap<>();
+        Map<UUID, BigDecimal> unpaidByCustomer = new HashMap<>();
+        Map<UUID, String> names = new LinkedHashMap<>();
+
+        for (Object[] row : collectionRepository.findCustomerAmountByStatusForMonth(year, month)) {
+            UUID customerId = (UUID) row[0];
+            names.putIfAbsent(customerId, (String) row[1]);
+            BigDecimal amount = nullSafe((BigDecimal) row[3]);
+            CollectionStatus status = (CollectionStatus) row[2];
+
+            if (status == CollectionStatus.PAID) {
+                paidByCustomer.merge(customerId, amount, BigDecimal::add);
+            } else if (status == CollectionStatus.PENDING) {
+                unpaidByCustomer.merge(customerId, amount, BigDecimal::add);
+            }
+        }
+
+        List<TopCustomerItemResponse> customers = names.entrySet().stream()
+                .map(entry -> {
+                    BigDecimal paid = paidByCustomer.getOrDefault(entry.getKey(), BigDecimal.ZERO);
+                    BigDecimal unpaid = unpaidByCustomer.getOrDefault(entry.getKey(), BigDecimal.ZERO);
+                    return TopCustomerItemResponse.builder()
+                            .customerId(entry.getKey())
+                            .companyName(entry.getValue())
+                            .paidAmount(paid)
+                            .unpaidAmount(unpaid)
+                            .totalAmount(paid.add(unpaid))
+                            .build();
+                })
+                .sorted(Comparator.comparing(TopCustomerItemResponse::getTotalAmount).reversed())
+                .limit(10)
                 .toList();
-
-        BigDecimal totalAmount = items.stream()
-                .map(PaymentTypeAmountItemResponse::getTotalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return MonthPaymentBreakdownResponse.builder()
                 .year(year)
                 .month(month)
                 .monthName(TURKISH_MONTH_NAMES[month - 1])
-                .totalAmount(totalAmount)
+                .totalAmount(paidAmount.add(unpaidAmount))
+                .paidAmount(paidAmount)
+                .unpaidAmount(unpaidAmount)
                 .items(items)
+                .mailOrderCompanies(mailOrderCompanies)
+                .customers(customers)
                 .build();
     }
 

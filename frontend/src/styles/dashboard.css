@@ -91,6 +91,11 @@
   border-radius: inherit;
 }
 
+.dashboard-month-select {
+  min-width: 10.5rem;
+  width: 100%;
+}
+
 @media (min-width: 768px) {
   .dashboard-widget__state {
     min-height: 220px;

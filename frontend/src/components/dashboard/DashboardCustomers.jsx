@@ -2,14 +2,42 @@
 
 import Link from "next/link";
 import { useTopCustomers } from "@/hooks/useDashboardMetrics";
-import useDashboardYear from "@/context/DashboardYearContext";
+import useDashboardYear, {
+  DASHBOARD_MONTH_OPTIONS,
+} from "@/context/DashboardYearContext";
 import { formatCurrency } from "@/utils/dashboardFormatters";
 import DashboardWidget from "./DashboardWidget";
 
+function periodLabel(year, month) {
+  const monthName = DASHBOARD_MONTH_OPTIONS.find(
+    (option) => option.value === month
+  )?.label;
+
+  if (year == null && month == null) {
+    return "Tüm dönem toplamı";
+  }
+
+  if (year != null && month == null) {
+    return `${year} toplamı`;
+  }
+
+  if (year == null && month != null) {
+    return `${monthName} toplamı`;
+  }
+
+  return `${monthName} ${year}`;
+}
+
 export default function DashboardCustomers() {
-  const { year } = useDashboardYear();
-  const { data, loading, error, refresh } = useTopCustomers(10, year);
+  const { year, month, chartYear } = useDashboardYear();
+  const effectiveYear = month != null ? year ?? chartYear : year;
+  const { data, loading, error, refresh } = useTopCustomers(
+    20,
+    effectiveYear,
+    month
+  );
   const customers = data?.customers || [];
+  const label = periodLabel(effectiveYear, month);
 
   return (
     <DashboardWidget
@@ -18,8 +46,10 @@ export default function DashboardCustomers() {
       error={error}
       onRetry={refresh}
     >
+      <p className="text-muted small mb-3">{label}</p>
+
       {customers.length === 0 ? (
-        <p className="text-muted mb-0">Henüz tahsilat kaydı yok.</p>
+        <p className="text-muted mb-0">Bu dönemde tahsilat yok.</p>
       ) : (
         <div className="dashboard-list">
           {customers.map((customer) => (

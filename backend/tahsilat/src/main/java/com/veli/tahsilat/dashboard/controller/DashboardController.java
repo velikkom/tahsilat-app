@@ -89,9 +89,10 @@ public class DashboardController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<TopCustomersResponse> getTopCustomers(
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) Integer year
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
     ) {
-        return ResponseEntity.ok(dashboardService.getTopCustomers(limit, year));
+        return ResponseEntity.ok(dashboardService.getTopCustomers(limit, year, month));
     }
 
     @Operation(summary = "Recent collections")

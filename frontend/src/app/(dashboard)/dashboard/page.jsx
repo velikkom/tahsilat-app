@@ -2,10 +2,10 @@
 
 import DashboardSummary from "@/components/dashboard/DashboardSummary";
 import DashboardCustomers from "@/components/dashboard/DashboardCustomers";
-import DashboardPaymentTypes from "@/components/dashboard/DashboardPaymentTypes";
 import DashboardAging from "@/components/dashboard/DashboardAging";
 import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
+import DashboardMonthDetail from "@/components/dashboard/DashboardMonthDetail";
 import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
 import { DashboardYearProvider } from "@/context/DashboardYearContext";
 
@@ -28,16 +28,11 @@ function DashboardContent() {
         <DashboardYearFilter />
       </div>
 
-      <div className="row g-3">
-        <div className="col-12 col-lg-6">
-          <DashboardCustomers />
-        </div>
-        <div className="col-12 col-lg-6">
-          <DashboardPaymentTypes />
-        </div>
-      </div>
+      <DashboardCustomers />
 
       <MonthlyCollectionsChart />
+
+      <DashboardMonthDetail />
 
       <DashboardAging />
     </div>

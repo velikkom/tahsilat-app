@@ -63,11 +63,15 @@ export function getPaymentTypeCustomers(paymentType, year, limit = 10) {
   );
 }
 
-export function getTopCustomers(limit = 10, year) {
+export function getTopCustomers(limit = 10, year, month) {
   const params = [`limit=${limit}`];
 
   if (year != null) {
     params.push(`year=${year}`);
+  }
+
+  if (month != null) {
+    params.push(`month=${month}`);
   }
 
   return dashboardFetch(

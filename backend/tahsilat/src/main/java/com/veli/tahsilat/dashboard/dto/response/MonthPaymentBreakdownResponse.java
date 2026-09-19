@@ -18,5 +18,13 @@ public class MonthPaymentBreakdownResponse {
 
     private BigDecimal totalAmount;
 
+    private BigDecimal paidAmount;
+
+    private BigDecimal unpaidAmount;
+
     private List<PaymentTypeAmountItemResponse> items;
+
+    private List<MailOrderCompanyAmountItemResponse> mailOrderCompanies;
+
+    private List<TopCustomerItemResponse> customers;
 }

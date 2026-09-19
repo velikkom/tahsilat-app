@@ -21,7 +21,7 @@ public interface DashboardService {
 
     PaymentTypeDistributionResponse getPaymentTypeDistribution(Integer year);
 
-    TopCustomersResponse getTopCustomers(int limit, Integer year);
+    TopCustomersResponse getTopCustomers(int limit, Integer year, Integer month);
 
     RecentCollectionsResponse getRecentCollections(int limit, Integer year);
 

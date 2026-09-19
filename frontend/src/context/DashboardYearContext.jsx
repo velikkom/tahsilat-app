@@ -10,16 +10,35 @@ export const DASHBOARD_YEAR_OPTIONS = [
   { label: "2026", value: 2026 },
 ];
 
+export const DASHBOARD_MONTH_OPTIONS = [
+  { label: "Tümü", value: null },
+  { label: "Ocak", value: 1 },
+  { label: "Şubat", value: 2 },
+  { label: "Mart", value: 3 },
+  { label: "Nisan", value: 4 },
+  { label: "Mayıs", value: 5 },
+  { label: "Haziran", value: 6 },
+  { label: "Temmuz", value: 7 },
+  { label: "Ağustos", value: 8 },
+  { label: "Eylül", value: 9 },
+  { label: "Ekim", value: 10 },
+  { label: "Kasım", value: 11 },
+  { label: "Aralık", value: 12 },
+];
+
 export function DashboardYearProvider({ children }) {
   const [year, setYear] = useState(null);
+  const [month, setMonth] = useState(null);
 
   const value = useMemo(
     () => ({
       year,
       setYear,
+      month,
+      setMonth,
       chartYear: year ?? new Date().getFullYear(),
     }),
-    [year]
+    [year, month]
   );
 
   return (

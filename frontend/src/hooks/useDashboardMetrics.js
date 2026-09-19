@@ -65,8 +65,11 @@ export function usePaymentTypeDistribution(year) {
   return useDashboardQuery(() => getPaymentTypeDistribution(year), [year]);
 }
 
-export function useTopCustomers(limit = 10, year) {
-  return useDashboardQuery(() => getTopCustomers(limit, year), [limit, year]);
+export function useTopCustomers(limit = 10, year, month) {
+  return useDashboardQuery(
+    () => getTopCustomers(limit, year, month),
+    [limit, year, month]
+  );
 }
 
 export function useRecentCollections(limit = 10, year) {

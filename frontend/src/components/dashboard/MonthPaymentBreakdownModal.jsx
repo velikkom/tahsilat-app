@@ -10,10 +10,13 @@ import {
 
 const ALL_PAYMENT_TYPES = [
   "CASH",
+  "BANK_TRANSFER",
   "CREDIT_CARD",
   "CHECK",
   "PROMISSORY_NOTE",
-  "BANK_TRANSFER",
+  "MAIL_ORDER",
+  "POS_YKB",
+  "POS_TEB",
 ];
 
 export default function MonthPaymentBreakdownModal({
