@@ -451,7 +451,6 @@ public class DashboardServiceImpl implements DashboardService {
                             .build();
                 })
                 .sorted(Comparator.comparing(TopCustomerItemResponse::getTotalAmount).reversed())
-                .limit(10)
                 .toList();
 
         return MonthPaymentBreakdownResponse.builder()

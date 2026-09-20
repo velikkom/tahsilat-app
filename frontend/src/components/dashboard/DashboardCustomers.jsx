@@ -29,15 +29,10 @@ function periodLabel(year, month) {
 }
 
 export default function DashboardCustomers() {
-  const { year, month, chartYear } = useDashboardYear();
-  const effectiveYear = month != null ? year ?? chartYear : year;
-  const { data, loading, error, refresh } = useTopCustomers(
-    20,
-    effectiveYear,
-    month
-  );
+  const { year } = useDashboardYear();
+  const { data, loading, error, refresh } = useTopCustomers(50, year);
   const customers = data?.customers || [];
-  const label = periodLabel(effectiveYear, month);
+  const label = periodLabel(year, null);
 
   return (
     <DashboardWidget

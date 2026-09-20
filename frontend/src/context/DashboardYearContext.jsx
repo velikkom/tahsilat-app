@@ -27,8 +27,8 @@ export const DASHBOARD_MONTH_OPTIONS = [
 ];
 
 export function DashboardYearProvider({ children }) {
-  const [year, setYear] = useState(null);
-  const [month, setMonth] = useState(null);
+  const [year, setYear] = useState(() => new Date().getFullYear());
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1);
 
   const value = useMemo(
     () => ({

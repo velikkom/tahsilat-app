@@ -7,9 +7,12 @@ import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
 import DashboardMonthDetail from "@/components/dashboard/DashboardMonthDetail";
 import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
-import { DashboardYearProvider } from "@/context/DashboardYearContext";
+import useDashboardYear, {
+  DashboardYearProvider,
+} from "@/context/DashboardYearContext";
 
 function DashboardContent() {
+  const { month } = useDashboardYear();
   return (
     <div className="dashboard-page d-flex flex-column gap-3 gap-md-4">
       <div>
@@ -28,11 +31,11 @@ function DashboardContent() {
         <DashboardYearFilter />
       </div>
 
-      <DashboardCustomers />
-
       <MonthlyCollectionsChart />
 
       <DashboardMonthDetail />
+
+      {month == null && <DashboardCustomers />}
 
       <DashboardAging />
     </div>
