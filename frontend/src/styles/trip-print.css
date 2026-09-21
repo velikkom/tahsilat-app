@@ -36,8 +36,9 @@
 }
 
 .dokumu-paper--arka {
-  max-width: 1480px;
+  max-width: 100%;
   width: calc(100% - 1.5rem);
+  overflow-x: hidden;
 }
 
 .dokumu-table {
@@ -71,19 +72,18 @@
 }
 
 .dokumu-table--arka {
-  table-layout: auto;
-  min-width: 1280px;
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0;
 }
 
 .dokumu-table--arka td {
   height: 18px;
   font-size: 9px;
   padding: 2px 3px;
-  white-space: nowrap;
-}
-
-.dokumu-table--arka td.dokumu-left {
   white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .dokumu-title {
@@ -175,14 +175,34 @@
 
   body.trip-print-active .dokumu-paper {
     box-shadow: none;
-    width: auto;
+    width: 100%;
     max-width: none;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+  }
+
+  body.trip-print-arka .dokumu-table--arka {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  body.trip-print-arka .dokumu-table--arka td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 7.5px;
+    line-height: 1.15;
+    padding: 1px 2px;
+  }
+
+  body.trip-print-arka .dokumu-title--arka {
+    font-size: 13px !important;
   }
 
   @page {
     size: A4 landscape;
-    margin: 8mm;
+    margin: 5mm;
   }
 }
