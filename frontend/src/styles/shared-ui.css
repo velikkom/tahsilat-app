@@ -4,6 +4,7 @@
   /* UI-1: modern SaaS palette (see feedback_tahsilat_workflow memory) */
   --color-canvas: #f4f6f8;
   --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
   --color-ink: #0f172a;
   --color-muted: #64748b;
   --color-accent: #0f766e;

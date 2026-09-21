@@ -1,12 +1,11 @@
 "use client";
 
-import { FaBars, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaBars } from "react-icons/fa";
 import { usePathname } from "next/navigation";
-import { Dropdown } from "react-bootstrap";
 import NewUserNotification from "./NewUserNotification";
 import DueMaturityNotification from "./DueMaturityNotification";
+import NavbarProfileMenu from "./NavbarProfileMenu";
 import useCurrentUser from "@/hooks/useCurrentUser";
-import { logout } from "@/services/authService";
 
 const PAGE_TITLES = [
   { prefix: "/dashboard", title: "Ana Sayfa" },
@@ -14,6 +13,7 @@ const PAGE_TITLES = [
   { prefix: "/collections", title: "Tahsilatlar" },
   { prefix: "/trips", title: "Turlar" },
   { prefix: "/admin/users", title: "Kullanıcılar" },
+  { prefix: "/profile", title: "Profil" },
 ];
 
 function pageTitleFor(pathname) {
@@ -25,17 +25,8 @@ function pageTitleFor(pathname) {
 }
 
 export default function Navbar({ onMenuToggle }) {
-  const { user } = useCurrentUser();
+  const { user, loading } = useCurrentUser();
   const pathname = usePathname();
-
-  const displayName = user?.firstName
-    ? `${user.firstName} ${user.lastName || ""}`.trim()
-    : "Hesap";
-
-  async function handleLogout() {
-    await logout();
-    window.location.href = "/login";
-  }
 
   return (
     <header className="app-navbar bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
@@ -57,25 +48,7 @@ export default function Navbar({ onMenuToggle }) {
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
         <DueMaturityNotification />
         <NewUserNotification />
-        <Dropdown align="end">
-          <Dropdown.Toggle
-            variant="outline-secondary"
-            size="sm"
-            id="navbar-profile"
-            className="app-navbar__profile touch-target d-inline-flex align-items-center gap-2"
-          >
-            <FaUserCircle aria-hidden />
-            <span className="app-navbar__profile-name text-truncate">
-              {displayName}
-            </span>
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item as="button" onClick={handleLogout}>
-              <FaSignOutAlt className="me-2" aria-hidden />
-              Çıkış
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+        <NavbarProfileMenu user={user} loading={loading} />
       </div>
     </header>
   );

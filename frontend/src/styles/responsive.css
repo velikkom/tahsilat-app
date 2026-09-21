@@ -366,8 +366,22 @@ body.sidebar-drawer-open {
     font-size: 1.25rem;
   }
 
-  .app-navbar__profile-name {
+  .app-navbar__profile-name,
+  .app-profile-trigger__name,
+  .app-profile-trigger__role {
     max-width: 12rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .app-navbar__profile-name,
+  .app-profile-trigger__meta {
+    display: none;
+  }
+
+  .app-profile-trigger {
+    padding: 0.18rem;
+    max-width: none;
   }
 }
 

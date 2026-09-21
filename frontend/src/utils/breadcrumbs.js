@@ -7,6 +7,7 @@ const SECTION_LABELS = {
   collections: "Tahsilatlar",
   trips: "Turlar",
   users: "Kullanıcılar",
+  profile: "Profil",
 };
 
 export function breadcrumbsFor(pathname, extraLabels = {}) {

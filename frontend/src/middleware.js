@@ -110,6 +110,10 @@ export const config = {
 
         '/admin/:path*',
 
+        '/profile',
+
+        '/profile/:path*',
+
         '/login',
 
         '/register',
