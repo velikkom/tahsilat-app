@@ -53,31 +53,25 @@ class TripCollectionDocumentGeneratorTest {
     }
 
     @Test
-    void creditCardCollectionIsOmittedFromDocument() throws IOException {
+    void mailOrderCustomerAppearsOnDocument() throws IOException {
         Trip trip = baseTrip();
         Collection cashCollection = collection("Nakit Musteri", PaymentType.CASH, new BigDecimal("500"), null);
-        Collection creditCardCollection =
-                collection("Kart Musteri", PaymentType.CREDIT_CARD, new BigDecimal("750"), null);
+        Collection mailOrderCollection =
+                collection("Kart Musteri", PaymentType.MAIL_ORDER, new BigDecimal("750"), null);
 
-        byte[] bytes = generator.generate(trip, List.of(cashCollection, creditCardCollection));
+        byte[] bytes = generator.generate(trip, List.of(cashCollection, mailOrderCollection));
 
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet sheet = workbook.getSheetAt(0);
 
             int nakitColumn = findColumnIndex(sheet, "NAKİT TUTARI");
+            int mailorderTutarColumn = findColumnIndex(sheet, "TUTAR", 2);
             int totalRowIndex = findRowByUnvani(sheet, "GENEL TOPLAM");
 
             assertEquals(500.0, numericValue(sheet, findRowByUnvani(sheet, "Nakit Musteri"), nakitColumn), 0.001);
+            assertEquals(750.0, numericValue(sheet, findRowByUnvani(sheet, "Kart Musteri"), mailorderTutarColumn), 0.001);
             assertEquals(500.0, numericValueOrZero(sheet, totalRowIndex, nakitColumn), 0.001);
-
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    if (cell.getCellType() == CellType.STRING
-                            && "Kart Musteri".equals(cell.getStringCellValue())) {
-                        throw new AssertionError("CREDIT_CARD customer should not appear on the document");
-                    }
-                }
-            }
+            assertEquals(750.0, numericValueOrZero(sheet, totalRowIndex, mailorderTutarColumn), 0.001);
         }
     }
 

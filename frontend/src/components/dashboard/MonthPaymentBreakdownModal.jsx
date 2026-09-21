@@ -11,7 +11,6 @@ import {
 const ALL_PAYMENT_TYPES = [
   "CASH",
   "BANK_TRANSFER",
-  "CREDIT_CARD",
   "CHECK",
   "PROMISSORY_NOTE",
   "MAIL_ORDER",

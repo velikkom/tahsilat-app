@@ -15,6 +15,7 @@ import {
   paymentTypeBodyTemplate,
   statusBodyTemplate,
 } from "./CollectionTemplates";
+import { PAYMENT_TYPE_FILTER_OPTIONS } from "@/utils/collectionUtils";
 
 export default function CollectionsTable({
   collections = [],
@@ -32,7 +33,9 @@ export default function CollectionsTable({
     onGlobalFilterChange,
   } = useCollectionFilters();
 
-  const paymentTypes = ["CASH", "CHECK", "BANK_TRANSFER", "CREDIT_CARD"];
+  const paymentTypes = PAYMENT_TYPE_FILTER_OPTIONS
+    .filter((option) => option.value !== "ALL")
+    .map((option) => option.value);
   const statuses = ["PENDING", "PAID"];
 
   const actionsBodyTemplate = useCallback(

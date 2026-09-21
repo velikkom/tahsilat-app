@@ -4,16 +4,15 @@ import com.veli.tahsilat.collection.enums.PaymentType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class CollectionExcelParseSupportTest {
 
     private final CollectionExcelParseSupport support = new CollectionExcelParseSupport();
 
     @Test
-    void karlandMapsToMailOrderNotCreditCard() {
+    void karlandMapsToMailOrder() {
         assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("Karland"));
-        assertNotEquals(PaymentType.CREDIT_CARD, support.mapPaymentType("karland"));
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("karland"));
     }
 
     @Test
@@ -36,8 +35,11 @@ class CollectionExcelParseSupportTest {
     }
 
     @Test
-    void unknownValueStillDefaultsToCreditCard() {
-        assertEquals(PaymentType.CREDIT_CARD, support.mapPaymentType("bilinmeyen deger"));
+    void unknownAndLegacyCardLabelsMapToMailOrder() {
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("bilinmeyen deger"));
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("Kredi Kartı"));
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("credit card"));
+        assertEquals(PaymentType.MAIL_ORDER, support.mapPaymentType("Mailorder"));
     }
 
     @Test

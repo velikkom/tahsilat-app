@@ -6,8 +6,6 @@ public enum PaymentType {
 
     BANK_TRANSFER,
 
-    CREDIT_CARD,
-
     CHECK,
 
     PROMISSORY_NOTE,

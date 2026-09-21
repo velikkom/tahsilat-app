@@ -104,12 +104,30 @@ class MailOrderCollectionTest {
     }
 
     @Test
-    void updateCreditCardCollectionToMailOrder() throws Exception {
+    void createRejectsCreditCardPaymentType() throws Exception {
+        String token = login();
+
+        mockMvc.perform(post("/api/v1/collections")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "customerId": "%s",
+                                  "amount": 100,
+                                  "collectionDate": "2026-09-16",
+                                  "paymentType": "CREDIT_CARD"
+                                }
+                                """.formatted(customer.getId())))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateCashCollectionToMailOrder() throws Exception {
         Collection collection = new Collection();
         collection.setCustomer(customer);
         collection.setAmount(new BigDecimal("30000.00"));
         collection.setCollectionDate(LocalDate.of(2026, 9, 14));
-        collection.setPaymentType(PaymentType.CREDIT_CARD);
+        collection.setPaymentType(PaymentType.CASH);
         collection.setStatus(CollectionStatus.PAID);
         collection.setCollectedBy(salesman);
         collection = collectionRepository.saveAndFlush(collection);

@@ -10,8 +10,7 @@ import java.time.LocalDate;
  * One Form 1 (tahsilat dökümü) row. Mirrors the column routing in
  * TripCollectionDocumentGenerator#writeCollectionRow: each collection's
  * amount lands in exactly one of the typed fields below, matching its
- * paymentType. CREDIT_CARD (and any unmapped type) leaves every amount
- * field null - same rule as the xlsx export.
+ * paymentType. Mail Order is the card column.
  */
 @Getter
 @Builder

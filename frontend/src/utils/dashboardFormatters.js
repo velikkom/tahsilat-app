@@ -1,7 +1,6 @@
 export const PAYMENT_TYPE_LABELS = {
   CASH: "Nakit",
   CHECK: "Çek",
-  CREDIT_CARD: "Kredi Kartı — diğer",
   BANK_TRANSFER: "Havale / EFT",
   PROMISSORY_NOTE: "Senet",
   MAIL_ORDER: "Mailorder",

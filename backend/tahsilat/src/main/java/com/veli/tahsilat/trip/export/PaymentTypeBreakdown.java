@@ -7,9 +7,8 @@ import java.util.List;
 
 /**
  * Per-payment-type totals shared by the trip print preview's Form 1 total
- * row and Form 2 collection summary block. CREDIT_CARD (and any future
- * unmapped type) is intentionally excluded from every bucket and from
- * genelToplam() - same rule as the Form 1/2 xlsx generators.
+ * row and Form 2 collection summary block. Every current PaymentType has a
+ * form column; inactive customers are the only rows left off the document.
  */
 public record PaymentTypeBreakdown(
         BigDecimal cash,
@@ -32,10 +31,8 @@ public record PaymentTypeBreakdown(
     }
 
     /**
-     * Rows that belong on the paper form: active customer, and a payment
-     * type that has a column. CREDIT_CARD is stored for the collection
-     * list but has no form slot, so keeping it would leave a customer
-     * name with a blank amount after the real tahsilat is gone.
+     * Rows that belong on the paper form: an active customer and a known
+     * payment type. Mail Order is the card column; POS YKB/TEB keep theirs.
      */
     public static boolean appearsOnDocument(Collection collection) {
         if (collection == null || collection.getPaymentType() == null) {
@@ -49,7 +46,6 @@ public record PaymentTypeBreakdown(
 
         return switch (collection.getPaymentType()) {
             case CASH, PROMISSORY_NOTE, CHECK, BANK_TRANSFER, MAIL_ORDER, POS_YKB, POS_TEB -> true;
-            case CREDIT_CARD -> false;
         };
     }
 
@@ -81,9 +77,6 @@ public record PaymentTypeBreakdown(
                 case MAIL_ORDER -> mailOrder = mailOrder.add(amount);
                 case POS_YKB -> posYkb = posYkb.add(amount);
                 case POS_TEB -> posTeb = posTeb.add(amount);
-                default -> {
-                    // CREDIT_CARD and any other unmapped type: excluded on purpose.
-                }
             }
         }
 

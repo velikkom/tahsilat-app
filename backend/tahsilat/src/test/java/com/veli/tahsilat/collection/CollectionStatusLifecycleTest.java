@@ -94,7 +94,7 @@ class CollectionStatusLifecycleTest {
 
     @ParameterizedTest
     @EnumSource(value = PaymentType.class, names = {
-            "CASH", "BANK_TRANSFER", "CREDIT_CARD", "MAIL_ORDER", "POS_YKB", "POS_TEB"
+            "CASH", "BANK_TRANSFER", "MAIL_ORDER", "POS_YKB", "POS_TEB"
     })
     void immediateSettlementTypesAreCreatedPaid(PaymentType paymentType) throws Exception {
         String token = login();

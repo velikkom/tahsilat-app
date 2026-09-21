@@ -197,9 +197,6 @@ public class TripCollectionDocumentGenerator {
         } else if (paymentType == PaymentType.POS_TEB) {
             setCell(sheet, rowIndex, COL_POS_TEB, collection.getAmount());
         }
-
-        // CREDIT_CARD (and any other/unknown type) is intentionally written
-        // to no amount column - there is no matching slot on the paper form yet.
     }
 
     private void writeTotalsRow(Sheet sheet, CellStyle labelStyle, int rowIndex, List<Collection> collections) {

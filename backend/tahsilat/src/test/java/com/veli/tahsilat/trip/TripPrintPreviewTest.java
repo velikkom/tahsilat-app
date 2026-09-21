@@ -82,20 +82,20 @@ class TripPrintPreviewTest {
     }
 
     @Test
-    void creditCardCollectionIsExcludedFromPrintPreview() throws Exception {
+    void mailOrderCollectionAppearsOnPrintPreview() throws Exception {
         String tokenA = login(salesmanA.getEmail());
         String tripId = createTrip(tokenA, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 4));
 
         saveCollection(salesmanA, customer, new BigDecimal("500.00"), PaymentType.CASH);
-        saveCollection(salesmanA, customer, new BigDecimal("700.00"), PaymentType.CREDIT_CARD);
+        saveCollection(salesmanA, customer, new BigDecimal("700.00"), PaymentType.MAIL_ORDER);
 
         mockMvc.perform(get("/api/v1/trips/" + tripId + "/print-preview")
                         .header("Authorization", bearer(tokenA)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.collectionRows.length()").value(1))
-                .andExpect(jsonPath("$.collectionRows[0].nakitTutari").value(500.0))
+                .andExpect(jsonPath("$.collectionRows.length()").value(2))
                 .andExpect(jsonPath("$.collectionTotals.cash").value(500.0))
-                .andExpect(jsonPath("$.collectionTotals.genelToplam").value(500.0));
+                .andExpect(jsonPath("$.collectionTotals.mailOrder").value(700.0))
+                .andExpect(jsonPath("$.collectionTotals.genelToplam").value(1200.0));
     }
 
     @Test

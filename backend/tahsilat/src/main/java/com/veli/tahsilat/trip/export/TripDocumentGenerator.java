@@ -229,10 +229,6 @@ public class TripDocumentGenerator {
             }
             case POS_YKB -> setNumber(sheet, rowIndex, Arka.COL_POS_YKB, amount);
             case POS_TEB -> setNumber(sheet, rowIndex, Arka.COL_POS_TEB, amount);
-            default -> {
-                // CREDIT_CARD is listed as a row but carries no amount column,
-                // matching the paper form and the print preview.
-            }
         }
     }
 

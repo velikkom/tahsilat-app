@@ -12,7 +12,6 @@ const COLLECTION_TYPES = [
   { value: "MAIL_ORDER", label: "Mailorder" },
   { value: "POS_YKB", label: "POS YKB" },
   { value: "POS_TEB", label: "POS TEB" },
-  { value: "CREDIT_CARD", label: "Kredi Kartı — diğer" },
 ];
 
 export default function CollectionFormFields({

@@ -125,9 +125,6 @@ public class TripPrintPreviewBuilder {
             row.posTeb(amount);
         }
 
-        // CREDIT_CARD (and any other/unknown type) intentionally left with
-        // no amount field set - same rule as the Form 1 xlsx export.
-
         return row.build();
     }
 

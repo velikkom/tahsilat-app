@@ -403,7 +403,8 @@ public class CollectionExcelImporter
             case "havale" ->
                     PaymentType.BANK_TRANSFER;
 
-            case "karland", "mailorder karland", "otokoc" ->
+            case "karland", "mailorder karland", "otokoc", "mailorder", "mail order",
+                    "kredi karti", "credit card", "kk" ->
                     PaymentType.MAIL_ORDER;
 
             case "ykb", "yapi kredi", "pos ykb" ->
@@ -413,7 +414,7 @@ public class CollectionExcelImporter
                     PaymentType.POS_TEB;
 
             default ->
-                    PaymentType.CREDIT_CARD;
+                    PaymentType.MAIL_ORDER;
         };
     }
 

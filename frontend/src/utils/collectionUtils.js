@@ -26,7 +26,6 @@ const MONTH_FORMATTER = new Intl.DateTimeFormat("tr-TR", {
 export const PAYMENT_TYPE_LABELS = {
   CASH: "Nakit",
   BANK_TRANSFER: "Havale",
-  CREDIT_CARD: "Kredi Kartı — diğer",
   CHECK: "Çek",
   PROMISSORY_NOTE: "Müşteri Senedi",
   MAIL_ORDER: "Mailorder",
@@ -92,7 +91,6 @@ export function getPaymentTypeLabel(paymentType) {
 export const PAYMENT_TYPE_TONES = {
   CASH: "cash",
   BANK_TRANSFER: "transfer",
-  CREDIT_CARD: "card",
   CHECK: "check",
   PROMISSORY_NOTE: "note",
   MAIL_ORDER: "mailorder",
@@ -192,7 +190,7 @@ export function hasMaturityTracking(collection) {
 
 /*
  * Vadeye kalan gun sayisi. Pozitif: vade gelecekte, negatif: gecikmis.
- * Vade takibi olmayan odeme turlerinde (CASH, CREDIT_CARD, ...) null doner.
+ * Vade takibi olmayan odeme turlerinde (CASH, MAIL_ORDER, ...) null doner.
  */
 export function getMaturityDays(collection) {
   if (!hasMaturityTracking(collection)) {
@@ -309,7 +307,6 @@ export const EMPTY_COLLECTION_FILTERS = {
 const PAYMENT_TYPE_FILTER_OPTIONS = [
   { value: "ALL", label: "Tümü" },
   { value: "CASH", label: "Nakit" },
-  { value: "CREDIT_CARD", label: "Kredi Kartı — diğer" },
   { value: "CHECK", label: "Çek" },
   { value: "PROMISSORY_NOTE", label: "Müşteri Senedi" },
   { value: "BANK_TRANSFER", label: "Havale" },
