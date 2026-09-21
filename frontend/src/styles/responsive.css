@@ -373,6 +373,38 @@ body.sidebar-drawer-open {
   }
 }
 
+@media (max-width: 767px) {
+  .app-navbar-search {
+    flex: 0 0 auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  .app-navbar-search__toggle {
+    display: inline-flex;
+  }
+
+  .app-navbar-search__form,
+  .app-navbar-search__kbd {
+    display: none;
+  }
+
+  .app-navbar-search--expanded {
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    z-index: 1080;
+  }
+
+  .app-navbar-search--expanded .app-navbar-search__toggle {
+    display: none;
+  }
+
+  .app-navbar-search--expanded .app-navbar-search__form {
+    display: block;
+  }
+}
+
 @media (max-width: 639px) {
   .app-navbar__profile-name,
   .app-profile-trigger__meta {

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import NewUserNotification from "./NewUserNotification";
 import DueMaturityNotification from "./DueMaturityNotification";
 import NavbarProfileMenu from "./NavbarProfileMenu";
+import NavbarSearch from "./NavbarSearch";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PAGE_TITLES = [
@@ -44,6 +45,8 @@ export default function Navbar({ onMenuToggle }) {
           {pageTitleFor(pathname)}
         </h5>
       </div>
+
+      <NavbarSearch />
 
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
         <DueMaturityNotification />
