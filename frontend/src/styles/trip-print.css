@@ -86,6 +86,15 @@
   word-break: break-word;
 }
 
+.dokumu-table--arka .dokumu-col-makbuz {
+  width: 4%;
+  max-width: 4.2em;
+  font-size: 8px;
+  line-height: 1.1;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
 .dokumu-title {
   font-size: 13px !important;
   font-weight: 700;

@@ -27,11 +27,11 @@ export default function TripDokumuArkaSheet({ preview, pageIndex = 0 }) {
     <div className="dokumu-paper dokumu-paper--arka">
       <table className="dokumu-table dokumu-table--arka">
         <colgroup>
-          <col style={{ width: "4%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "4%" }} />
-          <col style={{ width: "4%" }} />
-          <col style={{ width: "16%" }} />
+          <col style={{ width: "3.5%" }} />
+          <col className="dokumu-col-makbuz" style={{ width: "4%" }} />
+          <col style={{ width: "3.5%" }} />
+          <col style={{ width: "3.5%" }} />
+          <col style={{ width: "20%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "6%" }} />
           <col style={{ width: "6%" }} />
@@ -67,8 +67,10 @@ export default function TripDokumuArkaSheet({ preview, pageIndex = 0 }) {
             <td rowSpan={2} className="dokumu-head">
               SIRA NO
             </td>
-            <td rowSpan={2} className="dokumu-head">
-              TAHSİLAT MAKBUZ NO
+            <td rowSpan={2} className="dokumu-head dokumu-col-makbuz">
+              TAHSİLAT
+              <br />
+              MAKBUZ NO
             </td>
             <td colSpan={2} className="dokumu-head">
               MİKRO KAY.NO:
