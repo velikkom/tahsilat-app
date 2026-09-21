@@ -67,8 +67,12 @@
   font-weight: 600;
 }
 
-.app-navbar__welcome {
-  color: var(--color-muted) !important;
+.app-navbar__profile {
+  max-width: 14rem;
+}
+
+.app-navbar__profile-name {
+  max-width: 8.5rem;
 }
 
 .app-breadcrumb-bar {

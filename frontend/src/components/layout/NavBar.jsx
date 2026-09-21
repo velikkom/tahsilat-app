@@ -1,10 +1,12 @@
 "use client";
 
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import { usePathname } from "next/navigation";
+import { Dropdown } from "react-bootstrap";
 import NewUserNotification from "./NewUserNotification";
 import DueMaturityNotification from "./DueMaturityNotification";
 import useCurrentUser from "@/hooks/useCurrentUser";
+import { logout } from "@/services/authService";
 
 const PAGE_TITLES = [
   { prefix: "/dashboard", title: "Ana Sayfa" },
@@ -28,7 +30,12 @@ export default function Navbar({ onMenuToggle }) {
 
   const displayName = user?.firstName
     ? `${user.firstName} ${user.lastName || ""}`.trim()
-    : "Admin";
+    : "Hesap";
+
+  async function handleLogout() {
+    await logout();
+    window.location.href = "/login";
+  }
 
   return (
     <header className="app-navbar bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
@@ -50,9 +57,25 @@ export default function Navbar({ onMenuToggle }) {
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
         <DueMaturityNotification />
         <NewUserNotification />
-        <span className="app-navbar__welcome text-muted small">
-          Hoş geldiniz, {displayName}
-        </span>
+        <Dropdown align="end">
+          <Dropdown.Toggle
+            variant="outline-secondary"
+            size="sm"
+            id="navbar-profile"
+            className="app-navbar__profile touch-target d-inline-flex align-items-center gap-2"
+          >
+            <FaUserCircle aria-hidden />
+            <span className="app-navbar__profile-name text-truncate">
+              {displayName}
+            </span>
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item as="button" onClick={handleLogout}>
+              <FaSignOutAlt className="me-2" aria-hidden />
+              Çıkış
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
     </header>
   );

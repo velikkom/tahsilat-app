@@ -365,15 +365,9 @@ body.sidebar-drawer-open {
   .app-navbar__title {
     font-size: 1.25rem;
   }
-}
 
-.app-navbar__welcome {
-  display: none;
-}
-
-@media (min-width: 576px) {
-  .app-navbar__welcome {
-    display: inline;
+  .app-navbar__profile-name {
+    max-width: 12rem;
   }
 }
 

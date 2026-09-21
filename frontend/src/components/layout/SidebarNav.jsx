@@ -8,9 +8,7 @@ import {
   FaUsers,
   FaMoneyCheckAlt,
   FaRoute,
-  FaSignOutAlt,
 } from "react-icons/fa";
-import { logout } from "@/services/authService";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const BASE_MENUS = [
@@ -31,11 +29,6 @@ export default function SidebarNav({ onNavigate }) {
   const { isAdmin } = useCurrentUser();
 
   const menus = isAdmin ? [...BASE_MENUS, ADMIN_MENU] : BASE_MENUS;
-
-  async function handleLogout() {
-    await logout();
-    window.location.href = "/login";
-  }
 
   function handleLinkClick() {
     onNavigate?.();
@@ -64,17 +57,6 @@ export default function SidebarNav({ onNavigate }) {
           </Link>
         ))}
       </nav>
-
-      <div className="mt-auto pt-3">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2 touch-target"
-        >
-          <FaSignOutAlt />
-          Çıkış
-        </button>
-      </div>
     </div>
   );
 }
