@@ -442,6 +442,20 @@ public interface CollectionRepository
     );
 
     @Query("""
+            SELECT c.paymentType, c.customer.companyName, COALESCE(SUM(c.amount), 0), COUNT(c)
+            FROM Collection c
+            WHERE c.active = true
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            AND EXTRACT(MONTH FROM c.collectionDate) = :month
+            GROUP BY c.paymentType, c.customer.companyName
+            ORDER BY SUM(c.amount) DESC
+            """)
+    List<Object[]> sumCustomersByPaymentTypeForMonth(
+            @Param("year") int year,
+            @Param("month") int month
+    );
+
+    @Query("""
             SELECT c.customer.id, c.customer.companyName, COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true

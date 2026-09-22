@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Builder
@@ -13,4 +14,6 @@ public class PaymentTypeAmountItemResponse {
     private PaymentType paymentType;
 
     private BigDecimal totalAmount;
+
+    private List<MailOrderCompanyAmountItemResponse> companies;
 }

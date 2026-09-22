@@ -377,13 +377,35 @@ public class DashboardServiceImpl implements DashboardService {
             amountByType.put((PaymentType) row[0], nullSafe((BigDecimal) row[1]));
         }
 
+        List<MailOrderCompanyAmountItemResponse> mailOrderCompanies =
+                collectionRepository.sumMailOrderCompaniesForMonth(PaymentType.MAIL_ORDER, year, month)
+                        .stream()
+                        .map(row -> toCompanyAmountItem((String) row[0], row[1], row[2]))
+                        .toList();
+
+        Map<PaymentType, List<MailOrderCompanyAmountItemResponse>> customersByPaymentType =
+                new HashMap<>();
+
+        for (Object[] row : collectionRepository.sumCustomersByPaymentTypeForMonth(year, month)) {
+            PaymentType paymentType = (PaymentType) row[0];
+            customersByPaymentType
+                    .computeIfAbsent(paymentType, ignored -> new ArrayList<>())
+                    .add(toCompanyAmountItem((String) row[1], row[2], row[3]));
+        }
+
         List<PaymentTypeAmountItemResponse> items = new ArrayList<>();
 
         for (PaymentType paymentType : PaymentType.values()) {
+            List<MailOrderCompanyAmountItemResponse> companies =
+                    paymentType == PaymentType.MAIL_ORDER
+                            ? mailOrderCompanies
+                            : customersByPaymentType.getOrDefault(paymentType, List.of());
+
             items.add(
                     PaymentTypeAmountItemResponse.builder()
                             .paymentType(paymentType)
                             .totalAmount(amountByType.getOrDefault(paymentType, BigDecimal.ZERO))
+                            .companies(companies)
                             .build()
             );
         }
@@ -403,23 +425,6 @@ public class DashboardServiceImpl implements DashboardService {
                 unpaidAmount = unpaidAmount.add(amount);
             }
         }
-
-        List<MailOrderCompanyAmountItemResponse> mailOrderCompanies =
-                collectionRepository.sumMailOrderCompaniesForMonth(PaymentType.MAIL_ORDER, year, month)
-                        .stream()
-                        .map(row -> {
-                            String companyName = (String) row[0];
-                            return MailOrderCompanyAmountItemResponse.builder()
-                                    .companyName(
-                                            companyName == null || companyName.isBlank()
-                                                    ? "Belirtilmemiş"
-                                                    : companyName
-                                    )
-                                    .totalAmount(nullSafe((BigDecimal) row[1]))
-                                    .count(row[2] instanceof Number ? ((Number) row[2]).longValue() : 0L)
-                                    .build();
-                        })
-                        .toList();
 
         Map<UUID, BigDecimal> paidByCustomer = new HashMap<>();
         Map<UUID, BigDecimal> unpaidByCustomer = new HashMap<>();
@@ -545,6 +550,22 @@ public class DashboardServiceImpl implements DashboardService {
                 .highestMonth(highestMonth)
                 .highestMonthName(highestMonthName)
                 .highestMonthTotalAmount(highestMonthAmount)
+                .build();
+    }
+
+    private MailOrderCompanyAmountItemResponse toCompanyAmountItem(
+            String companyName,
+            Object amount,
+            Object count
+    ) {
+        return MailOrderCompanyAmountItemResponse.builder()
+                .companyName(
+                        companyName == null || companyName.isBlank()
+                                ? "Belirtilmemiş"
+                                : companyName
+                )
+                .totalAmount(nullSafe(amount instanceof BigDecimal ? (BigDecimal) amount : BigDecimal.ZERO))
+                .count(count instanceof Number ? ((Number) count).longValue() : 0L)
                 .build();
     }
 
