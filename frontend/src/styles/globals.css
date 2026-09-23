@@ -3,13 +3,13 @@ body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-    background-color: var(--color-canvas, #f4f6f8);
+    background-color: var(--color-canvas, #f8fafc);
     color: var(--color-ink, #0f172a);
 }
 
 body {
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-    background-color: var(--color-canvas, #f4f6f8);
+    background-color: var(--color-canvas, #f8fafc);
     color: var(--color-ink, #0f172a);
 
     -webkit-font-smoothing: antialiased;

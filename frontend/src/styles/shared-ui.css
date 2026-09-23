@@ -1,19 +1,22 @@
 /* Shared UI design tokens — Collections & Customers */
 
 :root {
-  /* UI-1: modern SaaS palette (see feedback_tahsilat_workflow memory) */
-  --color-canvas: #f4f6f8;
+  /* ERP SaaS palette — light */
+  --color-canvas: #f8fafc;
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
   --color-ink: #0f172a;
   --color-muted: #64748b;
-  --color-accent: #0f766e;
-  --color-accent-soft: #ccfbf1;
-  --color-danger: #dc2626;
-  --color-warning: #d97706;
-  --color-success: #15803d;
+  --color-accent: #2563eb;
+  --color-accent-soft: rgba(37, 99, 235, 0.12);
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
   --color-border: #e2e8f0;
   --color-sidebar: #0f172a;
+  --erp-ai: #7c3aed;
+  --erp-cta-hover: #1d4ed8;
+  --erp-cta-active: #1e40af;
 
   --radius-card: 16px;
   --radius-chip: 999px;
@@ -28,19 +31,23 @@
   --ui-shadow-hover: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.1);
 }
 
-[data-theme="dark"] {
-  --color-canvas: #0b1220;
-  --color-surface: #111827;
-  --color-surface-muted: #1e293b;
-  --color-ink: #e2e8f0;
+[data-theme="dark"],
+[data-bs-theme="dark"] {
+  --color-canvas: #0b0f19;
+  --color-surface: #1e293b;
+  --color-surface-muted: #162032;
+  --color-ink: #f1f5f9;
   --color-muted: #94a3b8;
-  --color-accent: #2dd4bf;
-  --color-accent-soft: rgba(45, 212, 191, 0.16);
-  --color-danger: #f87171;
-  --color-warning: #fbbf24;
-  --color-success: #4ade80;
+  --color-accent: #3b82f6;
+  --color-accent-soft: rgba(59, 130, 246, 0.16);
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
   --color-border: #334155;
-  --color-sidebar: #020617;
+  --color-sidebar: #0b0f19;
+  --erp-ai: #a855f7;
+  --erp-cta-hover: #2563eb;
+  --erp-cta-active: #1d4ed8;
   --ui-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
   --ui-shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.4);
   --ui-shadow-hover: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.45);
@@ -64,23 +71,23 @@
 }
 
 .ui-stat-card--primary {
-  border-left-color: #2563eb !important;
+  border-left-color: var(--color-accent) !important;
 }
 
 .ui-stat-card--success {
-  border-left-color: #16a34a !important;
+  border-left-color: var(--color-success) !important;
 }
 
 .ui-stat-card--info {
-  border-left-color: #0ea5e9 !important;
+  border-left-color: var(--erp-ai) !important;
 }
 
 .ui-stat-card--warning {
-  border-left-color: #f59e0b !important;
+  border-left-color: var(--color-warning) !important;
 }
 
 .ui-stat-card--danger {
-  border-left-color: #dc2626 !important;
+  border-left-color: var(--color-danger) !important;
 }
 
 .ui-stat-card--secondary {

@@ -1,6 +1,6 @@
 export const THEME_STORAGE_KEY = "tahsilat-theme";
 
-export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var t=localStorage.getItem(k);if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}var r=document.documentElement;r.setAttribute("data-theme",t);r.style.colorScheme=t;r.classList.toggle("dark-mode",t==="dark");if(document.body){document.body.classList.toggle("dark-mode",t==="dark");}}catch(e){}})();`;
+export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var t=localStorage.getItem(k);if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}var r=document.documentElement;r.setAttribute("data-theme",t);r.setAttribute("data-bs-theme",t);r.style.colorScheme=t;r.classList.toggle("dark-mode",t==="dark");}catch(e){}})();`;
 
 export function getStoredTheme() {
   try {
@@ -38,9 +38,9 @@ export function applyTheme(theme) {
   const root = document.documentElement;
 
   root.setAttribute("data-theme", next);
+  root.setAttribute("data-bs-theme", next);
   root.style.colorScheme = next;
   root.classList.toggle("dark-mode", next === "dark");
-  document.body?.classList.toggle("dark-mode", next === "dark");
 }
 
 export function persistTheme(theme) {

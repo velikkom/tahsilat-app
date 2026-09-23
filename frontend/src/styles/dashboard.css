@@ -31,7 +31,7 @@
 }
 
 .ui-stat-card--danger {
-  border-left-color: #dc2626 !important;
+  border-left-color: var(--color-danger) !important;
 }
 
 .dashboard-list {

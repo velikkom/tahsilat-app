@@ -52,7 +52,7 @@ export default function RootLayout({ children }) {
                 ${geistMono.variable}
             `}
     >
-      <body>
+      <body suppressHydrationWarning>
         <Script id="theme-bootstrap" strategy="beforeInteractive">
           {THEME_BOOTSTRAP_SCRIPT}
         </Script>
