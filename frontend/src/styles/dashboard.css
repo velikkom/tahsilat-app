@@ -122,6 +122,16 @@
   border-color: var(--color-border);
 }
 
+.payment-type-accordion--nested {
+  padding-left: 0.15rem;
+}
+
+.payment-type-accordion--nested .accordion-button {
+  font-size: 0.95rem;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
 .dashboard-list__more {
   display: inline-block;
   margin-top: 0.5rem;

@@ -377,10 +377,37 @@ public class DashboardServiceImpl implements DashboardService {
             amountByType.put((PaymentType) row[0], nullSafe((BigDecimal) row[1]));
         }
 
+        Map<String, List<MailOrderCompanyAmountItemResponse>> customersByMailOrderCompany =
+                new LinkedHashMap<>();
+
+        for (Object[] row : collectionRepository.sumCustomersByMailOrderCompanyForMonth(
+                PaymentType.MAIL_ORDER,
+                year,
+                month
+        )) {
+            String mailOrderCompany = displayCompanyName((String) row[0]);
+            customersByMailOrderCompany
+                    .computeIfAbsent(mailOrderCompany, ignored -> new ArrayList<>())
+                    .add(toCompanyAmountItem((String) row[1], row[2], row[3]));
+        }
+
         List<MailOrderCompanyAmountItemResponse> mailOrderCompanies =
                 collectionRepository.sumMailOrderCompaniesForMonth(PaymentType.MAIL_ORDER, year, month)
                         .stream()
-                        .map(row -> toCompanyAmountItem((String) row[0], row[1], row[2]))
+                        .map(row -> {
+                            String companyName = displayCompanyName((String) row[0]);
+                            return MailOrderCompanyAmountItemResponse.builder()
+                                    .companyName(companyName)
+                                    .totalAmount(nullSafe(row[1] instanceof BigDecimal
+                                            ? (BigDecimal) row[1]
+                                            : BigDecimal.ZERO))
+                                    .count(row[2] instanceof Number ? ((Number) row[2]).longValue() : 0L)
+                                    .customers(customersByMailOrderCompany.getOrDefault(
+                                            companyName,
+                                            List.of()
+                                    ))
+                                    .build();
+                        })
                         .toList();
 
         Map<PaymentType, List<MailOrderCompanyAmountItemResponse>> customersByPaymentType =
@@ -553,17 +580,19 @@ public class DashboardServiceImpl implements DashboardService {
                 .build();
     }
 
+    private String displayCompanyName(String companyName) {
+        return companyName == null || companyName.isBlank()
+                ? "Belirtilmemiş"
+                : companyName;
+    }
+
     private MailOrderCompanyAmountItemResponse toCompanyAmountItem(
             String companyName,
             Object amount,
             Object count
     ) {
         return MailOrderCompanyAmountItemResponse.builder()
-                .companyName(
-                        companyName == null || companyName.isBlank()
-                                ? "Belirtilmemiş"
-                                : companyName
-                )
+                .companyName(displayCompanyName(companyName))
                 .totalAmount(nullSafe(amount instanceof BigDecimal ? (BigDecimal) amount : BigDecimal.ZERO))
                 .count(count instanceof Number ? ((Number) count).longValue() : 0L)
                 .build();
