@@ -30,7 +30,7 @@ export default function Navbar({ onMenuToggle }) {
   const pathname = usePathname();
 
   return (
-    <header className="app-navbar bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
+    <header className="app-navbar sticky-top bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
       <div className="d-flex align-items-center gap-2 gap-md-3 min-v-0">
         <button
           type="button"
