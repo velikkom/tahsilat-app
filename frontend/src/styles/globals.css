@@ -3,6 +3,8 @@ body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
+    background-color: var(--color-canvas, #f4f6f8);
+    color: var(--color-ink, #0f172a);
 }
 
 body {

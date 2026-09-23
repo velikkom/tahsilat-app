@@ -8,6 +8,7 @@
   width: 100%;
   height: 100dvh;
   max-height: 100dvh;
+  background-color: var(--color-canvas);
 }
 
 .dashboard-shell__content {
@@ -18,11 +19,13 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background-color: var(--color-canvas);
 }
 
 .dashboard-shell__main {
   overflow-x: hidden;
   width: 100%;
+  background-color: var(--color-canvas);
 }
 
 /* Reserve space above the fixed mobile tab bar so page content is never hidden behind it */

@@ -227,23 +227,23 @@
 
 /* ===== Dark Mode ===== */
 
-body.dark-mode .customer-collections-table th {
+[data-theme="dark"] .customer-collections-table th {
   color: #9ca3af;
 }
 
-body.dark-mode .customer-collections-timeline__items {
+[data-theme="dark"] .customer-collections-timeline__items {
   border-left-color: #374151;
 }
 
-body.dark-mode .customer-collections-timeline__item {
+[data-theme="dark"] .customer-collections-timeline__item {
   border-bottom-color: #1f2937;
 }
 
-body.dark-mode .customer-collections-timeline__item:hover {
+[data-theme="dark"] .customer-collections-timeline__item:hover {
   background: #1f2937;
 }
 
-body.dark-mode .customer-collections-timeline__dot {
+[data-theme="dark"] .customer-collections-timeline__dot {
   border-color: #111827;
   box-shadow: 0 0 0 2px #1e3a8a;
 }

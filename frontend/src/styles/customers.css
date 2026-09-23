@@ -275,15 +275,15 @@
   border-radius: 12px;
 }
 
-body.dark-mode .customer-detail-field__value {
+[data-theme="dark"] .customer-detail-field__value {
   color: #f3f4f6;
 }
 
-body.dark-mode .customer-detail-phone__number {
+[data-theme="dark"] .customer-detail-phone__number {
   color: #60a5fa;
 }
 
-body.dark-mode .customer-detail-phone__number:hover {
+[data-theme="dark"] .customer-detail-phone__number:hover {
   color: #93c5fd;
 }
 
@@ -329,17 +329,17 @@ body.dark-mode .customer-detail-phone__number:hover {
   border: none !important;
 }
 
-body.dark-mode .customer-tabs .p-tabview-nav li .p-tabview-nav-link {
+[data-theme="dark"] .customer-tabs .p-tabview-nav li .p-tabview-nav-link {
   background: #1f2937 !important;
   color: #d1d5db !important;
 }
 
-body.dark-mode .customer-tabs .p-tabview-nav li .p-tabview-nav-link:hover {
+[data-theme="dark"] .customer-tabs .p-tabview-nav li .p-tabview-nav-link:hover {
   background: #374151 !important;
   color: white !important;
 }
 
-body.dark-mode .customer-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+[data-theme="dark"] .customer-tabs .p-tabview-nav li.p-highlight .p-tabview-nav-link {
   background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: white !important;
 }

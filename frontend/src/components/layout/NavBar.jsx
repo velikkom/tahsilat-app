@@ -6,6 +6,7 @@ import NewUserNotification from "./NewUserNotification";
 import DueMaturityNotification from "./DueMaturityNotification";
 import NavbarProfileMenu from "./NavbarProfileMenu";
 import NavbarSearch from "./NavbarSearch";
+import ThemeToggle from "./ThemeToggle";
 import useCurrentUser from "@/hooks/useCurrentUser";
 
 const PAGE_TITLES = [
@@ -30,7 +31,7 @@ export default function Navbar({ onMenuToggle }) {
   const pathname = usePathname();
 
   return (
-    <header className="app-navbar sticky-top bg-white border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
+    <header className="app-navbar sticky-top border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center gap-2">
       <div className="d-flex align-items-center gap-2 gap-md-3 min-v-0">
         <button
           type="button"
@@ -51,6 +52,7 @@ export default function Navbar({ onMenuToggle }) {
       <div className="d-flex align-items-center gap-3 flex-shrink-0">
         <DueMaturityNotification />
         <NewUserNotification />
+        <ThemeToggle />
         <NavbarProfileMenu user={user} loading={loading} />
       </div>
     </header>

@@ -170,11 +170,11 @@
 
 /* ===== Empty State (collection-specific overrides) */
 
-body.dark-mode .collection-card__amount {
+[data-theme="dark"] .collection-card__amount {
   color: #f3f4f6;
 }
 
-body.dark-mode .collection-table th {
+[data-theme="dark"] .collection-table th {
   color: #9ca3af;
 }
 

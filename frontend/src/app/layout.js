@@ -1,7 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+
+import { ThemeProvider } from "@/context/ThemeContext";
+import { THEME_BOOTSTRAP_SCRIPT } from "@/utils/theme";
 
 import "@/styles/globals.css";
-import "@/styles/theme.css";
 import "@/styles/layout.css";
 import "@/styles/shared-ui.css";
 import "@/styles/datatable.css";
@@ -18,6 +21,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
+
+import "@/styles/theme.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,12 +46,18 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="tr"
+      suppressHydrationWarning
       className={`
                 ${geistSans.variable}
                 ${geistMono.variable}
             `}
     >
-      <body>{children}</body>
+      <body>
+        <Script id="theme-bootstrap" strategy="beforeInteractive">
+          {THEME_BOOTSTRAP_SCRIPT}
+        </Script>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

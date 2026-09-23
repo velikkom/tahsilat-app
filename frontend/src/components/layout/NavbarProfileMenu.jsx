@@ -3,8 +3,9 @@
 import { forwardRef } from "react";
 import { useRouter } from "next/navigation";
 import { Dropdown } from "react-bootstrap";
-import { FaChevronDown, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaChevronDown, FaMoon, FaSignOutAlt, FaSun, FaUser } from "react-icons/fa";
 import { logout } from "@/services/authService";
+import useTheme from "@/context/ThemeContext";
 import { roleLabel, userDisplayName, userInitials } from "@/utils/userDisplay";
 
 const ProfileTrigger = forwardRef(function ProfileTrigger(
@@ -26,6 +27,7 @@ const ProfileTrigger = forwardRef(function ProfileTrigger(
 
 export default function NavbarProfileMenu({ user, loading = false }) {
   const router = useRouter();
+  const { isDark, toggleTheme } = useTheme();
   const name = userDisplayName(user);
   const initials = loading ? "" : userInitials(user);
   const email = user?.email || "";
@@ -87,6 +89,15 @@ export default function NavbarProfileMenu({ user, loading = false }) {
         >
           <FaUser aria-hidden />
           Profil
+        </Dropdown.Item>
+
+        <Dropdown.Item
+          as="button"
+          onClick={toggleTheme}
+          className="app-profile-menu__item"
+        >
+          {isDark ? <FaSun aria-hidden /> : <FaMoon aria-hidden />}
+          {isDark ? "Açık tema" : "Koyu tema"}
         </Dropdown.Item>
 
         <Dropdown.Divider />
