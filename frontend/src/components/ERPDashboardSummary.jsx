@@ -1,6 +1,5 @@
 "use client";
 
-import ThemeToggle from "@/components/layout/ThemeToggle";
 import useTheme from "@/context/ThemeContext";
 
 const ROWS = [
@@ -42,12 +41,9 @@ export default function ERPDashboardSummary() {
             kontrol edin.
           </p>
         </div>
-        <div className="d-flex align-items-center gap-2">
-          <span className="badge text-bg-primary">
-            {isDark ? "data-bs-theme=dark" : "data-bs-theme=light"}
-          </span>
-          <ThemeToggle />
-        </div>
+        <span className="badge text-bg-primary">
+          {isDark ? "data-bs-theme=dark" : "data-bs-theme=light"}
+        </span>
       </div>
 
       <div className="row g-3 mb-3">
