@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Accordion, ListGroup } from "react-bootstrap";
 import { formatCurrency } from "@/utils/dashboardFormatters";
 import { buildPaymentTypeSections } from "@/utils/paymentTypeAccordion";
@@ -29,20 +30,29 @@ function CustomerList({ customers }) {
 
   return (
     <ListGroup variant="flush" className="payment-type-accordion__companies">
-      {customers.map((customer) => (
-        <ListGroup.Item
-          key={customer.companyName}
-          className="d-flex justify-content-between align-items-center gap-3 px-0"
-        >
-          <span className="min-width-0">
-            <span className="text-break">{customer.companyName}</span>
-            <span className="text-muted small ms-2">{customer.count} işlem</span>
-          </span>
-          <span className="fw-semibold text-nowrap">
-            {formatCurrency(customer.totalAmount)}
-          </span>
-        </ListGroup.Item>
-      ))}
+      {customers.map((customer) => {
+        const href = customer.customerId
+          ? `/customers/${customer.customerId}`
+          : null;
+
+        return (
+          <ListGroup.Item
+            key={customer.customerId || customer.companyName}
+            action={Boolean(href)}
+            as={href ? Link : "div"}
+            href={href || undefined}
+            className="d-flex justify-content-between align-items-center gap-3 px-0 text-reset text-decoration-none"
+          >
+            <span className="min-width-0">
+              <span className="text-break">{customer.companyName}</span>
+              <span className="text-muted small ms-2">{customer.count} işlem</span>
+            </span>
+            <span className="fw-semibold text-nowrap">
+              {formatCurrency(customer.totalAmount)}
+            </span>
+          </ListGroup.Item>
+        );
+      })}
     </ListGroup>
   );
 }

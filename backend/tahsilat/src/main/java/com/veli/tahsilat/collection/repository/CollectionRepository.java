@@ -429,14 +429,14 @@ public interface CollectionRepository
     );
 
     @Query("""
-            SELECT COALESCE(c.mailOrderCompany, ''), c.customer.companyName,
+            SELECT COALESCE(c.mailOrderCompany, ''), c.customer.id, c.customer.companyName,
                    COALESCE(SUM(c.amount), 0), COUNT(c)
             FROM Collection c
             WHERE c.active = true
             AND c.paymentType = :paymentType
             AND EXTRACT(YEAR FROM c.collectionDate) = :year
             AND EXTRACT(MONTH FROM c.collectionDate) = :month
-            GROUP BY c.mailOrderCompany, c.customer.companyName
+            GROUP BY c.mailOrderCompany, c.customer.id, c.customer.companyName
             ORDER BY SUM(c.amount) DESC
             """)
     List<Object[]> sumCustomersByMailOrderCompanyForMonth(
@@ -459,12 +459,13 @@ public interface CollectionRepository
     );
 
     @Query("""
-            SELECT c.paymentType, c.customer.companyName, COALESCE(SUM(c.amount), 0), COUNT(c)
+            SELECT c.paymentType, c.customer.id, c.customer.companyName,
+                   COALESCE(SUM(c.amount), 0), COUNT(c)
             FROM Collection c
             WHERE c.active = true
             AND EXTRACT(YEAR FROM c.collectionDate) = :year
             AND EXTRACT(MONTH FROM c.collectionDate) = :month
-            GROUP BY c.paymentType, c.customer.companyName
+            GROUP BY c.paymentType, c.customer.id, c.customer.companyName
             ORDER BY SUM(c.amount) DESC
             """)
     List<Object[]> sumCustomersByPaymentTypeForMonth(

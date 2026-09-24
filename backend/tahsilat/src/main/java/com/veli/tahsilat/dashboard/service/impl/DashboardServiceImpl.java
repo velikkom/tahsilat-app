@@ -388,7 +388,7 @@ public class DashboardServiceImpl implements DashboardService {
             String mailOrderCompany = displayCompanyName((String) row[0]);
             customersByMailOrderCompany
                     .computeIfAbsent(mailOrderCompany, ignored -> new ArrayList<>())
-                    .add(toCompanyAmountItem((String) row[1], row[2], row[3]));
+                    .add(toCompanyAmountItem((UUID) row[1], (String) row[2], row[3], row[4]));
         }
 
         List<MailOrderCompanyAmountItemResponse> mailOrderCompanies =
@@ -417,7 +417,7 @@ public class DashboardServiceImpl implements DashboardService {
             PaymentType paymentType = (PaymentType) row[0];
             customersByPaymentType
                     .computeIfAbsent(paymentType, ignored -> new ArrayList<>())
-                    .add(toCompanyAmountItem((String) row[1], row[2], row[3]));
+                    .add(toCompanyAmountItem((UUID) row[1], (String) row[2], row[3], row[4]));
         }
 
         List<PaymentTypeAmountItemResponse> items = new ArrayList<>();
@@ -587,11 +587,13 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private MailOrderCompanyAmountItemResponse toCompanyAmountItem(
+            UUID customerId,
             String companyName,
             Object amount,
             Object count
     ) {
         return MailOrderCompanyAmountItemResponse.builder()
+                .customerId(customerId)
                 .companyName(displayCompanyName(companyName))
                 .totalAmount(nullSafe(amount instanceof BigDecimal ? (BigDecimal) amount : BigDecimal.ZERO))
                 .count(count instanceof Number ? ((Number) count).longValue() : 0L)

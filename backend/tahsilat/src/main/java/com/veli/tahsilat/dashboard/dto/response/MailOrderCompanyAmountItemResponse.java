@@ -5,10 +5,13 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class MailOrderCompanyAmountItemResponse {
+
+    private UUID customerId;
 
     private String companyName;
 
