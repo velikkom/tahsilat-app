@@ -114,21 +114,123 @@
 }
 
 .payment-type-accordion__body {
-  padding: 0 0.15rem 0.65rem;
+  padding: 0.35rem 0.15rem 0.85rem;
 }
 
-.payment-type-accordion__companies .list-group-item {
-  background: transparent;
-  border-color: var(--color-border);
+.payment-firm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
-.payment-type-accordion__companies a.list-group-item {
+.payment-firm-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem 0.85rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--ui-shadow-sm);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.payment-firm-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-accent), var(--erp-ai));
+  opacity: 0.7;
+}
+
+.payment-firm-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -60% auto;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-accent-soft), transparent 70%);
+  pointer-events: none;
+  opacity: 0.55;
+  z-index: -1;
+}
+
+.payment-firm-card__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
+.payment-firm-card__name {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.payment-firm-card__count {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.12rem 0.5rem;
+  border-radius: var(--radius-chip);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.payment-firm-card__amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.payment-firm-card__amount::after {
+  content: "→";
+  font-weight: 500;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+a.payment-firm-card {
   cursor: pointer;
 }
 
-.payment-type-accordion__companies a.list-group-item:hover {
-  background: var(--color-surface-muted);
-  color: var(--color-ink);
+a.payment-firm-card:hover,
+a.payment-firm-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  box-shadow:
+    var(--ui-shadow-hover),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-accent-soft));
+}
+
+a.payment-firm-card:hover .payment-firm-card__amount::after,
+a.payment-firm-card:focus-visible .payment-firm-card__amount::after {
+  opacity: 0.75;
+  transform: translateX(0);
+}
+
+a.payment-firm-card:active {
+  transform: translateY(-1px);
 }
 
 .payment-type-accordion--nested {

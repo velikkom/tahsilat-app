@@ -4,6 +4,9 @@ import CustomerPhoneActions from "@/components/customers/CustomerPhoneActions";
 import {
   formatCustomerDate,
   formatCustomerField,
+  getCustomerMapQuery,
+  googleMapsEmbedUrl,
+  googleMapsSearchUrl,
 } from "@/utils/customerUtils";
 
 function InfoField({ label, children }) {
@@ -16,6 +19,10 @@ function InfoField({ label, children }) {
 }
 
 export default function CustomerInfoCard({ customer }) {
+  const mapQuery = getCustomerMapQuery(customer);
+  const embedUrl = mapQuery ? googleMapsEmbedUrl(mapQuery) : "";
+  const mapsUrl = mapQuery ? googleMapsSearchUrl(mapQuery) : "";
+
   return (
     <div className="card border-0 shadow-sm">
       <div className="card-body">
@@ -39,12 +46,43 @@ export default function CustomerInfoCard({ customer }) {
             {formatCustomerField(customer.taxNumber)}
           </InfoField>
           <InfoField label="Adres">
-            {formatCustomerField(customer.address)}
+            {mapQuery ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="customer-detail-map__link"
+              >
+                {mapQuery}
+              </a>
+            ) : (
+              "-"
+            )}
           </InfoField>
           <InfoField label="Kayıt Tarihi">
             {formatCustomerDate(customer.createdAt)}
           </InfoField>
         </div>
+
+        {embedUrl && (
+          <div className="customer-detail-map mt-4">
+            <iframe
+              title={`${formatCustomerField(customer.companyName)} konumu`}
+              src={embedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="customer-detail-map__open"
+            >
+              Google Maps’te aç
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

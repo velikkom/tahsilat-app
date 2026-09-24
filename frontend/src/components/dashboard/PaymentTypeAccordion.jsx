@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Accordion, ListGroup } from "react-bootstrap";
+import { Accordion } from "react-bootstrap";
 import { formatCurrency } from "@/utils/dashboardFormatters";
 import { buildPaymentTypeSections } from "@/utils/paymentTypeAccordion";
 
@@ -29,31 +29,46 @@ function CustomerList({ customers }) {
   }
 
   return (
-    <ListGroup variant="flush" className="payment-type-accordion__companies">
+    <div className="payment-firm-list">
       {customers.map((customer) => {
         const href = customer.customerId
           ? `/customers/${customer.customerId}`
           : null;
+        const className = "payment-firm-card text-reset text-decoration-none";
 
-        return (
-          <ListGroup.Item
-            key={customer.customerId || customer.companyName}
-            action={Boolean(href)}
-            as={href ? Link : "div"}
-            href={href || undefined}
-            className="d-flex justify-content-between align-items-center gap-3 px-0 text-reset text-decoration-none"
-          >
-            <span className="min-width-0">
-              <span className="text-break">{customer.companyName}</span>
-              <span className="text-muted small ms-2">{customer.count} işlem</span>
+        const body = (
+          <>
+            <span className="payment-firm-card__copy min-width-0">
+              <span className="payment-firm-card__name">{customer.companyName}</span>
+              <span className="payment-firm-card__count">
+                {customer.count} işlem
+              </span>
             </span>
-            <span className="fw-semibold text-nowrap">
+            <span className="payment-firm-card__amount">
               {formatCurrency(customer.totalAmount)}
             </span>
-          </ListGroup.Item>
+          </>
+        );
+
+        if (href) {
+          return (
+            <Link
+              key={customer.customerId}
+              href={href}
+              className={className}
+            >
+              {body}
+            </Link>
+          );
+        }
+
+        return (
+          <div key={customer.companyName} className={className}>
+            {body}
+          </div>
         );
       })}
-    </ListGroup>
+    </div>
   );
 }
 
