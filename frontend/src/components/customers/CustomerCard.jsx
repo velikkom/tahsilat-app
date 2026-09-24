@@ -3,13 +3,13 @@
 import { memo } from "react";
 import { Badge } from "react-bootstrap";
 import CustomerActionButtons from "./CustomerActionButtons";
+import CustomerCardMeta from "./CustomerCardMeta";
 import {
   formatCustomerField,
   getCustomerStatusLabel,
   getCustomerStatusVariant,
   isCustomerActive,
 } from "@/utils/customerUtils";
-import { FaBuilding, FaPhone, FaUser } from "react-icons/fa";
 
 function CustomerCard({
   customer,
@@ -23,7 +23,7 @@ function CustomerCard({
   deleting = false,
 }) {
   const isActive = isCustomerActive(customer);
-  const statusVariant = getCustomerStatusVariant(customer);
+  const locked = disabled || deleting;
 
   return (
     <article
@@ -34,22 +34,11 @@ function CustomerCard({
       }`}
       role="button"
       tabIndex={0}
-      onClick={() => {
-        if (disabled || deleting) {
-          return;
-        }
-
-        onView?.(customer);
-      }}
+      onClick={() => !locked && onView?.(customer)}
       onKeyDown={(event) => {
-        if (disabled || deleting) {
-          return;
-        }
-
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          onView?.(customer);
-        }
+        if (locked || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        onView?.(customer);
       }}
     >
       <div className="card-body d-flex flex-column gap-3 p-3 p-md-4 min-width-0">
@@ -57,30 +46,14 @@ function CustomerCard({
           <h3 className="customer-card__title fw-bold mb-0 text-truncate min-width-0">
             {formatCustomerField(customer.companyName)}
           </h3>
-
           <Badge
-            bg={statusVariant}
+            bg={getCustomerStatusVariant(customer)}
             className="customer-card__status-badge flex-shrink-0"
           >
             {getCustomerStatusLabel(customer)}
           </Badge>
         </div>
-
-        <ul className="customer-card__meta list-unstyled mb-0 d-flex flex-column gap-2">
-          <li className="d-flex align-items-start gap-2 text-secondary">
-            <FaUser className="customer-card__icon mt-1" aria-hidden="true" />
-            <span>{formatCustomerField(customer.authorizedPerson)}</span>
-          </li>
-          <li className="d-flex align-items-start gap-2 text-secondary">
-            <FaPhone className="customer-card__icon mt-1" aria-hidden="true" />
-            <span>{formatCustomerField(customer.phone)}</span>
-          </li>
-          <li className="d-flex align-items-start gap-2 text-secondary">
-            <FaBuilding className="customer-card__icon mt-1" aria-hidden="true" />
-            <span>{formatCustomerField(customer.taxNumber)}</span>
-          </li>
-        </ul>
-
+        <CustomerCardMeta customer={customer} />
         <div
           className="customer-card__actions mt-auto pt-3 border-top min-width-0"
           onClick={(event) => event.stopPropagation()}

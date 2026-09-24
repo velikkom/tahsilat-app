@@ -1,100 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Accordion } from "react-bootstrap";
 import { formatCurrency } from "@/utils/dashboardFormatters";
 import { buildPaymentTypeSections } from "@/utils/paymentTypeAccordion";
-
-function CompanyAmountLabel({ company }) {
-  return (
-    <span className="d-flex justify-content-between align-items-center w-100 pe-3 gap-3">
-      <span className="min-width-0">
-        <span className="text-break">{company.companyName}</span>
-        <span className="text-muted small ms-2">{company.count} işlem</span>
-      </span>
-      <span className="fw-semibold text-nowrap">
-        {formatCurrency(company.totalAmount)}
-      </span>
-    </span>
-  );
-}
-
-function CustomerList({ customers }) {
-  if (!customers?.length) {
-    return (
-      <p className="text-muted small mb-0">
-        Bu firmadan geçen müşteri ödemesi yok.
-      </p>
-    );
-  }
-
-  return (
-    <div className="payment-firm-list">
-      {customers.map((customer) => {
-        const href = customer.customerId
-          ? `/customers/${customer.customerId}`
-          : null;
-        const className = "payment-firm-card text-reset text-decoration-none";
-
-        const body = (
-          <>
-            <span className="payment-firm-card__copy min-width-0">
-              <span className="payment-firm-card__name">{customer.companyName}</span>
-              <span className="payment-firm-card__count">
-                {customer.count} işlem
-              </span>
-            </span>
-            <span className="payment-firm-card__amount">
-              {formatCurrency(customer.totalAmount)}
-            </span>
-          </>
-        );
-
-        if (href) {
-          return (
-            <Link
-              key={customer.customerId}
-              href={href}
-              className={className}
-            >
-              {body}
-            </Link>
-          );
-        }
-
-        return (
-          <div key={customer.companyName} className={className}>
-            {body}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function MailOrderCompanyAccordion({ companies }) {
-  return (
-    <Accordion
-      flush
-      className="payment-type-accordion payment-type-accordion--nested"
-    >
-      {companies.map((company) => (
-        <Accordion.Item
-          key={company.companyName}
-          eventKey={company.companyName}
-          className="payment-type-accordion__item"
-        >
-          <Accordion.Header className="payment-type-accordion__header">
-            <CompanyAmountLabel company={company} />
-          </Accordion.Header>
-          <Accordion.Body className="payment-type-accordion__body">
-            <CustomerList customers={company.customers} />
-          </Accordion.Body>
-        </Accordion.Item>
-      ))}
-    </Accordion>
-  );
-}
+import CustomerList from "./CustomerList";
+import MailOrderCompanyAccordion from "./MailOrderCompanyAccordion";
 
 export default function PaymentTypeAccordion({ data }) {
   const sections = buildPaymentTypeSections(data);
@@ -120,7 +30,6 @@ export default function PaymentTypeAccordion({ data }) {
               </span>
             </span>
           </Accordion.Header>
-
           <Accordion.Body className="payment-type-accordion__body">
             {section.companies.length === 0 ? (
               <p className="text-muted small mb-0">

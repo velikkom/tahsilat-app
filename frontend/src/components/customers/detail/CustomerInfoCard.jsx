@@ -1,11 +1,11 @@
 "use client";
 
 import CustomerPhoneActions from "@/components/customers/CustomerPhoneActions";
+import CustomerAddressMap from "@/components/customers/detail/CustomerAddressMap";
 import {
   formatCustomerDate,
   formatCustomerField,
   getCustomerMapQuery,
-  googleMapsEmbedUrl,
   googleMapsSearchUrl,
 } from "@/utils/customerUtils";
 
@@ -20,14 +20,12 @@ function InfoField({ label, children }) {
 
 export default function CustomerInfoCard({ customer }) {
   const mapQuery = getCustomerMapQuery(customer);
-  const embedUrl = mapQuery ? googleMapsEmbedUrl(mapQuery) : "";
   const mapsUrl = mapQuery ? googleMapsSearchUrl(mapQuery) : "";
 
   return (
     <div className="card border-0 shadow-sm">
       <div className="card-body">
         <h5 className="fw-bold mb-4">Müşteri Bilgileri</h5>
-
         <div className="row g-3 g-md-4">
           <InfoField label="Şirket Adı">
             {formatCustomerField(customer.companyName)}
@@ -63,26 +61,7 @@ export default function CustomerInfoCard({ customer }) {
             {formatCustomerDate(customer.createdAt)}
           </InfoField>
         </div>
-
-        {embedUrl && (
-          <div className="customer-detail-map mt-4">
-            <iframe
-              title={`${formatCustomerField(customer.companyName)} konumu`}
-              src={embedUrl}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="customer-detail-map__open"
-            >
-              Google Maps’te aç
-            </a>
-          </div>
-        )}
+        <CustomerAddressMap customer={customer} />
       </div>
     </div>
   );

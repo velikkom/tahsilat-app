@@ -1,29 +1,13 @@
 "use client";
 
-import { forwardRef } from "react";
 import { useRouter } from "next/navigation";
 import { Dropdown } from "react-bootstrap";
-import { FaChevronDown, FaMoon, FaSignOutAlt, FaSun, FaUser } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { logout } from "@/services/authService";
 import useTheme from "@/context/ThemeContext";
 import { roleLabel, userDisplayName, userInitials } from "@/utils/userDisplay";
-
-const ProfileTrigger = forwardRef(function ProfileTrigger(
-  { children, onClick, className = "", variant: _variant, ...props },
-  ref
-) {
-  return (
-    <button
-      type="button"
-      ref={ref}
-      onClick={onClick}
-      className={`app-profile-trigger touch-target ${className}`.trim()}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-});
+import NavbarProfileTrigger from "./NavbarProfileTrigger";
+import NavbarProfileMenuPanel from "./NavbarProfileMenuPanel";
 
 export default function NavbarProfileMenu({ user, loading = false }) {
   const router = useRouter();
@@ -33,10 +17,6 @@ export default function NavbarProfileMenu({ user, loading = false }) {
   const email = user?.email || "";
   const role = roleLabel(user?.role);
 
-  function handleProfile() {
-    router.push("/profile");
-  }
-
   async function handleLogout() {
     await logout();
     window.location.href = "/login";
@@ -45,7 +25,7 @@ export default function NavbarProfileMenu({ user, loading = false }) {
   return (
     <Dropdown align="end">
       <Dropdown.Toggle
-        as={ProfileTrigger}
+        as={NavbarProfileTrigger}
         id="navbar-profile"
         aria-label="Hesap menüsü"
       >
@@ -66,51 +46,16 @@ export default function NavbarProfileMenu({ user, loading = false }) {
         <FaChevronDown className="app-profile-trigger__caret" aria-hidden />
       </Dropdown.Toggle>
 
-      <Dropdown.Menu className="app-profile-menu">
-        <div className="app-profile-menu__header">
-          <span className="app-profile-avatar app-profile-avatar--lg" aria-hidden>
-            {initials}
-          </span>
-          <div className="min-width-0">
-            <div className="app-profile-menu__name text-truncate">{name}</div>
-            {email ? (
-              <div className="app-profile-menu__email text-truncate">{email}</div>
-            ) : null}
-            <div className="app-profile-menu__badge">{role}</div>
-          </div>
-        </div>
-
-        <Dropdown.Divider />
-
-        <Dropdown.Item
-          as="button"
-          onClick={handleProfile}
-          className="app-profile-menu__item"
-        >
-          <FaUser aria-hidden />
-          Profil
-        </Dropdown.Item>
-
-        <Dropdown.Item
-          as="button"
-          onClick={toggleTheme}
-          className="app-profile-menu__item"
-        >
-          {isDark ? <FaSun aria-hidden /> : <FaMoon aria-hidden />}
-          {isDark ? "Açık tema" : "Koyu tema"}
-        </Dropdown.Item>
-
-        <Dropdown.Divider />
-
-        <Dropdown.Item
-          as="button"
-          onClick={handleLogout}
-          className="app-profile-menu__item app-profile-menu__item--danger"
-        >
-          <FaSignOutAlt aria-hidden />
-          Çıkış
-        </Dropdown.Item>
-      </Dropdown.Menu>
+      <NavbarProfileMenuPanel
+        name={name}
+        email={email}
+        role={role}
+        initials={initials}
+        isDark={isDark}
+        onProfile={() => router.push("/profile")}
+        onToggleTheme={toggleTheme}
+        onLogout={handleLogout}
+      />
     </Dropdown>
   );
 }

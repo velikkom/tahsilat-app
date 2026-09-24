@@ -1,23 +1,7 @@
 "use client";
 
-import { Table, Badge, Button } from "react-bootstrap";
-import {
-  canMarkCollectionAsPaid,
-  formatCurrency,
-  formatDate,
-  formatMaturityDays,
-  getEffectiveStatus,
-  getMarkAsPaidButtonTitle,
-  getPaymentTypeLabel,
-  getStatusLabel,
-  getStatusVariant,
-  showsMarkAsPaidAction,
-} from "@/utils/collectionUtils";
-
-function MaturityDaysCell({ collection }) {
-  const { text, tone } = formatMaturityDays(collection);
-  return <span className={`fw-semibold text-${tone}`}>{text}</span>;
-}
+import { Table } from "react-bootstrap";
+import CustomerCollectionsTableRow from "./CustomerCollectionsTableRow";
 
 export default function CustomerCollectionsTable({
   collections,
@@ -29,7 +13,11 @@ export default function CustomerCollectionsTable({
 }) {
   return (
     <div className="customer-collections-table-wrapper">
-      <Table hover responsive={false} className="customer-collections-table align-middle mb-0">
+      <Table
+        hover
+        responsive={false}
+        className="customer-collections-table align-middle mb-0"
+      >
         <thead>
           <tr>
             <th>Tutar</th>
@@ -42,88 +30,18 @@ export default function CustomerCollectionsTable({
             <th className="text-end">İşlemler</th>
           </tr>
         </thead>
-
         <tbody>
-          {collections.map((collection) => {
-            const status = getEffectiveStatus(collection);
-            const showMarkAsPaid = showsMarkAsPaidAction(collection);
-            const markEnabled = canMarkCollectionAsPaid(collection);
-
-            return (
-              <tr
-                key={collection.id}
-                role="button"
-                onClick={() => onSelect(collection)}
-              >
-                <td className="fw-bold">{formatCurrency(collection.amount)}</td>
-
-                <td>{getPaymentTypeLabel(collection.paymentType)}</td>
-
-                <td>
-                  <Badge bg={getStatusVariant(status)}>
-                    {getStatusLabel(status)}
-                  </Badge>
-                </td>
-
-                <td className="d-none d-xl-table-cell">
-                  {formatDate(collection.collectionDate)}
-                </td>
-
-                <td>{formatDate(collection.maturityDate)}</td>
-
-                <td>
-                  <MaturityDaysCell collection={collection} />
-                </td>
-
-                <td className="d-none d-xl-table-cell">
-                  <span
-                    className="customer-collections-table__description text-muted"
-                    title={collection.description || ""}
-                  >
-                    {collection.description || "-"}
-                  </span>
-                </td>
-
-                <td className="text-end" onClick={(e) => e.stopPropagation()}>
-                  <div className="d-inline-flex gap-1">
-                    {showMarkAsPaid && (
-                      <Button
-                        size="sm"
-                        variant="outline-success"
-                        disabled={busy || !markEnabled}
-                        onClick={() => onMarkAsPaid(collection)}
-                        title={getMarkAsPaidButtonTitle(collection)}
-                      >
-                        <i className="pi pi-check" aria-hidden="true" />
-                      </Button>
-                    )}
-
-                    <Button
-                      size="sm"
-                      variant="outline-warning"
-                      disabled={busy}
-                      onClick={() => onEdit(collection)}
-                      title="Düzenle"
-                      aria-label="Tahsilat düzenle"
-                    >
-                      <i className="pi pi-pencil" aria-hidden="true" />
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="outline-danger"
-                      disabled={busy}
-                      onClick={() => onDelete(collection)}
-                      title="Sil"
-                      aria-label="Tahsilat sil"
-                    >
-                      <i className="pi pi-trash" aria-hidden="true" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
+          {collections.map((collection) => (
+            <CustomerCollectionsTableRow
+              key={collection.id}
+              collection={collection}
+              onSelect={onSelect}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onMarkAsPaid={onMarkAsPaid}
+              busy={busy}
+            />
+          ))}
         </tbody>
       </Table>
     </div>

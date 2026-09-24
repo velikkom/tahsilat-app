@@ -5,53 +5,8 @@ import { Button, Form } from "react-bootstrap";
 import {
   PAYMENT_TYPE_FILTER_OPTIONS,
   STATUS_FILTER_OPTIONS,
-  getPaymentTypeTone,
 } from "@/utils/collectionUtils";
-
-function FilterChipGroup({
-  label,
-  options,
-  value,
-  onChange,
-  disabled,
-  colorByPaymentType = false,
-}) {
-  return (
-    <div className="collection-filter-group">
-      <span className="collection-filter-group__label text-muted">{label}</span>
-      <div className="ui-filter-scroll d-flex gap-2">
-        {options.map((option) => {
-          const isActive = value === option.value;
-          const tone =
-            colorByPaymentType && option.value !== "ALL"
-              ? getPaymentTypeTone(option.value)
-              : null;
-
-          return (
-            <Button
-              key={option.value}
-              variant={isActive ? "primary" : "outline-secondary"}
-              className={[
-                "ui-filter-chip",
-                "flex-shrink-0",
-                "touch-target",
-                tone ? `payment-type-chip payment-type-chip--${tone}` : "",
-                tone && isActive ? "is-active" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => onChange(option.value)}
-              disabled={disabled}
-              aria-pressed={isActive}
-            >
-              {option.label}
-            </Button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+import CollectionFilterChipGroup from "./CollectionFilterChipGroup";
 
 function CollectionFilters({
   searchQuery,
@@ -82,7 +37,6 @@ function CollectionFilters({
             aria-label="Tahsilat ara"
           />
         </div>
-
         {hasActiveFilters && (
           <Button
             variant="outline-secondary"
@@ -95,8 +49,7 @@ function CollectionFilters({
           </Button>
         )}
       </div>
-
-      <FilterChipGroup
+      <CollectionFilterChipGroup
         label="Ödeme Tipi"
         options={PAYMENT_TYPE_FILTER_OPTIONS}
         value={paymentType}
@@ -104,8 +57,7 @@ function CollectionFilters({
         disabled={disabled}
         colorByPaymentType
       />
-
-      <FilterChipGroup
+      <CollectionFilterChipGroup
         label="Durum"
         options={STATUS_FILTER_OPTIONS}
         value={status}

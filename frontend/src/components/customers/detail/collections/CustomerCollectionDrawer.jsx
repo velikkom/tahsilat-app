@@ -1,31 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Badge, Button, Offcanvas } from "react-bootstrap";
+import { Badge, Offcanvas } from "react-bootstrap";
 import {
-  canMarkCollectionAsPaid,
   formatCurrency,
-  formatDate,
-  formatDateTime,
-  formatMaturityDays,
   getEffectiveStatus,
-  getMarkAsPaidButtonTitle,
-  getPaymentTypeLabel,
   getStatusLabel,
   getStatusVariant,
-  showsMarkAsPaidAction,
 } from "@/utils/collectionUtils";
-
-function DetailField({ label, children }) {
-  return (
-    <div className="customer-collection-drawer__field">
-      <span className="customer-collection-drawer__label text-muted">
-        {label}
-      </span>
-      <div className="customer-collection-drawer__value">{children}</div>
-    </div>
-  );
-}
+import useOffcanvasPlacement from "@/hooks/useOffcanvasPlacement";
+import CustomerCollectionDrawerFields from "./CustomerCollectionDrawerFields";
+import CustomerCollectionDrawerActions from "./CustomerCollectionDrawerActions";
 
 export default function CustomerCollectionDrawer({
   show,
@@ -37,29 +21,13 @@ export default function CustomerCollectionDrawer({
   onDelete,
   onMarkAsPaid,
 }) {
-  const [placement, setPlacement] = useState("end");
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
-
-    function updatePlacement() {
-      setPlacement(mediaQuery.matches ? "bottom" : "end");
-    }
-
-    updatePlacement();
-    mediaQuery.addEventListener("change", updatePlacement);
-
-    return () => mediaQuery.removeEventListener("change", updatePlacement);
-  }, []);
+  const placement = useOffcanvasPlacement("(max-width: 767px)");
 
   if (!collection) {
     return null;
   }
 
   const status = getEffectiveStatus(collection);
-  const maturityDays = formatMaturityDays(collection);
-  const showMarkAsPaid = showsMarkAsPaidAction(collection);
-  const markEnabled = canMarkCollectionAsPaid(collection);
 
   return (
     <Offcanvas
@@ -79,80 +47,21 @@ export default function CustomerCollectionDrawer({
           <span className="customer-collection-drawer__amount fw-bold">
             {formatCurrency(collection.amount)}
           </span>
-
           <Badge bg={getStatusVariant(status)}>{getStatusLabel(status)}</Badge>
         </div>
 
-        <div className="customer-collection-drawer__fields">
-          <DetailField label="Müşteri">
-            {collection.customerName || customerName || "-"}
-          </DetailField>
+        <CustomerCollectionDrawerFields
+          collection={collection}
+          customerName={customerName}
+        />
 
-          <DetailField label="Ödeme Türü">
-            {getPaymentTypeLabel(collection.paymentType)}
-          </DetailField>
-
-          <DetailField label="Tahsilat Tarihi">
-            {formatDate(collection.collectionDate)}
-          </DetailField>
-
-          <DetailField label="Vade Tarihi">
-            {formatDate(collection.maturityDate)}
-            {maturityDays.text !== "*" && (
-              <span className={`ms-2 fw-semibold text-${maturityDays.tone}`}>
-                ({maturityDays.text})
-              </span>
-            )}
-          </DetailField>
-
-          <DetailField label="Açıklama">
-            {collection.description || "-"}
-          </DetailField>
-
-          <DetailField label="Oluşturulma Tarihi">
-            {formatDateTime(collection.createdAt)}
-          </DetailField>
-
-          <DetailField label="Son Güncelleme">
-            {formatDateTime(collection.updatedAt)}
-          </DetailField>
-        </div>
-
-        <div className="d-flex flex-column gap-2 mt-auto">
-          {showMarkAsPaid && (
-            <Button
-              variant="success"
-              disabled={busy || !markEnabled}
-              onClick={() => onMarkAsPaid(collection)}
-              title={getMarkAsPaidButtonTitle(collection)}
-            >
-              <i className="pi pi-check me-2" aria-hidden="true" />
-              Tahsil Edildi
-            </Button>
-          )}
-
-          <div className="d-flex gap-2">
-            <Button
-              variant="outline-warning"
-              className="flex-fill"
-              disabled={busy}
-              onClick={() => onEdit(collection)}
-            >
-              <i className="pi pi-pencil me-2" aria-hidden="true" />
-              Düzenle
-            </Button>
-
-            <Button
-              variant="outline-danger"
-              className="flex-fill"
-              disabled={busy}
-              onClick={() => onDelete(collection)}
-            >
-              <i className="pi pi-trash me-2" aria-hidden="true" />
-              Sil
-            </Button>
-          </div>
-        </div>
+        <CustomerCollectionDrawerActions
+          collection={collection}
+          busy={busy}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onMarkAsPaid={onMarkAsPaid}
+        />
       </Offcanvas.Body>
     </Offcanvas>
   );
