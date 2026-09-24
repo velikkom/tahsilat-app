@@ -7,7 +7,6 @@ import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
 import DashboardMonthDetail from "@/components/dashboard/DashboardMonthDetail";
 import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
-import ERPDashboardSummary from "@/components/ERPDashboardSummary";
 import useDashboardYear, {
   DashboardYearProvider,
 } from "@/context/DashboardYearContext";
@@ -24,8 +23,6 @@ function DashboardContent() {
       </div>
 
       <DueMaturityBanner />
-
-      <ERPDashboardSummary />
 
       <DashboardSummary />
 
