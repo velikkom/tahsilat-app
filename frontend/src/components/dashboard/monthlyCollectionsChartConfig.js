@@ -1,6 +1,21 @@
 import { formatCurrency, formatPaymentType } from "@/utils/dashboardFormatters";
 import { buildChartFontSize } from "@/utils/chartResponsive";
 
+const MONTH_NAMES = [
+  "Ocak",
+  "Şubat",
+  "Mart",
+  "Nisan",
+  "Mayıs",
+  "Haziran",
+  "Temmuz",
+  "Ağustos",
+  "Eylül",
+  "Ekim",
+  "Kasım",
+  "Aralık",
+];
+
 const PAYMENT_TYPE_SERIES = [
   { type: "CASH", color: "#16a34a" },
   { type: "BANK_TRANSFER", color: "#2563eb" },
@@ -280,6 +295,72 @@ export const monthlyTotalLabelPlugin = {
   },
 };
 
+function collectionYearMonth(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+  };
+}
+
+export function buildCustomerMonthlyCollections(collections, year) {
+  const months = MONTH_NAMES.map((monthName, index) => ({
+    month: index + 1,
+    monthName,
+    paidAmount: 0,
+    unpaidAmount: 0,
+    totalAmount: 0,
+    paymentTypes: PAYMENT_TYPE_SERIES.map((series) => ({
+      paymentType: series.type,
+      amount: 0,
+    })),
+  }));
+
+  for (const collection of collections || []) {
+    if (collection.active === false) {
+      continue;
+    }
+
+    const status = collection.status;
+
+    if (status !== "PAID" && status !== "PENDING") {
+      continue;
+    }
+
+    const parts = collectionYearMonth(collection.collectionDate);
+
+    if (!parts || parts.year !== year || parts.month < 1 || parts.month > 12) {
+      continue;
+    }
+
+    const amount = Number(collection.amount) || 0;
+    const month = months[parts.month - 1];
+
+    if (status === "PAID") {
+      month.paidAmount += amount;
+    } else {
+      month.unpaidAmount += amount;
+    }
+
+    month.totalAmount += amount;
+
+    const typeRow = month.paymentTypes.find(
+      (item) => item.paymentType === collection.paymentType
+    );
+
+    if (typeRow) {
+      typeRow.amount += amount;
+    }
+  }
+
+  return { year, months };
+}
+
 export function buildMonthlyCollectionsChartData(data) {
   const months = data?.months || [];
   const series = visibleSeries(months);
@@ -324,18 +405,19 @@ export function buildMonthlyCollectionsChartOptions({
       const canvas = event.native?.target;
 
       if (canvas) {
-        canvas.style.cursor = elements?.length ? "pointer" : "default";
+        canvas.style.cursor =
+          setMonth && elements?.length ? "pointer" : "default";
       }
     },
     onClick: (_event, elements) => {
-      if (!elements?.length || !months.length) {
+      if (!setMonth || !elements?.length || !months.length) {
         return;
       }
 
       const monthItem = months[elements[0].index];
 
       if (monthItem) {
-        if (year == null) {
+        if (year == null && setYear) {
           setYear(chartYear);
         }
 

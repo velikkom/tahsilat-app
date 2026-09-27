@@ -12,11 +12,19 @@ import {
   monthlyTotalLabelPlugin,
 } from "./monthlyCollectionsChartConfig";
 
-export default function MonthlyCollectionsChart() {
-  const { isMobile } = useBreakpoint();
-  const { year, chartYear, setYear, setMonth } = useDashboardYear();
-  const { data, loading, error, refresh } = useMonthlyCollections(year);
-
+export function MonthlyCollectionsChartView({
+  data,
+  loading = false,
+  error = null,
+  onRetry,
+  title,
+  hint = "Üzerine gelince dağılım açılır.",
+  isMobile = false,
+  year,
+  chartYear,
+  setYear,
+  setMonth,
+}) {
   const chartData = useMemo(
     () => buildMonthlyCollectionsChartData(data),
     [data]
@@ -39,14 +47,12 @@ export default function MonthlyCollectionsChart() {
 
   return (
     <DashboardWidget
-      title={`Aylık tahsilat (${displayYear})`}
+      title={title || `Aylık tahsilat (${displayYear})`}
       loading={loading}
       error={error}
-      onRetry={refresh}
+      onRetry={onRetry}
     >
-      <p className="text-muted small mb-3">
-        Üzerine gelince dağılım açılır; çubuğa tıklayınca ay seçilir.
-      </p>
+      <p className="text-muted small mb-3">{hint}</p>
       <div className="dashboard-chart dashboard-chart--monthly">
         <Chart
           type="bar"
@@ -57,5 +63,26 @@ export default function MonthlyCollectionsChart() {
         <div className="monthly-chart-tooltip" />
       </div>
     </DashboardWidget>
+  );
+}
+
+export default function MonthlyCollectionsChart() {
+  const { isMobile } = useBreakpoint();
+  const { year, chartYear, setYear, setMonth } = useDashboardYear();
+  const { data, loading, error, refresh } = useMonthlyCollections(year);
+
+  return (
+    <MonthlyCollectionsChartView
+      data={data}
+      loading={loading}
+      error={error}
+      onRetry={refresh}
+      hint="Üzerine gelince dağılım açılır; çubuğa tıklayınca ay seçilir."
+      isMobile={isMobile}
+      year={year}
+      chartYear={chartYear}
+      setYear={setYear}
+      setMonth={setMonth}
+    />
   );
 }

@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Spinner } from "react-bootstrap";
 
 import CustomerInfoCard from "./CustomerInfoCard";
+import CustomerMonthlyCollectionsChart from "./CustomerMonthlyCollectionsChart";
 import CustomerCollectionsSummary from "./collections/CustomerCollectionsSummary";
 import useCustomerCollections from "@/hooks/useCustomerCollections";
 import { buildCollectionsSummary } from "@/utils/collectionUtils";
@@ -23,6 +24,10 @@ export default function CustomerOverview({ customer }) {
         </div>
       ) : (
         <CustomerCollectionsSummary summary={summary} />
+      )}
+
+      {!loading && (
+        <CustomerMonthlyCollectionsChart collections={collections} />
       )}
 
       <CustomerInfoCard customer={customer} />
