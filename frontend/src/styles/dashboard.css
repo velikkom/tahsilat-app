@@ -12,7 +12,16 @@
 }
 
 .dashboard-chart {
+  position: relative;
   height: 260px;
+}
+
+.dashboard-chart .p-chart {
+  height: 100%;
+}
+
+.dashboard-chart.dashboard-chart--monthly {
+  height: 320px;
 }
 
 .dashboard-chart--tall {
@@ -252,6 +261,77 @@ a.payment-firm-card:active {
   text-decoration: none;
 }
 
+.monthly-chart-tooltip {
+  position: absolute;
+  z-index: 4;
+  min-width: 15.5rem;
+  padding: 0.7rem 0.85rem 0.55rem;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #f8fafc;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+  pointer-events: none;
+  opacity: 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.monthly-chart-tooltip__title {
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+}
+
+.monthly-chart-tooltip__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.08rem 0;
+}
+
+.monthly-chart-tooltip__row--total {
+  margin-top: 0.1rem;
+  font-weight: 700;
+}
+
+.monthly-chart-tooltip__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(248, 250, 252, 0.82);
+}
+
+.monthly-chart-tooltip__row--total .monthly-chart-tooltip__label,
+.monthly-chart-tooltip__row--total .monthly-chart-tooltip__value {
+  color: #fff;
+}
+
+.monthly-chart-tooltip__value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.monthly-chart-tooltip__divider {
+  height: 1px;
+  margin: 0.4rem 0 0.3rem;
+  background: rgba(248, 250, 252, 0.16);
+}
+
+.monthly-chart-tooltip__swatch {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 2px;
+  flex: none;
+}
+
+[data-theme="dark"] .monthly-chart-tooltip,
+[data-bs-theme="dark"] .monthly-chart-tooltip {
+  background: #0b1220;
+  border: 1px solid #334155;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
 .dashboard-bar {
   height: 6px;
   border-radius: 999px;
@@ -280,6 +360,10 @@ a.payment-firm-card:active {
     height: 280px;
   }
 
+  .dashboard-chart.dashboard-chart--monthly {
+    height: 360px;
+  }
+
   .dashboard-chart--tall {
     height: 380px;
   }
@@ -292,6 +376,10 @@ a.payment-firm-card:active {
 @media (min-width: 1024px) {
   .dashboard-chart {
     height: 320px;
+  }
+
+  .dashboard-chart.dashboard-chart--monthly {
+    height: 400px;
   }
 
   .dashboard-chart--tall {

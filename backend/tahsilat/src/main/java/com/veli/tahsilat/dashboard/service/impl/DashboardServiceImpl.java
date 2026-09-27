@@ -13,6 +13,7 @@ import com.veli.tahsilat.dashboard.dto.response.MailOrderCompanyAmountItemRespon
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
+import com.veli.tahsilat.dashboard.dto.response.MonthlyPaymentTypeAmountResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeAmountItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeDistributionItemResponse;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,6 +53,11 @@ public class DashboardServiceImpl implements DashboardService {
     private static final List<PaymentType> MATURITY_PAYMENT_TYPES = List.of(
             PaymentType.CHECK,
             PaymentType.PROMISSORY_NOTE
+    );
+
+    private static final List<CollectionStatus> MONTHLY_CHART_STATUSES = List.of(
+            CollectionStatus.PAID,
+            CollectionStatus.PENDING
     );
 
     private final CollectionRepository collectionRepository;
@@ -232,11 +239,42 @@ public class DashboardServiceImpl implements DashboardService {
             }
         }
 
+        Map<Integer, Map<PaymentType, BigDecimal>> amountByMonthAndType = new HashMap<>();
+
+        for (Object[] row : collectionRepository.sumAmountGroupByMonthAndPaymentTypeForYear(
+                targetYear,
+                MONTHLY_CHART_STATUSES
+        )) {
+            int month = ((Number) row[0]).intValue();
+            PaymentType paymentType = (PaymentType) row[1];
+
+            if (paymentType == null) {
+                continue;
+            }
+
+            BigDecimal amount = nullSafe((BigDecimal) row[2]);
+            amountByMonthAndType
+                    .computeIfAbsent(month, ignored -> new EnumMap<>(PaymentType.class))
+                    .merge(paymentType, amount, BigDecimal::add);
+        }
+
         List<MonthlyCollectionItemResponse> months = new ArrayList<>();
 
         for (int month = 1; month <= 12; month++) {
             BigDecimal paid = paidTotals.getOrDefault(month, BigDecimal.ZERO);
             BigDecimal unpaid = unpaidTotals.getOrDefault(month, BigDecimal.ZERO);
+            Map<PaymentType, BigDecimal> monthTypes =
+                    amountByMonthAndType.getOrDefault(month, Map.of());
+            List<MonthlyPaymentTypeAmountResponse> paymentTypes = new ArrayList<>();
+
+            for (PaymentType paymentType : PaymentType.values()) {
+                paymentTypes.add(
+                        MonthlyPaymentTypeAmountResponse.builder()
+                                .paymentType(paymentType)
+                                .amount(monthTypes.getOrDefault(paymentType, BigDecimal.ZERO))
+                                .build()
+                );
+            }
 
             months.add(
                     MonthlyCollectionItemResponse.builder()
@@ -245,6 +283,7 @@ public class DashboardServiceImpl implements DashboardService {
                             .paidAmount(paid)
                             .unpaidAmount(unpaid)
                             .totalAmount(paid.add(unpaid))
+                            .paymentTypes(paymentTypes)
                             .build()
             );
         }

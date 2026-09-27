@@ -9,6 +9,7 @@ import DashboardWidget from "./DashboardWidget";
 import {
   buildMonthlyCollectionsChartData,
   buildMonthlyCollectionsChartOptions,
+  monthlyTotalLabelPlugin,
 } from "./monthlyCollectionsChartConfig";
 
 export default function MonthlyCollectionsChart() {
@@ -44,10 +45,16 @@ export default function MonthlyCollectionsChart() {
       onRetry={refresh}
     >
       <p className="text-muted small mb-3">
-        Çubuğa tıklayınca ay seçilir; müşteri listesi ve ay detayı o aya göre güncellenir.
+        Üzerine gelince dağılım açılır; çubuğa tıklayınca ay seçilir.
       </p>
-      <div className="dashboard-chart">
-        <Chart type="bar" data={chartData} options={chartOptions} />
+      <div className="dashboard-chart dashboard-chart--monthly">
+        <Chart
+          type="bar"
+          data={chartData}
+          options={chartOptions}
+          plugins={[monthlyTotalLabelPlugin]}
+        />
+        <div className="monthly-chart-tooltip" />
       </div>
     </DashboardWidget>
   );

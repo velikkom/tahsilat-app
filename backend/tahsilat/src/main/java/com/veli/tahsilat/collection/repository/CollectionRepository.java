@@ -311,6 +311,19 @@ public interface CollectionRepository
             """)
     List<Object[]> sumAmountGroupByMonthAndStatusForYear(@Param("year") int year);
 
+    @Query("""
+            SELECT EXTRACT(MONTH FROM c.collectionDate), c.paymentType, COALESCE(SUM(c.amount), 0)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status IN :statuses
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            GROUP BY EXTRACT(MONTH FROM c.collectionDate), c.paymentType
+            """)
+    List<Object[]> sumAmountGroupByMonthAndPaymentTypeForYear(
+            @Param("year") int year,
+            @Param("statuses") List<CollectionStatus> statuses
+    );
+
     long countByStatusAndPaymentTypeInAndMaturityDateAndActiveTrue(
             CollectionStatus status,
             List<PaymentType> paymentTypes,

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,4 +19,6 @@ public class MonthlyCollectionItemResponse {
     private BigDecimal paidAmount;
 
     private BigDecimal unpaidAmount;
+
+    private List<MonthlyPaymentTypeAmountResponse> paymentTypes;
 }
