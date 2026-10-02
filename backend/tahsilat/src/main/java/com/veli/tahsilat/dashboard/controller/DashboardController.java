@@ -6,6 +6,7 @@ import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
+import com.veli.tahsilat.dashboard.dto.response.PayingCustomerCountResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeDistributionResponse;
 import com.veli.tahsilat.dashboard.dto.response.RecentCollectionsResponse;
@@ -34,6 +35,16 @@ public class DashboardController {
             @RequestParam(required = false) Integer year
     ) {
         return ResponseEntity.ok(dashboardService.getMetrics(year));
+    }
+
+    @Operation(summary = "Distinct customers with a paid collection in the selected period")
+    @GetMapping("/paying-customers")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
+    public ResponseEntity<PayingCustomerCountResponse> getPayingCustomerCount(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month
+    ) {
+        return ResponseEntity.ok(dashboardService.getPayingCustomerCount(year, month));
     }
 
     @Operation(summary = "Pending check and promissory-note aging")

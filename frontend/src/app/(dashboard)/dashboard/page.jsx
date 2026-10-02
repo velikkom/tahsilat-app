@@ -4,6 +4,7 @@ import DashboardSummary from "@/components/dashboard/DashboardSummary";
 import DashboardCustomers from "@/components/dashboard/DashboardCustomers";
 import DashboardAging from "@/components/dashboard/DashboardAging";
 import DashboardYearFilter from "@/components/dashboard/DashboardYearFilter";
+import DashboardPayingFirms from "@/components/dashboard/DashboardPayingFirms";
 import MonthlyCollectionsChart from "@/components/dashboard/MonthlyCollectionsChart";
 import DashboardMonthDetail from "@/components/dashboard/DashboardMonthDetail";
 import DueMaturityBanner from "@/components/collections/DueMaturityBanner";
@@ -27,7 +28,10 @@ function DashboardContent() {
       <DashboardSummary />
 
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
-        <h2 className="h5 fw-bold mb-0">Kırılımlar</h2>
+        <div className="d-flex flex-column align-items-start gap-2">
+          <h2 className="h5 fw-bold mb-0">Kırılımlar</h2>
+          <DashboardPayingFirms />
+        </div>
         <DashboardYearFilter />
       </div>
 

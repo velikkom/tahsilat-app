@@ -6,6 +6,7 @@ import com.veli.tahsilat.dashboard.dto.response.DashboardInsightsResponse;
 import com.veli.tahsilat.dashboard.dto.response.DashboardMetricsResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
+import com.veli.tahsilat.dashboard.dto.response.PayingCustomerCountResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeDistributionResponse;
 import com.veli.tahsilat.dashboard.dto.response.RecentCollectionsResponse;
@@ -14,6 +15,8 @@ import com.veli.tahsilat.dashboard.dto.response.TopCustomersResponse;
 public interface DashboardService {
 
     DashboardMetricsResponse getMetrics(Integer year);
+
+    PayingCustomerCountResponse getPayingCustomerCount(Integer year, Integer month);
 
     DashboardAgingResponse getAging();
 

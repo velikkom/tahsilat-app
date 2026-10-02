@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   getDashboardInsights,
   getDashboardMetrics,
+  getPayingCustomerCount,
   getDashboardAging,
   getMonthlyCollections,
   getPaymentTypeDistribution,
@@ -53,6 +54,13 @@ function useDashboardQuery(fetcher, deps = []) {
 
 export function useDashboardMetrics(year) {
   return useDashboardQuery(() => getDashboardMetrics(year), [year]);
+}
+
+export function usePayingCustomerCount(year, month) {
+  return useDashboardQuery(
+    () => getPayingCustomerCount(year, month),
+    [year, month]
+  );
 }
 
 export function useMonthlyCollections(year) {

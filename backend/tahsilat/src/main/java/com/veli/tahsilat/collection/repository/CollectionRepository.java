@@ -254,6 +254,19 @@ public interface CollectionRepository
     BigDecimal sumAmountByActiveTrueAndOptionalYear(@Param("year") Integer year);
 
     @Query("""
+            SELECT COUNT(DISTINCT c.customer.id)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = com.veli.tahsilat.collection.enums.CollectionStatus.PAID
+            AND (:year IS NULL OR EXTRACT(YEAR FROM c.collectionDate) = :year)
+            AND (:month IS NULL OR EXTRACT(MONTH FROM c.collectionDate) = :month)
+            """)
+    long countDistinctPayingCustomers(
+            @Param("year") Integer year,
+            @Param("month") Integer month
+    );
+
+    @Query("""
             SELECT COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true

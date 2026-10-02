@@ -16,6 +16,29 @@
   height: 260px;
 }
 
+.dashboard-paying-firms {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.dashboard-paying-firms__value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-ink);
+}
+
+.dashboard-paying-firms__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
 .dashboard-chart .p-chart {
   height: 100%;
 }

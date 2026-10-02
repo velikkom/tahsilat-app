@@ -13,6 +13,7 @@ import com.veli.tahsilat.dashboard.dto.response.MailOrderCompanyAmountItemRespon
 import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
+import com.veli.tahsilat.dashboard.dto.response.PayingCustomerCountResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyPaymentTypeAmountResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeAmountItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
@@ -160,6 +161,15 @@ public class DashboardServiceImpl implements DashboardService {
                 ))
                 .paidAmount(paidAmount)
                 .unpaidAmount(unpaidAmount)
+                .build();
+    }
+
+    @Override
+    public PayingCustomerCountResponse getPayingCustomerCount(Integer year, Integer month) {
+        return PayingCustomerCountResponse.builder()
+                .count(collectionRepository.countDistinctPayingCustomers(year, month))
+                .year(year)
+                .month(month)
                 .build();
     }
 
