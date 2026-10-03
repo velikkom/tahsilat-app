@@ -25,6 +25,8 @@ export default function DashboardPayingFirms() {
   const { year, month } = useDashboardYear();
   const { data, loading, error } = usePayingCustomerCount(year, month);
   const count = Number(data?.count ?? 0);
+  const paidCount = Number(data?.paidCount ?? 0);
+  const ready = !loading && !error;
 
   return (
     <div className="dashboard-paying-firms">
@@ -32,8 +34,11 @@ export default function DashboardPayingFirms() {
         {loading ? "…" : error ? "—" : count}
       </div>
       <div>
-        <div className="dashboard-paying-firms__label">firma ödeme yaptı</div>
-        <div className="text-muted small">{periodLabel(year, month)}</div>
+        <div className="dashboard-paying-firms__label">aktif firma</div>
+        <div className="text-muted small">
+          {periodLabel(year, month)}
+          {ready && ` · ${paidCount} firma ödedi`}
+        </div>
       </div>
     </div>
   );

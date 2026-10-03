@@ -37,7 +37,7 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getMetrics(year));
     }
 
-    @Operation(summary = "Distinct customers with a paid collection in the selected period")
+    @Operation(summary = "Distinct customers with a paid or pending collection in the selected period")
     @GetMapping("/paying-customers")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<PayingCustomerCountResponse> getPayingCustomerCount(

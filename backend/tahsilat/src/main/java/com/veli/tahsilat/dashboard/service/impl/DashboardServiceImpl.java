@@ -167,7 +167,10 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public PayingCustomerCountResponse getPayingCustomerCount(Integer year, Integer month) {
         return PayingCustomerCountResponse.builder()
-                .count(collectionRepository.countDistinctPayingCustomers(year, month))
+                .count(collectionRepository.countDistinctCustomersByStatuses(
+                        MONTHLY_CHART_STATUSES, year, month))
+                .paidCount(collectionRepository.countDistinctCustomersByStatuses(
+                        List.of(CollectionStatus.PAID), year, month))
                 .year(year)
                 .month(month)
                 .build();
