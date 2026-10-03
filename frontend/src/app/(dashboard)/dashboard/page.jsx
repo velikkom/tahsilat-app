@@ -27,12 +27,12 @@ function DashboardContent() {
 
       <DashboardSummary />
 
-      <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
-        <div className="d-flex flex-column align-items-start gap-2">
+      <div className="d-flex flex-column gap-3">
+        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
           <h2 className="h5 fw-bold mb-0">Kırılımlar</h2>
-          <DashboardPayingFirms />
+          <DashboardYearFilter />
         </div>
-        <DashboardYearFilter />
+        <DashboardPayingFirms />
       </div>
 
       <MonthlyCollectionsChart />

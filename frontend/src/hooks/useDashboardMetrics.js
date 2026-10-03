@@ -56,11 +56,8 @@ export function useDashboardMetrics(year) {
   return useDashboardQuery(() => getDashboardMetrics(year), [year]);
 }
 
-export function usePayingCustomerCount(year, month) {
-  return useDashboardQuery(
-    () => getPayingCustomerCount(year, month),
-    [year, month]
-  );
+export function usePayingCustomerCount(year) {
+  return useDashboardQuery(() => getPayingCustomerCount(year), [year]);
 }
 
 export function useMonthlyCollections(year) {

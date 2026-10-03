@@ -37,14 +37,13 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getMetrics(year));
     }
 
-    @Operation(summary = "Distinct customers with a paid or pending collection in the selected period")
+    @Operation(summary = "Distinct paying customers per month, cumulative and new, for a year")
     @GetMapping("/paying-customers")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SALESMAN')")
     public ResponseEntity<PayingCustomerCountResponse> getPayingCustomerCount(
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) Integer month
+            @RequestParam(required = false) Integer year
     ) {
-        return ResponseEntity.ok(dashboardService.getPayingCustomerCount(year, month));
+        return ResponseEntity.ok(dashboardService.getPayingCustomerCount(year));
     }
 
     @Operation(summary = "Pending check and promissory-note aging")

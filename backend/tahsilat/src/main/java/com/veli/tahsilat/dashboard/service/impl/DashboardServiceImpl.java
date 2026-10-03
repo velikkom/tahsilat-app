@@ -14,6 +14,7 @@ import com.veli.tahsilat.dashboard.dto.response.MonthPaymentBreakdownResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyCollectionsResponse;
 import com.veli.tahsilat.dashboard.dto.response.PayingCustomerCountResponse;
+import com.veli.tahsilat.dashboard.dto.response.PayingCustomerMonthResponse;
 import com.veli.tahsilat.dashboard.dto.response.MonthlyPaymentTypeAmountResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeAmountItemResponse;
 import com.veli.tahsilat.dashboard.dto.response.PaymentTypeCustomersResponse;
@@ -36,9 +37,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -165,14 +168,48 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public PayingCustomerCountResponse getPayingCustomerCount(Integer year, Integer month) {
+    public PayingCustomerCountResponse getPayingCustomerCount(Integer year) {
+        if (year == null) {
+            return PayingCustomerCountResponse.builder()
+                    .count(collectionRepository.countDistinctCustomersByStatuses(
+                            List.of(CollectionStatus.PAID), null, null))
+                    .months(List.of())
+                    .build();
+        }
+
+        Map<Integer, Set<UUID>> customersByMonth = new HashMap<>();
+        Map<UUID, Integer> firstMonthByCustomer = new HashMap<>();
+
+        for (Object[] row : collectionRepository.findPaidCustomerMonthsForYear(year)) {
+            UUID customerId = (UUID) row[0];
+            int month = ((Number) row[1]).intValue();
+            customersByMonth.computeIfAbsent(month, key -> new HashSet<>()).add(customerId);
+            firstMonthByCustomer.merge(customerId, month, Math::min);
+        }
+
+        Map<Integer, Long> newByMonth = new HashMap<>();
+        firstMonthByCustomer.values().forEach(month -> newByMonth.merge(month, 1L, Long::sum));
+
+        List<PayingCustomerMonthResponse> months = new ArrayList<>();
+        long cumulative = 0;
+
+        for (int month = 1; month <= 12; month++) {
+            long newCount = newByMonth.getOrDefault(month, 0L);
+            cumulative += newCount;
+            months.add(
+                    PayingCustomerMonthResponse.builder()
+                            .month(month)
+                            .count((long) customersByMonth.getOrDefault(month, Set.of()).size())
+                            .cumulativeCount(cumulative)
+                            .newCount(newCount)
+                            .build()
+            );
+        }
+
         return PayingCustomerCountResponse.builder()
-                .count(collectionRepository.countDistinctCustomersByStatuses(
-                        MONTHLY_CHART_STATUSES, year, month))
-                .paidCount(collectionRepository.countDistinctCustomersByStatuses(
-                        List.of(CollectionStatus.PAID), year, month))
+                .count((long) firstMonthByCustomer.size())
                 .year(year)
-                .month(month)
+                .months(months)
                 .build();
     }
 

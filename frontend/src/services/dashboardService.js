@@ -27,15 +27,9 @@ export function getDashboardMetrics(year) {
   );
 }
 
-export function getPayingCustomerCount(year, month) {
-  const params = [buildYearQuery(year)];
-
-  if (month != null) {
-    params.push(`month=${month}`);
-  }
-
+export function getPayingCustomerCount(year) {
   return dashboardFetch(
-    appendQuery("/paying-customers", params),
+    appendQuery("/paying-customers", [buildYearQuery(year)]),
     "Ödeme yapan firma sayısı alınamadı"
   );
 }

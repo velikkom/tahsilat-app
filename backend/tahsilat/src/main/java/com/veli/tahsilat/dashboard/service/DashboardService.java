@@ -16,7 +16,7 @@ public interface DashboardService {
 
     DashboardMetricsResponse getMetrics(Integer year);
 
-    PayingCustomerCountResponse getPayingCustomerCount(Integer year, Integer month);
+    PayingCustomerCountResponse getPayingCustomerCount(Integer year);
 
     DashboardAgingResponse getAging();
 

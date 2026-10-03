@@ -268,6 +268,16 @@ public interface CollectionRepository
     );
 
     @Query("""
+            SELECT c.customer.id, EXTRACT(MONTH FROM c.collectionDate)
+            FROM Collection c
+            WHERE c.active = true
+            AND c.status = com.veli.tahsilat.collection.enums.CollectionStatus.PAID
+            AND EXTRACT(YEAR FROM c.collectionDate) = :year
+            GROUP BY c.customer.id, EXTRACT(MONTH FROM c.collectionDate)
+            """)
+    List<Object[]> findPaidCustomerMonthsForYear(@Param("year") int year);
+
+    @Query("""
             SELECT COALESCE(SUM(c.amount), 0)
             FROM Collection c
             WHERE c.active = true

@@ -39,6 +39,71 @@
   line-height: 1.2;
 }
 
+.dashboard-paying-firms-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.dashboard-paying-firms-panel .dashboard-paying-firms {
+  flex: 0 0 auto;
+}
+
+.dashboard-paying-firms__months {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(2.4rem, 1fr);
+  gap: 0.15rem;
+  flex: 1 1 22rem;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.35rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+}
+
+.dashboard-paying-firms__month {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.3rem 0.1rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-ink);
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.dashboard-paying-firms__month:hover {
+  border-color: var(--color-border);
+}
+
+.dashboard-paying-firms__month.is-active {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.dashboard-paying-firms__month-name {
+  font-size: 0.72rem;
+  color: var(--bs-secondary-color, #6b7280);
+}
+
+.dashboard-paying-firms__month-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.dashboard-paying-firms__month-new {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
 .dashboard-chart .p-chart {
   height: 100%;
 }
