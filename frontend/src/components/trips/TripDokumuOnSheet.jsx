@@ -40,6 +40,7 @@ export default function TripDokumuOnSheet({ preview, pageIndex = 0 }) {
             posYkb={model.posYkb}
             posTeb={model.posTeb}
             havale={model.havale}
+            excludedByType={model.excludedByType}
             masraf={model.masraf}
             prim={model.prim}
             kalanNakit={model.kalanNakit}

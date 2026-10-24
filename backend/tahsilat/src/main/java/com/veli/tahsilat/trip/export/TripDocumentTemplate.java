@@ -121,11 +121,19 @@ public class TripDocumentTemplate {
 
         /**
          * Column C of the tahsilat özeti: "PİRİMDEN DÜŞÜLECEK TAHSİLAT".
-         * A single trip-level amount is written on the nakit row (C17);
-         * {@code B26 = (B25 - SUM(C17:C24)) / 1.2} then takes 1% in B27.
+         * Each payment type is written on its own row. Excel row 20 is the
+         * leftover firma total; the mail-order amount row is Excel row 21.
+         * {@code SUM(C17:C24)} is what the prim matrahı formula subtracts.
          */
         public static final int COL_COMMISSION_EXCLUDED = 2;
-        public static final int ROW_COMMISSION_EXCLUDED = 16;
+        public static final int ROW_EXCLUDED_CASH = 16;
+        public static final int ROW_COMMISSION_EXCLUDED = ROW_EXCLUDED_CASH;
+        public static final int ROW_EXCLUDED_NOTE = 17;
+        public static final int ROW_EXCLUDED_CHECK = 18;
+        public static final int ROW_EXCLUDED_MAIL_ORDER = 20;
+        public static final int ROW_EXCLUDED_POS_YKB = 21;
+        public static final int ROW_EXCLUDED_POS_TEB = 22;
+        public static final int ROW_EXCLUDED_TRANSFER = 23;
 
         /** Reconciliation block, column E. */
         public static final int COL_RECONCILIATION_VALUE = 4;

@@ -52,16 +52,22 @@ class TripDocumentGeneratorTest {
 
         Collection flagged = cashCollection("Musteri", 500);
         flagged.setExcludeFromCommission(true);
+        Collection mailOrder = cashCollection("Mail", 400);
+        mailOrder.setPaymentType(PaymentType.MAIL_ORDER);
+        mailOrder.setExcludeFromCommission(true);
         Collection plain = cashCollection("Diger", 800);
 
-        byte[] bytes = generator.generate(trip, List.of(flagged, plain));
+        byte[] bytes = generator.generate(trip, List.of(flagged, mailOrder, plain));
 
         try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
             Sheet on = workbook.getSheet(TripDocumentTemplate.SHEET_ON);
-            Cell cell = on.getRow(TripDocumentTemplate.On.ROW_COMMISSION_EXCLUDED)
+            Cell cashCell = on.getRow(TripDocumentTemplate.On.ROW_EXCLUDED_CASH)
+                    .getCell(TripDocumentTemplate.On.COL_COMMISSION_EXCLUDED);
+            Cell mailOrderCell = on.getRow(TripDocumentTemplate.On.ROW_EXCLUDED_MAIL_ORDER)
                     .getCell(TripDocumentTemplate.On.COL_COMMISSION_EXCLUDED);
 
-            assertEquals(3200.0, cell.getNumericCellValue(), 0.001);
+            assertEquals(3200.0, cashCell.getNumericCellValue(), 0.001);
+            assertEquals(400.0, mailOrderCell.getNumericCellValue(), 0.001);
         }
     }
 

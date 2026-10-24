@@ -5,6 +5,32 @@ import {
   toNumber,
 } from "@/utils/tripDokumuFormat";
 
+function excludedAmounts(preview) {
+  const byType = preview.commissionExcludedByType;
+
+  if (!byType) {
+    return {
+      cash: toNumber(preview.commissionExcludedAmount),
+      senet: 0,
+      cek: 0,
+      mailOrder: 0,
+      posYkb: 0,
+      posTeb: 0,
+      havale: 0,
+    };
+  }
+
+  return {
+    cash: toNumber(byType.cash),
+    senet: toNumber(byType.promissoryNote),
+    cek: toNumber(byType.check),
+    mailOrder: toNumber(byType.mailOrder),
+    posYkb: toNumber(byType.posYkb),
+    posTeb: toNumber(byType.posTeb),
+    havale: toNumber(byType.bankTransfer),
+  };
+}
+
 function expenseByDate(dailyExpenses = []) {
   const map = new Map();
 
@@ -36,7 +62,15 @@ export default function buildTripDokumuOnModel(preview, pageIndex = 0) {
   const posTeb = toNumber(totals.posTeb);
   const havale = toNumber(totals.bankTransfer);
   const genelToplam = cash + senet + cek + mailOrder + posYkb + posTeb + havale;
-  const excluded = toNumber(preview.commissionExcludedAmount);
+  const excludedByType = excludedAmounts(preview);
+  const excluded =
+    excludedByType.cash +
+    excludedByType.senet +
+    excludedByType.cek +
+    excludedByType.mailOrder +
+    excludedByType.posYkb +
+    excludedByType.posTeb +
+    excludedByType.havale;
   const primMatrah = Math.round(((genelToplam - excluded) / 1.2) * 100) / 100;
   const prim = Math.round(primMatrah * 0.01 * 100) / 100;
   const masraf = toNumber(preview.expenseTotal);
@@ -65,6 +99,7 @@ export default function buildTripDokumuOnModel(preview, pageIndex = 0) {
     posTeb,
     havale,
     genelToplam,
+    excludedByType,
     primMatrah,
     prim,
     masraf,

@@ -11,6 +11,7 @@ export default function TripDokumuOnCollectionRows({
   posYkb,
   posTeb,
   havale,
+  excludedByType,
   masraf,
   prim,
   kalanNakit,
@@ -31,7 +32,7 @@ export default function TripDokumuOnCollectionRows({
       <tr>
         <td>NAKİT TAHSİLAT TOPLAMI</td>
         <td className="dokumu-strong">{formatFormAmount(cash, { zero: true })}</td>
-        <td>{formatFormAmount(preview.commissionExcludedAmount)}</td>
+        <td>{formatFormAmount(excludedByType.cash)}</td>
         <td>MASRAF TOPLAMI</td>
         <td className="dokumu-strong">
           {formatFormAmount(masraf, { zero: true })}
@@ -41,7 +42,7 @@ export default function TripDokumuOnCollectionRows({
       <tr>
         <td>SENET TAHSİLAT TOPLAMI</td>
         <td className="dokumu-strong">{formatFormAmount(senet, { zero: true })}</td>
-        <td />
+        <td>{formatFormAmount(excludedByType.senet)}</td>
         <td>ALDIĞI HAFTALIK</td>
         <td>{formatFormAmount(preview.weeklyAllowance)}</td>
         <td colSpan={3} />
@@ -49,7 +50,7 @@ export default function TripDokumuOnCollectionRows({
       <tr>
         <td>ÇEK TAHSİLAT TOPLAMI</td>
         <td className="dokumu-strong">{formatFormAmount(cek, { zero: true })}</td>
-        <td />
+        <td>{formatFormAmount(excludedByType.cek)}</td>
         <td>ALDIĞI PRİM</td>
         <td className="dokumu-strong">{formatFormAmount(prim, { zero: true })}</td>
         <td colSpan={3} />
@@ -60,6 +61,7 @@ export default function TripDokumuOnCollectionRows({
         posYkb={posYkb}
         posTeb={posTeb}
         havale={havale}
+        excludedByType={excludedByType}
         kalanNakit={kalanNakit}
       />
     </>

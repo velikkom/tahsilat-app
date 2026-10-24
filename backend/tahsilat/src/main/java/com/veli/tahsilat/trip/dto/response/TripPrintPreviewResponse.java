@@ -44,6 +44,8 @@ public class TripPrintPreviewResponse {
 
     private BigDecimal commissionExcludedAmount;
 
+    private CommissionExcludedByTypeResponse commissionExcludedByType;
+
     private BigDecimal commissionReceived;
 
     private BigDecimal extraReceived;

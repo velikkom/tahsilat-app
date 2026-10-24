@@ -6,6 +6,7 @@ export default function TripDokumuOnCollectionTail({
   posYkb,
   posTeb,
   havale,
+  excludedByType,
   kalanNakit,
 }) {
   return (
@@ -15,7 +16,7 @@ export default function TripDokumuOnCollectionTail({
         <td className="dokumu-strong">
           {formatFormAmount(mailOrder, { zero: true })}
         </td>
-        <td />
+        <td>{formatFormAmount(excludedByType.mailOrder)}</td>
         <td>FAZLADAN ALDIĞI</td>
         <td>{formatFormAmount(preview.extraReceived)}</td>
         <td colSpan={3} />
@@ -25,7 +26,7 @@ export default function TripDokumuOnCollectionTail({
         <td className="dokumu-strong">
           {formatFormAmount(posYkb, { zero: true })}
         </td>
-        <td />
+        <td>{formatFormAmount(excludedByType.posYkb)}</td>
         <td>ALDIĞI AGİ</td>
         <td>{formatFormAmount(preview.agiReceived)}</td>
         <td colSpan={3} />
@@ -35,7 +36,7 @@ export default function TripDokumuOnCollectionTail({
         <td className="dokumu-strong">
           {formatFormAmount(posTeb, { zero: true })}
         </td>
-        <td />
+        <td>{formatFormAmount(excludedByType.posTeb)}</td>
         <td>KALAN NAKİT</td>
         <td className="dokumu-strong">
           {formatFormAmount(kalanNakit, { zero: true })}
@@ -47,7 +48,7 @@ export default function TripDokumuOnCollectionTail({
         <td className="dokumu-strong">
           {formatFormAmount(havale, { zero: true })}
         </td>
-        <td />
+        <td>{formatFormAmount(excludedByType.havale)}</td>
         <td className="dokumu-head">İMZASI</td>
         <td />
         <td colSpan={3} />

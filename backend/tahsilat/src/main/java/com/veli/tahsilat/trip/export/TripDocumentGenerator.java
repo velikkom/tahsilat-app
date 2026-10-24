@@ -1,6 +1,7 @@
 package com.veli.tahsilat.trip.export;
 
 import com.veli.tahsilat.collection.entity.Collection;
+import com.veli.tahsilat.collection.enums.PaymentType;
 import com.veli.tahsilat.common.exception.BusinessException;
 import com.veli.tahsilat.trip.entity.Trip;
 import com.veli.tahsilat.trip.entity.TripDailyExpense;
@@ -73,7 +74,7 @@ public class TripDocumentGenerator {
                 retargetOnArkaFormulas(onSheets.get(0), arkaSheets);
             }
 
-            BigDecimal commissionExcluded = CommissionExclusion.total(
+            Map<PaymentType, BigDecimal> commissionExcluded = CommissionExclusion.byType(
                     trip.getCommissionExcludedAmount(),
                     documentRows
             );
@@ -263,7 +264,7 @@ public class TripDocumentGenerator {
             Trip trip,
             List<LocalDate> days,
             boolean primarySheet,
-            BigDecimal commissionExcluded
+            Map<PaymentType, BigDecimal> commissionExcluded
     ) {
         if (primarySheet) {
             writeVehicleRow(sheet, trip);
@@ -322,12 +323,7 @@ public class TripDocumentGenerator {
         setNumber(sheet, On.ROW_WEEKLY_ALLOWANCE, On.COL_RECONCILIATION_VALUE, trip.getWeeklyAllowance());
         setNumber(sheet, On.ROW_EXTRA_RECEIVED, On.COL_RECONCILIATION_VALUE, trip.getExtraReceived());
         setNumber(sheet, On.ROW_AGI_RECEIVED, On.COL_RECONCILIATION_VALUE, trip.getAgiReceived());
-        setNumber(
-                sheet,
-                On.ROW_COMMISSION_EXCLUDED,
-                On.COL_COMMISSION_EXCLUDED,
-                commissionExcluded
-        );
+        writeCommissionExcluded(sheet, commissionExcluded);
 
         // Prim matrahı is KDV-exclusive: (genel toplam - primden düşülecek) / 1.2
         setFormula(sheet, 25, 1, "(B25-SUM(C17:C24))/1.2");
@@ -397,6 +393,16 @@ public class TripDocumentGenerator {
         }
 
         return row.getCell(columnIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+    }
+
+    private void writeCommissionExcluded(Sheet sheet, Map<PaymentType, BigDecimal> excluded) {
+        setNumber(sheet, On.ROW_EXCLUDED_CASH, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.CASH));
+        setNumber(sheet, On.ROW_EXCLUDED_NOTE, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.PROMISSORY_NOTE));
+        setNumber(sheet, On.ROW_EXCLUDED_CHECK, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.CHECK));
+        setNumber(sheet, On.ROW_EXCLUDED_MAIL_ORDER, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.MAIL_ORDER));
+        setNumber(sheet, On.ROW_EXCLUDED_POS_YKB, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.POS_YKB));
+        setNumber(sheet, On.ROW_EXCLUDED_POS_TEB, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.POS_TEB));
+        setNumber(sheet, On.ROW_EXCLUDED_TRANSFER, On.COL_COMMISSION_EXCLUDED, excluded.get(PaymentType.BANK_TRANSFER));
     }
 
     /** Blank stays blank: the paper form is filled with gaps, not zeros. */

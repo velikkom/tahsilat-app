@@ -2,6 +2,7 @@ package com.veli.tahsilat.trip.export;
 
 import com.veli.tahsilat.collection.entity.Collection;
 import com.veli.tahsilat.collection.enums.PaymentType;
+import com.veli.tahsilat.trip.dto.response.CommissionExcludedByTypeResponse;
 import com.veli.tahsilat.trip.dto.response.TripPrintCollectionRowResponse;
 import com.veli.tahsilat.trip.dto.response.TripPrintPreviewResponse;
 import com.veli.tahsilat.trip.dto.response.TripPrintTotalsResponse;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Builds the /print-preview payload (on-screen Form 1 + Form 2). Reuses
@@ -32,6 +34,10 @@ public class TripPrintPreviewBuilder {
     public TripPrintPreviewResponse build(Trip trip, List<Collection> collections) {
         List<Collection> rows = PaymentTypeBreakdown.appearingOnDocument(collections);
         PaymentTypeBreakdown breakdown = PaymentTypeBreakdown.fromCollections(rows);
+        Map<PaymentType, BigDecimal> excludedByType = CommissionExclusion.byType(
+                trip.getCommissionExcludedAmount(),
+                rows
+        );
 
         BigDecimal expenseTotal = totalExpenses(trip.getDailyExpenses());
         BigDecimal remainingCash = breakdown.cash()
@@ -58,9 +64,8 @@ public class TripPrintPreviewBuilder {
                 .tripFuelAmount(trip.getTripFuelAmount())
                 .totalFuelAmount(nvl(trip.getExitFuelAmount()).add(nvl(trip.getTripFuelAmount())))
                 .weeklyAllowance(trip.getWeeklyAllowance())
-                .commissionExcludedAmount(
-                        CommissionExclusion.total(trip.getCommissionExcludedAmount(), rows)
-                )
+                .commissionExcludedAmount(sumExcluded(excludedByType))
+                .commissionExcludedByType(toExcludedByType(excludedByType))
                 .commissionReceived(trip.getCommissionReceived())
                 .extraReceived(trip.getExtraReceived())
                 .agiReceived(trip.getAgiReceived())
@@ -150,6 +155,28 @@ public class TripPrintPreviewBuilder {
         }
 
         return total;
+    }
+
+    private BigDecimal sumExcluded(Map<PaymentType, BigDecimal> excludedByType) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (BigDecimal amount : excludedByType.values()) {
+            total = total.add(amount);
+        }
+
+        return total.compareTo(BigDecimal.ZERO) == 0 ? null : total;
+    }
+
+    private CommissionExcludedByTypeResponse toExcludedByType(Map<PaymentType, BigDecimal> excludedByType) {
+        return CommissionExcludedByTypeResponse.builder()
+                .cash(excludedByType.get(PaymentType.CASH))
+                .promissoryNote(excludedByType.get(PaymentType.PROMISSORY_NOTE))
+                .check(excludedByType.get(PaymentType.CHECK))
+                .mailOrder(excludedByType.get(PaymentType.MAIL_ORDER))
+                .posYkb(excludedByType.get(PaymentType.POS_YKB))
+                .posTeb(excludedByType.get(PaymentType.POS_TEB))
+                .bankTransfer(excludedByType.get(PaymentType.BANK_TRANSFER))
+                .build();
     }
 
     private BigDecimal nvl(BigDecimal value) {
