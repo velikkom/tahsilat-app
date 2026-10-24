@@ -5,21 +5,31 @@ import {
   toNumber,
 } from "@/utils/tripDokumuFormat";
 
-function excludedAmounts(preview) {
-  const byType = preview.commissionExcludedByType;
+function emptyExcluded() {
+  return {
+    cash: 0,
+    senet: 0,
+    cek: 0,
+    mailOrder: 0,
+    posYkb: 0,
+    posTeb: 0,
+    havale: 0,
+  };
+}
 
-  if (!byType) {
-    return {
-      cash: toNumber(preview.commissionExcludedAmount),
-      senet: 0,
-      cek: 0,
-      mailOrder: 0,
-      posYkb: 0,
-      posTeb: 0,
-      havale: 0,
-    };
-  }
+function sumParts(parts) {
+  return (
+    parts.cash +
+    parts.senet +
+    parts.cek +
+    parts.mailOrder +
+    parts.posYkb +
+    parts.posTeb +
+    parts.havale
+  );
+}
 
+function fromByType(byType) {
   return {
     cash: toNumber(byType.cash),
     senet: toNumber(byType.promissoryNote),
@@ -28,6 +38,60 @@ function excludedAmounts(preview) {
     posYkb: toNumber(byType.posYkb),
     posTeb: toNumber(byType.posTeb),
     havale: toNumber(byType.bankTransfer),
+  };
+}
+
+function sumFlaggedRows(rows = []) {
+  const totals = emptyExcluded();
+
+  for (const row of rows) {
+    if (!row?.excludeFromCommission) {
+      continue;
+    }
+
+    if (row.nakitTutari != null) {
+      totals.cash += toNumber(row.nakitTutari);
+    } else if (row.senetTutar != null) {
+      totals.senet += toNumber(row.senetTutar);
+    } else if (row.cekTutar != null) {
+      totals.cek += toNumber(row.cekTutar);
+    } else if (row.mailorder != null) {
+      totals.mailOrder += toNumber(row.mailorder);
+    } else if (row.havaleTutar != null) {
+      totals.havale += toNumber(row.havaleTutar);
+    } else if (row.posYkb != null) {
+      totals.posYkb += toNumber(row.posYkb);
+    } else if (row.posTeb != null) {
+      totals.posTeb += toNumber(row.posTeb);
+    }
+  }
+
+  return totals;
+}
+
+function excludedAmounts(preview) {
+  const fromRows = sumFlaggedRows(preview.collectionRows);
+  const rowTotal = sumParts(fromRows);
+  const statedTotal = toNumber(preview.commissionExcludedAmount);
+
+  if (rowTotal > 0) {
+    const manualOnCash = Math.max(0, statedTotal - rowTotal);
+
+    return {
+      ...fromRows,
+      cash: fromRows.cash + manualOnCash,
+    };
+  }
+
+  const byType = preview.commissionExcludedByType;
+
+  if (byType && sumParts(fromByType(byType)) > 0) {
+    return fromByType(byType);
+  }
+
+  return {
+    ...emptyExcluded(),
+    cash: statedTotal,
   };
 }
 

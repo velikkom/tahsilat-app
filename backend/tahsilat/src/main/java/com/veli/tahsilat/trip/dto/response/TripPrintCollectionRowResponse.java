@@ -51,4 +51,6 @@ public class TripPrintCollectionRowResponse {
     private BigDecimal posYkb;
 
     private BigDecimal posTeb;
+
+    private Boolean excludeFromCommission;
 }

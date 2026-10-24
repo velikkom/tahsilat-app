@@ -111,7 +111,8 @@ public class TripPrintPreviewBuilder {
                 .mikroNo(collection.getMikroNo())
                 .customerName(collection.getCustomer() == null ? null : collection.getCustomer().getCompanyName())
                 .collectionDate(collection.getCollectionDate())
-                .bankName(collection.getBankName());
+                .bankName(collection.getBankName())
+                .excludeFromCommission(Boolean.TRUE.equals(collection.getExcludeFromCommission()));
 
         PaymentType paymentType = collection.getPaymentType();
         BigDecimal amount = collection.getAmount();
