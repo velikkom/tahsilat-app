@@ -58,7 +58,9 @@ public class TripPrintPreviewBuilder {
                 .tripFuelAmount(trip.getTripFuelAmount())
                 .totalFuelAmount(nvl(trip.getExitFuelAmount()).add(nvl(trip.getTripFuelAmount())))
                 .weeklyAllowance(trip.getWeeklyAllowance())
-                .commissionExcludedAmount(trip.getCommissionExcludedAmount())
+                .commissionExcludedAmount(
+                        CommissionExclusion.total(trip.getCommissionExcludedAmount(), rows)
+                )
                 .commissionReceived(trip.getCommissionReceived())
                 .extraReceived(trip.getExtraReceived())
                 .agiReceived(trip.getAgiReceived())

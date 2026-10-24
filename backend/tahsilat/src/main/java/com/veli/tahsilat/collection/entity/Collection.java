@@ -67,4 +67,7 @@ public class Collection
 
     @Column(length = 100)
     private String mailOrderCompany;
+
+    @Column(name = "exclude_from_commission", nullable = false)
+    private Boolean excludeFromCommission = false;
 }

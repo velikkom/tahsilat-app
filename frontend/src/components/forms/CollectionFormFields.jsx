@@ -36,6 +36,20 @@ export default function CollectionFormFields({
         onChange={onChange}
         onPaymentTypeChange={onPaymentTypeChange}
       />
+      <Col xs={12}>
+        <Form.Check
+          type="switch"
+          id="exclude-from-commission"
+          name="excludeFromCommission"
+          label="Primden düşülecek"
+          checked={Boolean(form.excludeFromCommission)}
+          onChange={onChange}
+          disabled={isFormDisabled}
+        />
+        <Form.Text className="text-muted">
+          Açıkken bu tutar tur dökümünde prim matrahından düşülür.
+        </Form.Text>
+      </Col>
       <CollectionDateFields
         form={form}
         validated={validated}

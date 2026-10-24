@@ -10,6 +10,7 @@ export const createInitialForm = (defaultCustomerId = "") => ({
   mikroNo: "",
   bankName: "",
   mailOrderCompany: "",
+  excludeFromCommission: false,
 });
 
 export const mapCollectionToForm = (collection) => ({
@@ -24,6 +25,7 @@ export const mapCollectionToForm = (collection) => ({
   mikroNo: collection?.mikroNo || "",
   bankName: collection?.bankName || "",
   mailOrderCompany: collection?.mailOrderCompany || "",
+  excludeFromCommission: Boolean(collection?.excludeFromCommission),
 });
 
 export function applyPaymentTypeChange(prev, value) {
@@ -56,5 +58,6 @@ export function buildCollectionSubmitPayload(
     bankName: form.bankName || null,
     mailOrderCompany:
       form.paymentType === "MAIL_ORDER" ? mailOrderCompany || null : null,
+    excludeFromCommission: Boolean(form.excludeFromCommission),
   };
 }

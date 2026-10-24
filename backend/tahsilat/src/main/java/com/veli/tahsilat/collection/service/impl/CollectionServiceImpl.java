@@ -95,6 +95,7 @@ public class CollectionServiceImpl
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
         collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
+        collection.setExcludeFromCommission(Boolean.TRUE.equals(request.getExcludeFromCommission()));
 
         collection.setStatus(resolveInitialStatus(request.getPaymentType()));
         collection.setCollectedBy(getCurrentUser());
@@ -158,6 +159,7 @@ public class CollectionServiceImpl
         collection.setMikroNo(request.getMikroNo());
         collection.setBankName(request.getBankName());
         collection.setMailOrderCompany(normalizeMailOrderCompany(request.getMailOrderCompany()));
+        collection.setExcludeFromCommission(Boolean.TRUE.equals(request.getExcludeFromCommission()));
         collection.setStatus(nextStatus);
 
         Collection savedCollection =

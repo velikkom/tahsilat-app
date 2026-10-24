@@ -46,4 +46,6 @@ public class CreateCollectionRequest {
 
     @Size(max = 100)
     private String mailOrderCompany;
+
+    private Boolean excludeFromCommission;
 }

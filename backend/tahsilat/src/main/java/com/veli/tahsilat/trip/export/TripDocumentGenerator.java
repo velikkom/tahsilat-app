@@ -73,10 +73,21 @@ public class TripDocumentGenerator {
                 retargetOnArkaFormulas(onSheets.get(0), arkaSheets);
             }
 
+            BigDecimal commissionExcluded = CommissionExclusion.total(
+                    trip.getCommissionExcludedAmount(),
+                    documentRows
+            );
+
             for (int page = 0; page < onSheets.size(); page++) {
                 int from = page * On.DAY_COL_CAPACITY;
                 int to = Math.min(days.size(), from + On.DAY_COL_CAPACITY);
-                fillOn(onSheets.get(page), trip, days.subList(from, to), page == 0);
+                fillOn(
+                        onSheets.get(page),
+                        trip,
+                        days.subList(from, to),
+                        page == 0,
+                        commissionExcluded
+                );
             }
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -247,7 +258,13 @@ public class TripDocumentGenerator {
 
     // ----- ÖN: expenses and reconciliation -----
 
-    private void fillOn(Sheet sheet, Trip trip, List<LocalDate> days, boolean primarySheet) {
+    private void fillOn(
+            Sheet sheet,
+            Trip trip,
+            List<LocalDate> days,
+            boolean primarySheet,
+            BigDecimal commissionExcluded
+    ) {
         if (primarySheet) {
             writeVehicleRow(sheet, trip);
         }
@@ -309,7 +326,7 @@ public class TripDocumentGenerator {
                 sheet,
                 On.ROW_COMMISSION_EXCLUDED,
                 On.COL_COMMISSION_EXCLUDED,
-                trip.getCommissionExcludedAmount()
+                commissionExcluded
         );
 
         // Prim matrahı is KDV-exclusive: (genel toplam - primden düşülecek) / 1.2

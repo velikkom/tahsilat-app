@@ -45,6 +45,8 @@ public class CollectionResponse {
 
     private String mailOrderCompany;
 
+    private Boolean excludeFromCommission;
+
     private Boolean active;
 
     private LocalDateTime createdAt;

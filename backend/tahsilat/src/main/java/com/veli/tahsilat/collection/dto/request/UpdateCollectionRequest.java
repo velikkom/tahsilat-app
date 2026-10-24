@@ -44,4 +44,6 @@ public class UpdateCollectionRequest {
 
     @Size(max = 100)
     private String mailOrderCompany;
+
+    private Boolean excludeFromCommission;
 }

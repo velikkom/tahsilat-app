@@ -46,6 +46,26 @@ class TripDocumentGeneratorTest {
     }
 
     @Test
+    void flaggedCollectionIsAddedToCommissionExcludedAmount() throws IOException {
+        Trip trip = baseTrip();
+        trip.setCommissionExcludedAmount(new BigDecimal("2700"));
+
+        Collection flagged = cashCollection("Musteri", 500);
+        flagged.setExcludeFromCommission(true);
+        Collection plain = cashCollection("Diger", 800);
+
+        byte[] bytes = generator.generate(trip, List.of(flagged, plain));
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(bytes))) {
+            Sheet on = workbook.getSheet(TripDocumentTemplate.SHEET_ON);
+            Cell cell = on.getRow(TripDocumentTemplate.On.ROW_COMMISSION_EXCLUDED)
+                    .getCell(TripDocumentTemplate.On.COL_COMMISSION_EXCLUDED);
+
+            assertEquals(3200.0, cell.getNumericCellValue(), 0.001);
+        }
+    }
+
+    @Test
     void blankCommissionExcludedAmountLeavesC17Empty() throws IOException {
         Trip trip = baseTrip();
 

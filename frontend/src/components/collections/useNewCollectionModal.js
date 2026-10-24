@@ -28,8 +28,11 @@ export default function useNewCollectionModal({
     requiresMaturityDate: state.requiresMaturityDate,
     isFormDisabled: submitting || loadingCustomers,
     handleChange: (e) => {
-      const { name, value } = e.target;
-      state.setForm((prev) => ({ ...prev, [name]: value }));
+      const { name, type, checked, value } = e.target;
+      state.setForm((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
     },
     handlePaymentTypeChange: (e) => {
       state.setForm((prev) => applyPaymentTypeChange(prev, e.target.value));
