@@ -21,7 +21,6 @@ export default function useTripDelete(refresh) {
         confirmButtonText: "Evet, sil",
         cancelButtonText: "İptal",
         reverseButtons: true,
-        focusCancel: true,
       });
 
       if (!confirmation.isConfirmed) {

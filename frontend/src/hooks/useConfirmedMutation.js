@@ -9,7 +9,6 @@ const CONFIRM_DEFAULTS = {
   confirmButtonText: "Evet",
   cancelButtonText: "İptal",
   reverseButtons: true,
-  focusCancel: true,
 };
 
 const SUCCESS_DEFAULTS = {

@@ -22,7 +22,6 @@ export async function confirmMailOrderCompany(
     confirmButtonText: "Evet, kaydet",
     cancelButtonText: "Vazgeç",
     reverseButtons: true,
-    focusCancel: true,
   });
 
   return confirmation.isConfirmed;

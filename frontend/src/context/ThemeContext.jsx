@@ -1,11 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { installSwalEnterToClose } from "@/lib/installSwalEnterToClose";
 import {
   applyTheme,
   getResolvedTheme,
   persistTheme,
 } from "@/utils/theme";
+
+installSwalEnterToClose();
 
 const ThemeContext = createContext(null);
 

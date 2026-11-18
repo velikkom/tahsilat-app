@@ -14,7 +14,6 @@ export async function runCustomerDetailDelete({
     confirmButtonText: "Evet, sil",
     cancelButtonText: "İptal",
     reverseButtons: true,
-    focusCancel: true,
   });
 
   if (!confirmation.isConfirmed) {
